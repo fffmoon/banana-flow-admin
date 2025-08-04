@@ -1,0 +1,49 @@
+// 旋转
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// 铃铛摇摆动画
+@keyframes bell-double-shake {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(18deg);
+  }
+
+  40% {
+    transform: rotate(-14deg);
+
+  }
+
+  60% {
+    transform: rotate(12deg);
+  }
+
+  80% {
+    transform: rotate(-8deg);
+
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.shake-icon-2x {
+  animation: bell-double-shake 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  transform-origin: top center;
+  display: inline-block;
+}
+
+.rotate-icon {
+  animation: rotate 0.34s linear 1 forwards;
+}

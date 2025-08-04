@@ -1,0 +1,17 @@
+services:
+  vue:
+    container_name: front-01
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    ports:
+      - '18002:80'
+    volumes:
+      - /opt/front-01/dist:/usr/share/nginx/html
+      - /opt/front-01/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - common2-network
+
+networks:
+  common2-network:
+    driver: bridge

@@ -1,0 +1,57 @@
+/* reset.scss */
+
+/* Reset box sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Remove default margin and padding */
+html,
+body,
+div,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+li,
+figure,
+figcaption {
+  margin: 0;
+  padding: 0;
+}
+
+/* Remove list styles */
+ul,
+ol {
+  list-style: none;
+}
+
+/* Set a consistent style for buttons */
+button {
+  cursor: pointer;
+}
+
+/* Set a consistent width for images */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.clearfix::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
+#app,
+body,
+html,
+main {
+  height: 100%;
+}

@@ -1,0 +1,200 @@
+// #region ➤ 隐藏滚动条
+// ================================================
+
+.scroll-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// #endregion 
+
+
+// #region ➤ 切换主题的动画效果
+// ================================================
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root),
+.dark::view-transition-new(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root),
+.dark::view-transition-old(root) {
+  z-index: 9999;
+}
+
+// #endregion 
+
+
+// #region ➤ 路由动画
+// ================================================
+
+/* ================== 滑动动画 ================== */
+.fade-slide-leave-active,
+.fade-slide-enter-active {
+  transition: all 0.3s;
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateX(-2%);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateX(2%);
+}
+
+/* ================== 淡入淡出动画 ================== */
+.fade-leave-active,
+.fade-enter-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* ================== 抽屉效果动画 ================== */
+.slide-left-leave-active,
+.slide-left-enter-active,
+.slide-right-leave-active,
+.slide-right-enter-active {
+  transition: all 0.4s cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+/* 左侧进入 */
+.slide-left-enter-from {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+
+/* 左侧离开 */
+.slide-left-leave-to {
+  opacity: 0;
+  transform: translateX(50%);
+}
+
+/* 右侧进入 */
+.slide-right-enter-from {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+/* 右侧离开 */
+.slide-right-leave-to {
+  opacity: 0;
+  transform: translateX(-50%);
+}
+
+/* ================== 缩放动画 ================== */
+.zoom-leave-active,
+.zoom-enter-active {
+  transition: all 0.3s ease;
+}
+
+.zoom-enter-from {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.zoom-leave-to {
+  opacity: 0;
+  transform: scale(1.1);
+}
+
+/* ================== 翻转动画 ================== */
+.flip-leave-active,
+.flip-enter-active {
+  transition: all 0.4s;
+  backface-visibility: hidden;
+}
+
+.flip-enter-from {
+  transform: rotateY(180deg);
+  opacity: 0;
+}
+
+.flip-leave-to {
+  transform: rotateY(-180deg);
+  opacity: 0;
+}
+
+// #endregion 路由动画
+
+
+// #region ➤ 图标
+// ================================================
+
+// 基础图标样式
+.icon-base {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+
+  // 不同尺寸预设
+  &--sm {
+    font-size: 16px;
+  }
+
+  &--md {
+    font-size: 20px;
+  }
+
+  &--lg {
+    font-size: 24px;
+  }
+
+  // 状态样式
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// 键盘图标
+.keyboard-box {
+  --at-apply: "border-1 bg-[var(--custom-button-color-2)] border-color-[var(--custom-border-color)] rounded-[var(--custom-border-radius)] border-solid p-2px";
+
+  &:nth-child(n + 2) {
+    margin-left: 4px;
+  }
+}
+
+
+// #endregion 图标
+
+
+// #region ➤ 配置列表排列方式
+// ================================================
+.settings {
+  --at-apply: 'w-full';
+
+  .settings-label {
+    --at-apply: 'min-w-[124px] min-h-36px';
+  }
+
+  .settings-content {
+    --at-apply: 'flex-1 flex justify-end h-36px items-center';
+
+  }
+}
+
+.settings-input-box {
+  --at-apply: 'w-full h-36px min-w-[124px] max-w-[200px]';
+}
+
+// #endregion 

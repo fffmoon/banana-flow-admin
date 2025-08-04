@@ -1,0 +1,135 @@
+<style>
+  :root {
+    --primary-hue: 210;
+    --primary-color: hsl(var(--primary-hue), 100%, 55%);
+    --secondary-color: hsl(calc(var(--primary-hue) + 40), 100%, 55%);
+  }
+
+  .loading-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: hsl(0, 0%, 98%);
+    backdrop-filter: blur(4px);
+  }
+
+  .loading-content {
+    text-align: center;
+    transform: translateY(-20%);
+  }
+
+
+  .loader {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto;
+    position: relative;
+    border-radius: 50%;
+    background: conic-gradient(transparent,
+        var(--primary-color),
+        var(--secondary-color));
+    animation:
+      spin 1.2s linear infinite;
+    box-shadow: 0 0 20px hsla(var(--primary-hue), 100%, 55%, 0.1);
+  }
+
+  .loader::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    background: hsl(0, 0%, 98%);
+    border-radius: 50%;
+    z-index: 1;
+  }
+
+  .content-font {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-weight: 500;
+    font-size: 1.1rem;
+    color: hsl(0, 0%, 30%);
+    letter-spacing: 0.02em;
+    opacity: 0.9;
+    line-height: 1.5;
+  }
+
+  .loading-app-name {
+    margin-top: 18px;
+  }
+
+  .loading-text {
+    position: relative;
+    display: inline-block;
+  }
+
+  .loading-text::after {
+    content: '...';
+    position: absolute;
+    animation: dots 1.5s steps(3, end) infinite;
+  }
+
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes dots {
+
+    0%,
+    20% {
+      content: '.';
+    }
+
+    40% {
+      content: '..';
+    }
+
+    60%,
+    100% {
+      content: '...';
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .loading-container {
+      background: hsl(220, 15%, 16%);
+    }
+
+    .content-font {
+      color: hsl(0, 0%, 85%);
+    }
+
+    .loader::before {
+      background: hsl(220, 15%, 16%);
+    }
+
+  }
+</style>
+
+<div class="loading-container">
+  <div class="loading-content">
+    <div class="loader"></div>
+    <div class="loading-app-name content-font">%VITE_APP_TITLE%</div>
+    <div class="loading-text content-font">载入中</div>
+  </div>
+</div>

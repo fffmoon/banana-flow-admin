@@ -1,0 +1,49 @@
+// 来源：全局搜[BREAKPOINTS]
+$breakpoints: (
+  xs: 575.98px,
+  sm: 767.98px,
+  md: 991.98px,
+  lg: 1199.98px,
+  xl: 1399.98px
+);
+$breakpoint-xs: map-get($breakpoints, 'xs');
+$breakpoint-sm: map-get($breakpoints, 'sm');
+$breakpoint-md: map-get($breakpoints, 'md');
+$breakpoint-lg: map-get($breakpoints, 'lg');
+$breakpoint-xl: map-get($breakpoints, 'xl');
+
+// 间距
+$spacing: (
+  xs: 4px,
+  sm: 8px,
+  md: 12px,
+  lg: 16px,
+  xl: 24px,
+  xxl: 32px
+);
+$spacing-xs: map-get($spacing, 'xs');
+$spacing-sm: map-get($spacing, 'sm');
+$spacing-md: map-get($spacing, 'md');
+$spacing-lg: map-get($spacing, 'lg');
+$spacing-xl: map-get($spacing, 'xl');
+$spacing-xxl: map-get($spacing, 'xxl');
+
+:root {
+
+  // 基础断点 --breakpoint-sm
+  @each $key, $value in $breakpoints {
+    --breakpoint-#{$key}: #{$value};
+  }
+
+  // 自定义间距 --space-sm
+  @each $key, $value in $spacing {
+    --space-#{$key}: #{$value};
+  }
+
+  // 头部高度
+  --header-height: 64px;
+  // 后台管理的内容padding
+  --admin-content-padding: 12px;
+  // 标签栏高度
+  --tabs-view-height: 50px;
+}

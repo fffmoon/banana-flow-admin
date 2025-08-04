@@ -1,0 +1,20 @@
+<template>
+  <div class="base-container">
+    <slot></slot>
+  </div>
+</template>
+
+<style lang='scss' scoped>
+.base-container {
+  font-family: system-ui;
+  width: 100vw;
+  height: 100vh;
+  background-image: linear-gradient(to bottom right, hsl(173deg 80.0% 36.0%) 0%, hsl(151deg 55.0% 41.5%) 100%);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 120px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+</style>

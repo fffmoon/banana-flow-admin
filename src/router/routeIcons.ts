@@ -1,0 +1,46 @@
+/*
+ * @Author: Qing
+ * @Description:
+ * @Date: 2025-03-31 18:49:58
+ * @LastEditTime: 2025-04-10 10:34:19
+ */
+export const routeIcons = [
+  'i-mdi-view-dashboard',
+  'i-mdi-palette-outline',
+  'i-mdi-palette',
+  'i-mdi-account',
+  'i-mdi-login-variant',
+  'i-mdi-panorama',
+  'i-mdi-note-edit',
+  'i-mdi-eye-outline',
+  'i-mdi-cube',
+  'i-mdi-image-multiple',
+  'i-mdi-alert-circle',
+  'i-mdi-alert-circle-outline',
+  'i-mdi-lock-outline',
+  'i-mdi-bug-outline',
+  'i-mdi-mouse-right-click',
+  'i-mdi-message-alert',
+  'i-mdi-alpha-i-circle',
+  'i-mdi-two-factor-authentication',
+  'i-mdi-shopping',
+  'i-mdi-invert-colors',
+  'i-mdi-desktop-mac-dashboard',
+  'i-mdi-puzzle',
+  'i-mdi-window-maximize',
+  'i-mdi-sitemap',
+  'i-mdi-watermark',
+  'i-mdi-content-copy',
+  'i-mdi-script-text',
+  'i-mdi-tab-minus',
+  'i-mdi-tab-plus',
+  'i-mdi-image-search',
+  'i-mdi-exit-to-app',
+  'i-mdi-link-variant',
+  'i-mdi-tag-edit',
+  'i-mdi-paper-roll',
+  'i-mdi-form-dropdown',
+  'i-mdi-forum',
+  'i-mdi-widgets',
+  'i-mdi-data-matrix',
+]

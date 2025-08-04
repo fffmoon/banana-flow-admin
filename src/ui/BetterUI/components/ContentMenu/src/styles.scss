@@ -1,0 +1,84 @@
+:deep(.ContextMenuContent),
+:deep(.ContextMenuSubContent) {
+  z-index: 10;
+  min-width: 220px;
+  background-color: var(--custom-popover-color);
+  border-radius: 6px;
+  overflow: hidden;
+  padding: 5px;
+  box-shadow: var(--custom-box-shadow-1);
+}
+
+.ContextMenuItem,
+.ContextMenuCheckboxItem,
+.ContextMenuRadioItem,
+.ContextMenuSubTrigger {
+  font-size: 13px;
+  line-height: 1;
+  color: var(--custom-text-color-base);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 5px;
+  position: relative;
+  // padding-left: 25px;
+  user-select: none;
+  outline: none;
+}
+
+.ContextMenuSubTrigger[data-state='open'] {
+  background-color: var(--custom-primary-color-suppl);
+  color: var(--custom-text-color-1);
+}
+
+.ContextMenuItem[data-disabled],
+.ContextMenuCheckboxItem[data-disabled],
+.ContextMenuRadioItem[data-disabled],
+.ContextMenuSubTrigger[data-disabled] {
+  color: var(--custom-text-color-disabled);
+  pointer-events: 'none';
+}
+
+.ContextMenuItem[data-highlighted],
+.ContextMenuCheckboxItem[data-highlighted],
+.ContextMenuRadioItem[data-highlighted],
+.ContextMenuSubTrigger[data-highlighted] {
+  background-color: var(--custom-primary-color-suppl);
+  color: var(--custom-text-color-1);
+}
+
+.ContextMenuLabel {
+  font-size: 12px;
+  line-height: 25px;
+  color: var(--custom-text-color-2);
+}
+
+.ContextMenuSeparator {
+  height: 1px;
+  background-color: var(--custom-divider-color);
+  margin: 5px;
+}
+
+.ContextMenuItemIndicator {
+  position: absolute;
+  left: 0;
+  width: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.RightSlot {
+  margin-left: auto;
+  padding-left: 20px;
+  color: var(--custom-text-color-2);
+}
+
+[data-highlighted]>.RightSlot {
+  color: var(--custom-text-color-1);
+}
+
+[data-disabled] .RightSlot {
+  color: var(--custom-text-color-2);
+}
