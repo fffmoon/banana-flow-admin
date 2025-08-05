@@ -68,7 +68,7 @@ export const useTabsViewStore = defineStore('tabsView', {
         return
       }
       // 删除目标标签页
-      if (this.unPinTabsViewList.find(tab => tab.id !== id)) {
+      if (!this.unPinTabsViewList.find(tab => tab.id === id)) {
         console.error(`关闭标签失败，不存在${id}标签页`)
         return
       }
