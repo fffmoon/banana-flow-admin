@@ -2,7 +2,7 @@
  * @Author: Qing
  * @Description:
  * @Date: 2024-09-03 09:42:22
- * @LastEditTime: 2025-07-31 17:00:39
+ * @LastEditTime: 2025-10-25 22:05:17
  */
 import type { IRouteDataRaw, IRouteItem } from 'types/vue-router'
 import type { App } from 'vue'
@@ -13,7 +13,7 @@ import {
 
 import { fixedRoutes } from './modules/fixedRoutes'
 import { createRouterGuards } from './routerGuards'
-import { generateFullPath, generateMeta, loadView, normalizePath, pathToName, toRouteRecordRaw } from './utils'
+import { generateFullPath, generateMeta, loadView, normalizePath, toRouteRecordRaw } from './utils'
 
 export const routes: Array<IRouteItem> = []
 
@@ -48,7 +48,7 @@ export function setupRouter(app: App) {
 export function generateRoutes(routes: IRouteDataRaw[], parentPath = ''): IRouteItem[] {
   return routes.map((route) => {
     const fullPath = generateFullPath(route.path, parentPath)
-    const name = pathToName(route.path) || route.id
+    const name = route.id
     const item: IRouteItem = {
       name,
       path: fullPath,
