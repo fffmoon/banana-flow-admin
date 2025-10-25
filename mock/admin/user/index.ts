@@ -2,7 +2,7 @@
  * @Author: Qing
  * @Description: 
  * @Date: 2025-01-22 17:31:39
- * @LastEditTime: 2025-08-04 14:32:53
+ * @LastEditTime: 2025-10-25 22:04:31
  */
 
 import type { MockMethod } from 'vite-plugin-mock'
@@ -28,7 +28,7 @@ const accountList = [
   },
 ]
 
-const routerVersion = '1.0.3'
+const routerVersion = '1.0.4'
 
 const allRouterList: IRouteDataRaw[] = [
   {
