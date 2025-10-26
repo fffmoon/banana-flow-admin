@@ -54,7 +54,7 @@ export default {
       {
         ignoreFunctions: [
           'bp', // 自定义断点函数
-          'map-get', // Sass 内置函数
+          'map.get', // Sass 内置函数
           'map-has-key', // Sass 内置函数
           'theme', // 主题函数 (如 UnoCSS)
           'screen', // Tailwind 相关

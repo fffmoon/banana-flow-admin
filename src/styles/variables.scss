@@ -1,3 +1,5 @@
+@use "sass:map";
+
 // 来源：全局搜[BREAKPOINTS]
 $breakpoints: (
   xs: 575.98px,
@@ -6,11 +8,11 @@ $breakpoints: (
   lg: 1199.98px,
   xl: 1399.98px
 );
-$breakpoint-xs: map-get($breakpoints, 'xs');
-$breakpoint-sm: map-get($breakpoints, 'sm');
-$breakpoint-md: map-get($breakpoints, 'md');
-$breakpoint-lg: map-get($breakpoints, 'lg');
-$breakpoint-xl: map-get($breakpoints, 'xl');
+$breakpoint-xs: map.get($breakpoints, 'xs');
+$breakpoint-sm: map.get($breakpoints, 'sm');
+$breakpoint-md: map.get($breakpoints, 'md');
+$breakpoint-lg: map.get($breakpoints, 'lg');
+$breakpoint-xl: map.get($breakpoints, 'xl');
 
 // 间距
 $spacing: (
@@ -21,12 +23,12 @@ $spacing: (
   xl: 24px,
   xxl: 32px
 );
-$spacing-xs: map-get($spacing, 'xs');
-$spacing-sm: map-get($spacing, 'sm');
-$spacing-md: map-get($spacing, 'md');
-$spacing-lg: map-get($spacing, 'lg');
-$spacing-xl: map-get($spacing, 'xl');
-$spacing-xxl: map-get($spacing, 'xxl');
+$spacing-xs: map.get($spacing, 'xs');
+$spacing-sm: map.get($spacing, 'sm');
+$spacing-md: map.get($spacing, 'md');
+$spacing-lg: map.get($spacing, 'lg');
+$spacing-xl: map.get($spacing, 'xl');
+$spacing-xxl: map.get($spacing, 'xxl');
 
 :root {
 
