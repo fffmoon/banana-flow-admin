@@ -5,10 +5,10 @@
  * @LastEditTime: 2025-07-31 13:23:12
  */
 import type { IRouteDataRaw, IRouteItem } from 'types/vue-router'
+import { API } from '@apis/index'
 import { setupDynamicRoutes } from '@/router'
 import { findRouterById } from '@/router/utils'
 import { Storage } from '@/utils/storage/Storage'
-import { API } from '@apis/index'
 
 interface AsyncRouteState {
   // 是否载入过路由

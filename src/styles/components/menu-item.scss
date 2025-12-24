@@ -1,0 +1,53 @@
+
+.app-menu-item {
+  // --- 基础外观 ---
+  cursor: pointer;
+  user-select: none;
+  border-radius: var(--custom-border-radius);
+  color: var(--custom-text-color-2);
+
+  // --- 动画 (统一基准) ---
+  transition: all 0.299s ease-in-out;
+  transform: translateZ(0); // 开启 GPU 加速
+
+  // --- 子元素：图标 ---
+  &__icon {
+    font-size: 1.25rem;
+    transition: transform 0.248s ease-in-out;
+    flex-shrink: 0; // 防止图标被压缩
+  }
+
+  // --- 子元素：文本 ---
+  &__text {
+    font-size: var(--custom-font-size-medium);
+    white-space: nowrap;
+  }
+
+  // --- 交互状态：悬停 (Hover) ---
+  &:hover {
+    background-color: var(--custom-hover-color);
+    box-shadow: var(--un-shadow-sm);
+    color: var(--custom-text-color-1);
+
+    // 悬停时图标放大
+    .app-menu-item__icon {
+      transform: scale(1.15);
+    }
+  }
+
+  // --- 交互状态：点击 (Active) ---
+  &:active {
+    transform: scale(0.98);
+  }
+
+  // --- 交互状态：选中 (Selected) ---
+  &.is-active {
+    background-color: var(--custom-primary-color-suppl);
+    color: var(--custom-primary-color);
+    box-shadow: var(--un-shadow-sm);
+
+    &:hover {
+      background-color: var(--custom-primary-color-suppl);
+    }
+  }
+}

@@ -5,18 +5,19 @@
  * @LastEditTime: 2025-07-18 17:08:58
 -->
 <script lang='ts' setup>
-import type { ITabsViewItem } from '@/store/modules/tabsView'
 import type { CustomDropdownOption } from '@ui/BetterUI'
+import type { ITabsViewItem } from '@/store/modules/tabsView'
+import { useRoute, useRouter } from 'vue-router'
+import HorizontalScroller from '@/components/HorizontalScroller/index.vue'
 import { usePageJump } from '@/hooks/usePageJump'
 import CONFIG from '@/settings'
-import { debounce } from 'lodash-es'
-import { useRoute, useRouter } from 'vue-router'
 
 const tabsViewStore = useTabsViewStore()
 const router = useRouter()
 const route = useRoute()
 const { goToShouldConfirm, refresh } = usePageJump(router)
 const tabsBlockRef = ref<HTMLElement | null>(null)
+const scrollerRef = ref<InstanceType<typeof HorizontalScroller> | null>(null)
 
 // #region ➤ 页面操作
 // ================================================
@@ -60,17 +61,6 @@ watch(() => tabsViewStore.unPinTabsViewList, () => {
     goToShouldConfirm(targetTab.fullPath)
   }
 })
-
-// 获取dom
-function getGroupDom() {
-  const container = tabsBlockRef.value
-  if (!container)
-    return false
-  const group = container.querySelector(`.group`)
-  if (!group)
-    return false
-  return group as HTMLElement
-}
 
 // 处理点击
 function handleClickTab(tab: ITabsViewItem) {
@@ -194,102 +184,30 @@ function handleSelectTab(tab: ITabsViewItem): CustomDropdownOption[] {
 // @ver:
 // ================================================
 
-// 线性动画的鼠标滚动
-function handleWheelScroll(event) {
-  event.preventDefault()
-  const group = getGroupDom()
-  if (!group)
-    return
-
-  const baseStep = 30 // 基础滚动步长
-  const acceleration = 1.5 // 加速度因子
-  const delta = event.deltaY * acceleration
-  const step = Math.abs(delta) > baseStep ? delta : baseStep * Math.sign(delta)
-
-  // 实现线性滚动
-  let isScrolling = false
-  const start = group.scrollLeft
-  const target = start + step
-  const duration = 300 // 动画时长ms
-
-  if (isScrolling)
-    return
-  isScrolling = true
-
-  const startTime = Date.now()
-  const animate = () => {
-    const now = Date.now()
-    const progress = Math.min((now - startTime) / duration, 1)
-    const ease = progress // 线性缓动
-    group.scrollLeft = start + (target - start) * ease
-
-    if (progress < 1) {
-      requestAnimationFrame(animate)
-    }
-    else {
-      isScrolling = false
-    }
-  }
-
-  requestAnimationFrame(animate)
-}
-
-const containerState = reactive({
-  canScroll: false,
-  atStart: true,
-  atEnd: false,
-})
-
-const checkScrollState = debounce(() => {
-  const group = getGroupDom()
-  if (!group)
-    return
-  containerState.canScroll = group.scrollWidth > group.clientWidth
-  containerState.atStart = group.scrollLeft <= 0
-  containerState.atEnd = group.scrollLeft + group.clientWidth >= group.scrollWidth
-  // console.info('checkScrollState', containerState.canScroll, containerState.atStart, containerState.atEnd)
-}, 100, { leading: true, trailing: true })
-
-function handleScroll() {
-  checkScrollState()
-}
-
-onMounted(() => {
-  checkScrollState()
-  window.addEventListener('resize', checkScrollState)
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', checkScrollState)
-})
-
 // 处理路由改变之后，滚动到标签所在的位置
 function scrollToPosition(id) {
-  // 添加滚动逻辑
-  requestAnimationFrame(() => {
-    nextTick(() => {
-      const group = getGroupDom()
-      if (!group)
-        return
+  nextTick(() => {
+    const scrollEl = scrollerRef.value?.$el
+    if (!scrollEl)
+      return
 
-      // 查找对应标签元素
-      const targetElement = group.querySelector(`[data-id="${id}"]`) as HTMLElement | null
-      if (!targetElement)
-        return
+    // 在容器内查找目标 Tab 元素
+    const targetElement = scrollEl.querySelector(`[data-id="${id}"]`) as HTMLElement | null
+    if (!targetElement)
+      return
 
-      // 计算滚动位置
-      const containerWidth = group.offsetWidth
-      const targetLeft = targetElement.offsetLeft
-      const targetWidth = targetElement.offsetWidth
+    // 计算居中位置
+    const containerWidth = scrollEl.clientWidth
+    const targetLeft = targetElement.offsetLeft
+    const targetWidth = targetElement.offsetWidth
 
-      // 使标签居中显示的计算
-      const scrollToPosition = targetLeft + targetWidth / 2 - containerWidth / 2
+    // 目标位置 = 元素左边距 + 元素一半宽度 - 容器一半宽度
+    const scrollToLeft = targetLeft + targetWidth / 2 - containerWidth / 2
 
-      // 执行滚动
-      group.scrollTo({
-        left: scrollToPosition,
-        behavior: 'smooth',
-      })
+    // 调用公共组件暴露的 scrollTo 方法
+    scrollerRef.value?.scrollTo({
+      left: scrollToLeft,
+      behavior: 'smooth',
     })
   })
 }
@@ -347,73 +265,44 @@ function handleDragEnter(e: DragEvent, tab: ITabsViewItem) {
     ref="tabsBlockRef"
     class="tabs-container relative h-[var(--tabs-view-height)] w-full select-none bg-[var(--custom-admin-content-color)] px-[var(--admin-content-padding)]"
   >
-    <TransitionGroup
-      name="tabs-move" tag="div"
-      class="group scroll-none wh-full flex flex-nowrap items-center gap-x-8px overflow-x-auto overflow-y-hidden"
-      @wheel="handleWheelScroll" @scroll="handleScroll"
-    >
-      <BContentMenu
-        v-for="tab in tabsViewStore.getTabsViewList" :key="tab.id" :options="handleSelectTab(tab)"
-        trigger="manual" placement="bottom-start" :data-id="tab.id"
-      >
-        <div
-          draggable="true" class="tab-item" :class="{
-            '!btn-select': tab.id === currentTabsViewId,
-            'dragging': dragState.draggingId === tab.id,
-          }" @click.stop="handleClickTab(tab)" @dragstart="handleDragStart($event, tab)" @dragend="handleDragEnd"
-          @dragenter="handleDragEnter($event, tab)"
+    <HorizontalScroller ref="scrollerRef" class="custom-scroller-mask">
+      <TransitionGroup name="tabs-move" tag="div" class="h-full flex flex-nowrap items-center gap-x-8px pr-4">
+        <BContentMenu
+          v-for="tab in tabsViewStore.getTabsViewList" :key="tab.id" :options="handleSelectTab(tab)"
+          trigger="manual" placement="bottom-start" :data-id="tab.id"
         >
-          <div v-if="CONFIG.tabbar.enableIcon" class="ml-4px box-content cursor-pointer font-size-16px" :class="tab.icon" />
-          <div class="ml-6px text-nowrap">
-            {{ tab.title }}
-          </div>
           <div
-            class="operation-box ml-4px h-20px w-20px flex-center rounded-[var(--custom-border-radius-small)] hover:bg-[var(--custom-hover-color)]"
+            draggable="true" class="tab-item" :class="{
+              '!btn-select': tab.id === currentTabsViewId,
+              'dragging': dragState.draggingId === tab.id,
+            }" @click.stop="handleClickTab(tab)" @dragstart="handleDragStart($event, tab)" @dragend="handleDragEnd"
+            @dragenter="handleDragEnter($event, tab)"
           >
-            <div v-if="tab.isPin" class="icon-box i-mdi-pin" @click.stop="tabsViewStore.unpinTabsView(tab.id)" />
-            <div v-else class="icon-box i-mdi-close" @click.stop="tabsViewStore.handleCloseTabsView(tab.id)" />
+            <div
+              v-if="CONFIG.tabbar.enableIcon" class="ml-4px box-content cursor-pointer font-size-16px"
+              :class="tab.icon"
+            />
+            <div class="ml-6px text-nowrap">
+              {{ tab.title }}
+            </div>
+            <div
+              class="operation-box ml-4px h-20px w-20px flex-center rounded-[var(--custom-border-radius-small)] hover:bg-[var(--custom-hover-color)]"
+            >
+              <div v-if="tab.isPin" class="icon-box i-mdi-pin" @click.stop="tabsViewStore.unpinTabsView(tab.id)" />
+              <div v-else class="icon-box i-mdi-close" @click.stop="tabsViewStore.handleCloseTabsView(tab.id)" />
+            </div>
           </div>
-        </div>
-      </BContentMenu>
-    </TransitionGroup>
-
-    <!-- 渐变遮罩 -->
-    <div
-      class="mask-left scroll-mask left-0"
-      :class="{ hide: containerState.atStart, show: containerState.canScroll }"
-    />
-    <div
-      class="scroll-mask mask-right right-0"
-      :class="{ hide: containerState.atEnd, show: containerState.canScroll }"
-    />
+        </BContentMenu>
+      </TransitionGroup>
+    </HorizontalScroller>
   </div>
 </template>
 
 <style lang='scss' scoped>
 .tabs-container {
-  /* 渐变遮罩 */
-  .scroll-mask {
-    --at-apply: pointer-events-none absolute top-0 h-full w-100px;
 
-    transition: opacity 0.3s;
-    opacity: 0;
-
-  }
-
-  .mask-left {
-    --at-apply: from-[var(--custom-body-color)] to-transparent bg-gradient-to-r
-  }
-
-  .mask-right {
-    --at-apply: from-[var(--custom-body-color)] to-transparent bg-gradient-to-l
-  }
-
-  .show {
-    opacity: 0.85;
-  }
-
-  .hide {
-    opacity: 0;
+  .custom-scroller-mask {
+    --custom-body-color: var(--custom-admin-content-color);
   }
 
   .operation-box {

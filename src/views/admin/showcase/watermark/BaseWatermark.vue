@@ -2,7 +2,7 @@
 const props = withDefaults(defineProps<IProps>(), {
   orientation: 'vertical',
 })
-const globalStore = useGlobalStore()
+const configStore = useConfigStore()
 interface IProps {
   orientation?: 'vertical' | 'horizontal'
 }
@@ -29,8 +29,8 @@ const orientationInfo = computed(() => {
       </div>
       <div class="settings-content">
         <NSwitch
-          :value="globalStore.getWatermarkOptions.show"
-          @update:value="(status: boolean) => globalStore.toggleWatermark(status)"
+          :value="configStore.getWatermarkOptions.show"
+          @update:value="(status: boolean) => configStore.toggleWatermark(status)"
         >
         </NSwitch>
       </div>
@@ -44,9 +44,9 @@ const orientationInfo = computed(() => {
       </div>
       <div class="settings-content">
         <NSwitch
-          :value="globalStore.getWatermarkOptions.timestamp" @update:value="(status: boolean) => {
-            globalStore.setWatermarkOptions({ timestamp: status });
-            !!status && globalStore.toggleWatermark(status)
+          :value="configStore.getWatermarkOptions.timestamp" @update:value="(status: boolean) => {
+            configStore.setWatermarkOptions({ timestamp: status });
+            !!status && configStore.toggleWatermark(status)
           }"
         >
         </NSwitch>
@@ -61,8 +61,8 @@ const orientationInfo = computed(() => {
       </div>
       <div class="settings-content">
         <NSwitch
-          :value="globalStore.getCustomWatermarkContent"
-          @update:value="(status: boolean) => globalStore.setCustomWatermarkContent(status)"
+          :value="configStore.getCustomWatermarkContent"
+          @update:value="(status: boolean) => configStore.setCustomWatermarkContent(status)"
         >
         </NSwitch>
       </div>
@@ -76,9 +76,9 @@ const orientationInfo = computed(() => {
       </div>
       <div class="settings-content">
         <NInput
-          class="settings-input-box" :value="globalStore.getWatermarkOptions.content" type="text"
-          placeholder="请输入水印内容" :disabled="!globalStore.getCustomWatermarkContent"
-          @input="(t) => globalStore.setWatermarkOptions({ content: t })"
+          class="settings-input-box" :value="configStore.getWatermarkOptions.content" type="text"
+          placeholder="请输入水印内容" :disabled="!configStore.getCustomWatermarkContent"
+          @input="(t) => configStore.setWatermarkOptions({ content: t })"
         />
       </div>
     </BSpace>
@@ -91,8 +91,8 @@ const orientationInfo = computed(() => {
       </div>
       <div class="settings-content">
         <NInputNumber
-          class="settings-input-box" :value="globalStore.getWatermarkOptions.fontSize"
-          @update:value="(t) => globalStore.setWatermarkOptions({ fontSize: t })"
+          class="settings-input-box" :value="configStore.getWatermarkOptions.fontSize"
+          @update:value="(t) => configStore.setWatermarkOptions({ fontSize: t })"
         />
       </div>
     </BSpace>
@@ -105,8 +105,8 @@ const orientationInfo = computed(() => {
       </div>
       <div class="settings-content">
         <NColorPicker
-          class="settings-input-box" :default-value="globalStore.getWatermarkOptions.textColor"
-          :actions="['confirm']" @confirm="(t) => globalStore.setWatermarkOptions({ textColor: t })"
+          class="settings-input-box" :default-value="configStore.getWatermarkOptions.textColor"
+          :actions="['confirm']" @confirm="(t) => configStore.setWatermarkOptions({ textColor: t })"
         />
       </div>
     </BSpace>
@@ -118,7 +118,7 @@ const orientationInfo = computed(() => {
         重置水印配置
       </div>
       <div class="settings-content">
-        <NButton secondary strong type="error" @click="globalStore.resetWatermarkConfig">
+        <NButton secondary strong type="error" @click="configStore.resetWatermarkConfig">
           重置
         </NButton>
       </div>

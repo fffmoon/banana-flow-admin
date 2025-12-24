@@ -21,6 +21,11 @@ export function createRouterGuards(router: Router) {
     // 动态路由
     const userStore = useUserStore()
     const asyncRouteStore = useAsyncRouteStore()
+    // 如果没有载入过路由，先载入一次路由
+    if (!asyncRouteStore.routesLoaded) {
+      await asyncRouteStore.handleRouterMenu(asyncRouteStore.menus, asyncRouteStore.routesVersion as string)
+      return next({ ...to, replace: true })
+    }
     // 如果需要更新，则从接口获取路由，如果获取更新失败，则跳转到错误页面
     const needUpdate = await asyncRouteStore.checkRoutesUpdate()
     if (needUpdate) {
@@ -37,11 +42,6 @@ export function createRouterGuards(router: Router) {
           },
         })
       }
-    }
-    // 如果没有载入过路由，载入一次路由
-    if (!asyncRouteStore.routesLoaded) {
-      await asyncRouteStore.handleRouterMenu(asyncRouteStore.menus, asyncRouteStore.routesVersion as string)
-      return next({ ...to, replace: true })
     }
     // 如果是系统错误，则直接放行
     if (to.name === 'ServerError') {

@@ -5,6 +5,14 @@
  * @LastEditTime: 2025-07-21 15:22:05
  */
 declare namespace Settings {
+  type LayoutMode
+    = | 'vertical-mixed' // 侧边栏混合
+      | 'classic' // 经典模式 (选中项)
+      | 'sidebar' // 侧边栏
+      | 'vertical' // 极简侧边栏
+      | 'top' // 顶栏
+      | 'mixed' // 分栏布局
+      | 'top-mixed' // 顶栏混合
   // 侧边栏
   interface app {
     // 是否显示全局偏好设置菜单按钮
@@ -22,12 +30,7 @@ declare namespace Settings {
   }
   // 菜单
   interface menu {
-    /**
-     * 导航栏模式
-     * side: 侧边栏，三栏模式
-     * single: 侧边栏，两栏模式
-     */
-    mode: 'side' | 'single'
+    mode: LayoutMode
     // 侧边栏主要菜单宽度
     mainMenuWidth: number
     // 侧边栏次要菜单宽度
@@ -52,7 +55,7 @@ declare namespace Settings {
   // 水印
   interface watermark {
     // 是否开启水印
-    enable: boolean
+    show: boolean
     // 默认水印内容
     content: string
     // 开启时间戳

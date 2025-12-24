@@ -5,10 +5,10 @@
  * @LastEditTime: 2025-07-30 17:31:44
  */
 import type { GetUserInfoResponse } from '@apis/modules/user/type'
+import { defineStore } from 'pinia'
 import { router } from '@/router'
 import { Storage } from '@/utils/storage/Storage'
-import { defineStore } from 'pinia'
-import { useGlobalStore } from './global'
+import { useConfigStore } from './config'
 
 interface LoginParams {
   username: string
@@ -122,8 +122,8 @@ export const useUserStore = defineStore('user', {
           throw new Error('获取权限菜单失败')
 
         // 3. 设置水印效果
-        const globalStore = useGlobalStore()
-        globalStore.setWatermarkName()
+        const configStore = useConfigStore()
+        configStore.setWatermarkName()
       }
       catch (error) {
         console.error('初始化用户信息失败:', error)
@@ -190,8 +190,8 @@ export const useUserStore = defineStore('user', {
       Storage.remove('perms')
 
       // 重置水印
-      const globalStore = useGlobalStore()
-      globalStore.resetWatermarkConfig()
+      const configStore = useConfigStore()
+      configStore.resetWatermarkConfig()
 
       // 跳转登录页
       await router.push('/user/login')

@@ -20,8 +20,8 @@ const SETTINGS: Settings.All = {
   },
 
   watermark: {
-    enable: false,
-    content: '默认水印',
+    show: false,
+    content: '这是默认水印',
     timestamp: false,
     fontSize: 16,
     textColor: 'rgba(0,0,0,0.15)',

@@ -5,10 +5,10 @@
  * @LastEditTime: 2025-04-02 14:07:08
 -->
 <script setup lang="ts">
+import { darkTheme } from 'naive-ui'
 import SuspenseFallback from '@/components/SuspenseFallback/index.vue'
 import WaterMark from '@/components/WaterMark/index.vue'
 import { useThemeStore } from '@/theme'
-import { darkTheme } from 'naive-ui'
 
 const themeStore = useThemeStore()
 const { getNaiveuiLocale }

@@ -18,7 +18,7 @@ const SETTINGS: Settings.RequiredAll = {
     mainMenuWidth: 90,
     subMenuWidth: 180,
     collapsedWidth: 64,
-    mode: 'side',
+    mode: 'vertical-mixed',
   },
 
   tabbar: {
@@ -32,7 +32,7 @@ const SETTINGS: Settings.RequiredAll = {
   },
 
   watermark: {
-    enable: false,
+    show: false,
     content: '默认水印',
     timestamp: false,
     fontSize: 16,
