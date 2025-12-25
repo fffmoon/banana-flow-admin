@@ -38,6 +38,26 @@ const transitionNames = [
 defineExpose({
   toggleDialog,
 })
+
+/* 导航栏模式 */
+
+interface LayoutOption {
+  value: Settings.LayoutMode
+  label: string
+}
+
+const layoutOptions: LayoutOption[] = [
+  { value: 'vertical-mixed', label: '侧边栏混合模式' },
+  { value: 'classic', label: '经典模式 (顶栏+侧栏)' },
+  /* { value: 'sidebar', label: '侧边栏模式' },
+  { value: 'vertical', label: '极简侧边栏' },
+  { value: 'top', label: '顶栏模式' },
+  { value: 'mixed', label: '分栏布局' },
+  { value: 'top-mixed', label: '顶栏居中模式' }, */
+]
+
+// 切换处理
+const handleSelect = (mode: Settings.LayoutMode) => globalStore.menu.mode = mode
 </script>
 
 <template>
@@ -96,6 +116,103 @@ defineExpose({
           :default-value="themeStore.getCustomOptions.primaryColor" :show-alpha="false"
           :actions="['confirm']" @confirm="handleConfirm"
         />
+      </BSpace>
+
+      <!-- 主色调 -->
+      <NDivider title-placement="center">
+        导航栏模式
+      </NDivider>
+
+      <BSpace class="w-full" vertical>
+        <!-- 布局选择区容器：使用 Flex 居中并自动换行 -->
+        <div class="flex flex-wrap justify-center gap-6 py-4">
+          <template v-for="item in layoutOptions" :key="item.value">
+            <NTooltip trigger="hover">
+              <template #trigger>
+                <!-- 单个选项卡片 -->
+                <div
+                  class="relative box-border h-12 w-20 cursor-pointer overflow-hidden border-2 rounded-lg border-solid bg-[var(--custom-base-color)] shadow-sm transition-all duration-200"
+                  :class="[
+                    globalStore.menu.mode === item.value
+                      ? 'border-[var(--custom-primary-color)] ring-2 ring-[var(--custom-primary-color)]/20'
+                      : 'border-[var(--custom-border-color)] hover:border-[var(--custom-primary-color-hover)] hover:shadow',
+                  ]" @click="handleSelect(item.value)"
+                >
+                  <!-- 1. 侧边栏混合模式: 左深窄 | 左浅宽 | 右虚线 -->
+                  <div v-if="item.value === 'vertical-mixed'" class="h-full w-full flex gap-1 p-1">
+                    <div class="h-full w-2 rounded-l-sm bg-[var(--custom-primary-color)]"></div>
+                    <div class="h-full w-5 rounded-sm bg-[var(--custom-primary-color-hover)]/80"></div>
+                    <div
+                      class="h-full flex-1 border border-[var(--custom-primary-color)]/60 rounded-sm border-dashed bg-[var(--custom-primary-color-suppl)]"
+                    >
+                    </div>
+                  </div>
+
+                  <!-- 2. 经典模式 (图示选中项): 上深 | 下(左浅+右虚线) -->
+                  <div v-else-if="item.value === 'classic'" class="h-full w-full flex flex-col gap-1 p-1">
+                    <div class="h-3.5 w-full rounded-t-sm bg-[var(--custom-primary-color)]"></div>
+                    <div class="w-full flex flex-1 gap-1 overflow-hidden">
+                      <div class="h-full w-6 rounded-bl-sm bg-[var(--custom-primary-color-hover)]/80"></div>
+                      <div
+                        class="h-full flex-1 border border-[var(--custom-primary-color)]/60 rounded-br-sm border-dashed bg-[var(--custom-primary-color-suppl)]"
+                      >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 3. 侧边栏模式: 左浅宽 | 右虚线 -->
+                  <div v-else-if="item.value === 'sidebar'" class="h-full w-full flex gap-1 p-1">
+                    <div class="h-full w-7 rounded-l-sm bg-[var(--custom-primary-color-hover)]/80"></div>
+                    <div
+                      class="h-full flex-1 border border-[var(--custom-primary-color)]/60 rounded-r-sm border-dashed bg-[var(--custom-primary-color-suppl)]"
+                    >
+                    </div>
+                  </div>
+
+                  <!-- 4. 极简侧边栏: 左深窄 | 右虚线 -->
+                  <div v-else-if="item.value === 'vertical'" class="h-full w-full flex gap-1 p-1">
+                    <div class="h-full w-2.5 rounded-l-sm bg-[var(--custom-primary-color)]"></div>
+                    <div
+                      class="h-full flex-1 border border-[var(--custom-primary-color)]/60 rounded-r-sm border-dashed bg-[var(--custom-primary-color-suppl)]"
+                    >
+                    </div>
+                  </div>
+
+                  <!-- 5. 顶栏模式: 上深 | 下虚线 -->
+                  <div v-else-if="item.value === 'top'" class="h-full w-full flex flex-col gap-1 p-1">
+                    <div class="h-3.5 w-full rounded-t-sm bg-[var(--custom-primary-color)]"></div>
+                    <div
+                      class="w-full flex-1 border border-[var(--custom-primary-color)]/60 rounded-b-sm border-dashed bg-[var(--custom-primary-color-suppl)]"
+                    >
+                    </div>
+                  </div>
+
+                  <!-- 6. 分栏布局: 左深窄 | 右虚线(含内嵌块) -->
+                  <div v-else-if="item.value === 'mixed'" class="h-full w-full flex gap-1 p-1">
+                    <div class="h-full w-2.5 rounded-l-sm bg-[var(--custom-primary-color)]"></div>
+                    <div
+                      class="h-full flex flex-1 items-center justify-center border border-[var(--custom-primary-color)]/60 rounded-r-sm border-dashed bg-[var(--custom-primary-color-suppl)]"
+                    >
+                      <div class="h-5 w-8 rounded-sm bg-[var(--custom-primary-color-hover)]/60"></div>
+                    </div>
+                  </div>
+
+                  <!-- 7. 顶栏混合: 上深 | 下虚线(含内嵌块) -->
+                  <div v-else-if="item.value === 'top-mixed'" class="h-full w-full flex flex-col gap-1 p-1">
+                    <div class="h-3.5 w-full rounded-t-sm bg-[var(--custom-primary-color)]"></div>
+                    <div
+                      class="w-full flex flex-1 items-center justify-center border border-[var(--custom-primary-color)]/60 rounded-b-sm border-dashed bg-[var(--custom-primary-color-suppl)]"
+                    >
+                      <div class="h-5 w-10 rounded-sm bg-[var(--custom-primary-color-hover)]/60"></div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <!-- Tooltip 内容 -->
+              {{ item.label }}
+            </NTooltip>
+          </template>
+        </div>
       </BSpace>
 
       <!-- 页面水印 -->
