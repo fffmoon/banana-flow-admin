@@ -17,6 +17,18 @@ import { generateFullPath, generateMeta, loadView, normalizePath, toRouteRecordR
 
 export const routes: Array<IRouteItem> = []
 
+// 定义 404 路由配置
+const notFoundRoute = {
+  path: '/:pathMatch(.*)*',
+  name: 'NotFound',
+  component: () => import('@/views/exception/404.vue'),
+  meta: {
+    id: 'not-found',
+    title: '页面未找到',
+    hideInMenu: true,
+  },
+}
+
 /**
  * @author Qing
  * @description 创建路由
@@ -107,6 +119,10 @@ export function setupDynamicRoutes(data: IRouteDataRaw[] = []) {
         router.addRoute(toRouteRecordRaw(route))
       }
     })
+    // 最后添加 404 路由，如果 404 路由在一开始就存在，它会"吞噬"掉尚未加载的动态路由的匹配。最佳实践是：只有当所有合法路由都无法匹配时，才添加 404 路由。
+    if (!router.hasRoute('NotFound')) {
+      router.addRoute(toRouteRecordRaw(notFoundRoute as any))
+    }
   }
   catch (error) {
     console.error('加载动态路由失败:', error)

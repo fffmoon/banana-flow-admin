@@ -6,8 +6,8 @@
 -->
 <script setup lang="ts">
 import type { IWaterMarkOptions } from '@/directive/vBetterWaterMark/type'
-import { MenuKey } from '@/constants'
 import CONFIG from '@/settings'
+import { useMenuStore } from '@/store/modules/menu'
 import DrawerSider from './components/DrawerSider/index.vue'
 import ExitMaximizationButton from './components/ExitMaximizationButton/index.vue'
 import Header from './components/Header/index.vue'
@@ -19,16 +19,24 @@ import TabsView from './components/TabsView/index.vue'
 import ThemeSetting from './components/ThemeSetting/index.vue'
 
 import TopHeader from './components/TopHeader/index.vue'
-import { useMenuData } from './js/useMenuData'
 
 const asyncRouteStore = useAsyncRouteStore()
-const configStore = useConfigStore()
+const globalStore = useGlobalStore()
+const watermarkStore = useWatermarkStore()
 const networkRequestStore = useNetworkRequestStore()
 const tabsViewStore = useTabsViewStore()
 const { isTablet, isDesktop, screenInfo } = useResponsive()
+const menuStore = useMenuStore()
+const route = useRoute()
 
-const menuData = useMenuData()
-provide(MenuKey, { ...menuData })
+// 监听路由，同步 Store 状态
+watch(
+  () => route.fullPath,
+  () => {
+    menuStore.syncMenuWithRoute(route)
+  },
+  { immediate: true },
+)
 
 // 是否最大化
 const isMaxComputed = computed(() => tabsViewStore.getIsMaximized)
@@ -64,7 +72,7 @@ const isShowTabsComputed = computed(() => {
 
 watch(() => screenInfo.value, () => {
   if (isTablet.value || isDesktop.value) {
-    menuData.collapsed.value = false
+    menuStore.toggleCollapsed(false)
   }
 })
 
@@ -98,12 +106,12 @@ provide(ThemeSettingKey, { openThemeSetting })
 
 // 全局水印
 const markOptions = computed((): IWaterMarkOptions => {
-  return Object.assign({}, { show: '', content: '' }, configStore.getWatermarkOptions)
+  return Object.assign({}, { show: '', content: '' }, watermarkStore.watermarkConfig)
 })
 
 // 页面切换动画
 const getTransitionName = computed(() => {
-  return configStore.getTransitionName || 'fade-slide'
+  return globalStore.getTransitionName || 'fade-slide'
 })
 </script>
 
@@ -111,7 +119,7 @@ const getTransitionName = computed(() => {
   <div v-waterMark="markOptions" class="wh-full">
     <!-- 移动端抽屉 -->
     <DrawerSider ref="drawerSiderRef" />
-    <div v-if="configStore.menu.mode === 'vertical-mixed'" class="wh-full flex">
+    <div v-if="globalStore.menu.mode === 'vertical-mixed'" class="wh-full flex">
       <!-- 侧边栏 -->
       <Sider v-show="isShowSiderComputed" />
       <!-- 右边菜单 -->
@@ -144,7 +152,7 @@ const getTransitionName = computed(() => {
       </div>
     </div>
     <!-- 顶部模式 top -->
-    <div v-else-if="configStore.menu.mode === 'classic'" class="wh-full flex flex-col">
+    <div v-else-if="globalStore.menu.mode === 'classic'" class="wh-full flex flex-col">
       <!-- 头部 -->
       <!-- <Header v-show="isShowHeaderComputed" :show-sider="isShowSiderBtnComputed" @toggle-drawer="toggleDrawer" /> -->
       <TopHeader></TopHeader>

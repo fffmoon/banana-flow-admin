@@ -7,6 +7,7 @@
 import type { IRouteDataRaw, IRouteItem } from 'types/vue-router'
 import { API } from '@apis/index'
 import { setupDynamicRoutes } from '@/router'
+import { localRoutesData } from '@/router/modules/localRoutes'
 import { findRouterById } from '@/router/utils'
 import { Storage } from '@/utils/storage/Storage'
 
@@ -77,15 +78,23 @@ export const useAsyncRouteStore = defineStore('asyncRoute', {
     /**
      * @description 处理路由，将后台的原始路由数据转化为前端可用的路由
      * @author Qing
-     * @param {IRouteDataRaw[]} menus 原始路由数据
+     * @param {IRouteDataRaw[]} backendMenus 原始路由数据
      * @param {string} version 路由的版本号
      * @date 2025-07-30 13:58:34
      */
-    async handleRouterMenu(menus: IRouteDataRaw[], version: string) {
-      this.setMenus(menus)
+    async handleRouterMenu(backendMenus: IRouteDataRaw[], version: string) {
+      const mergedMenus = [...localRoutesData, ...backendMenus]
+      this.setMenus(mergedMenus)
       this.setRoutesVersion(version)
       this.setRoutesLoaded(true)
-      setupDynamicRoutes(menus)
+      setupDynamicRoutes(mergedMenus)
+    },
+    // 仅加载本地路由的方法（用于开发环境或者兜底）
+    async initLocalRoutes() {
+      if (this.routesLoaded)
+        return
+      // 模拟一个版本号，或者置空
+      await this.handleRouterMenu([], 'local-dev-v1')
     },
     // 卸载路由
     async removeAllRoutes() {
@@ -95,6 +104,9 @@ export const useAsyncRouteStore = defineStore('asyncRoute', {
     },
     // 检查路由版本是否需要更新
     async checkRoutesUpdate() {
+      // 如果动态路由开关关闭，则不检查路由更新
+      if (!import.meta.env.VITE_DYNAMIC_ROUTE_SW)
+        return false
       // 初始加载
       if (!this.routesVersion)
         return true

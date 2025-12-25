@@ -1,11 +1,10 @@
 /*
  * @Author: Qing
- * @Description: 固定路由
+ * @Description: 固定路由，不包含业务菜单
  * @Date: 2025-03-10 23:23:50
  * @LastEditTime: 2025-07-31 10:46:10
  */
 import type { IRouteItem } from 'types/vue-router'
-import { example } from './example'
 
 export const RedirectName = 'Redirect'
 export const RedirectLayoutName = 'RedirectLayout'
@@ -35,7 +34,6 @@ export const fixedRoutes: Array<IRouteItem> = [
       },
     ],
   },
-  ...example,
   {
     path: '/redirect',
     name: RedirectLayoutName,
@@ -67,16 +65,6 @@ export const fixedRoutes: Array<IRouteItem> = [
     meta: {
       id: 'server-error',
       title: '服务器错误',
-      hideInMenu: true,
-    },
-  },
-  {
-    path: '/:pathMatch(.*)*',
-    name: 'NotFound',
-    component: () => import('@/views/exception/404.vue'),
-    meta: {
-      id: 'not-found',
-      title: '页面未找到',
       hideInMenu: true,
     },
   },

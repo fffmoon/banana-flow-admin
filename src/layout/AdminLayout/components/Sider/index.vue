@@ -6,7 +6,6 @@
 -->
 <script lang='ts' setup>
 import CONFIG from '@/settings'
-import { useMenu } from '../../js/useMenu'
 import Logo from '../Logo/index.vue'
 
 interface IProps {
@@ -17,7 +16,9 @@ const props = withDefaults(defineProps<IProps>(), {
   showLogo: true,
 })
 
-const { currentMainMenuId, mainMenus, handleMainMenuClick } = useMenu()
+const menuStore = useMenuStore()
+const { currentMainMenuId, mainMenus } = storeToRefs(menuStore)
+const { clickMainMenu } = menuStore
 </script>
 
 <template>
@@ -33,7 +34,7 @@ const { currentMainMenuId, mainMenus, handleMainMenuClick } = useMenu()
       <div
         v-for="menu in mainMenus" :key="menu.meta?.id"
         class="app-menu-item flex flex-center flex-col gap-4px py-[var(--space-md)]"
-        :class="{ 'is-active': currentMainMenuId === menu.meta?.id }" @click="handleMainMenuClick(menu)"
+        :class="{ 'is-active': currentMainMenuId === menu.meta?.id }" @click="clickMainMenu(menu)"
       >
         <div class="app-menu-item__icon" :class="menu.meta?.icon || 'i-mdi-dots-horizontal'" />
 

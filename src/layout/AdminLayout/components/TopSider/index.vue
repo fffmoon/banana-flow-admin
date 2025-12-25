@@ -1,18 +1,17 @@
 <!--
  * @Author: Qing
- * @Description: 主菜单栏组件 (Refactored)
+ * @Description: 主菜单栏组件
 -->
 <script lang='ts' setup>
 import { nextTick, ref, watch } from 'vue'
-// 引入刚刚封装的组件
-import HorizontalScroller from '@/components/HorizontalScroller/index.vue' // 请根据实际路径调整
-import { useMenu } from '../../js/useMenu'
+import HorizontalScroller from '@/components/HorizontalScroller/index.vue'
+import { useMenuStore } from '@/store/modules/menu'
 
-const { currentMainMenuId, mainMenus, handleMainMenuClick } = useMenu()
+const menuStore = useMenuStore()
 const scrollerRef = ref<InstanceType<typeof HorizontalScroller> | null>(null)
 
-// 监听菜单变化，更新滚动状态（例如异步加载菜单后）
-watch(() => mainMenus.value, () => {
+// 监听 Store 中的 mainMenus 变化
+watch(() => menuStore.mainMenus, () => {
   nextTick(() => {
     scrollerRef.value?.update()
   })
@@ -21,20 +20,15 @@ watch(() => mainMenus.value, () => {
 
 <template>
   <nav class="min-w-0 wh-full flex">
-    <!-- 使用封装的滚动容器 -->
     <HorizontalScroller ref="scrollerRef">
       <ul class="menu-list m-0 h-full flex list-none items-center p-y-2">
         <li
-          v-for="menu in mainMenus"
-          :key="menu.meta?.id"
+          v-for="menu in menuStore.mainMenus" :key="menu.meta?.id"
           class="app-menu-item mr-2 flex shrink-0 cursor-pointer select-none items-center justify-center gap-4px px-[var(--space-md)]"
-          :class="{ 'is-active': currentMainMenuId === menu.meta?.id }"
-          @click="handleMainMenuClick(menu)"
+          :class="{ 'is-active': menuStore.currentMainMenuId === menu.meta?.id }"
+          @click="menuStore.clickMainMenu(menu)"
         >
-          <div
-            class="app-menu-item__icon"
-            :class="menu.meta?.icon || 'i-mdi-dots-horizontal'"
-          />
+          <div class="app-menu-item__icon" :class="menu.meta?.icon || 'i-mdi-dots-horizontal'" />
           <span class="app-menu-item__text">
             {{ menu.meta?.title }}
           </span>
@@ -47,10 +41,8 @@ watch(() => mainMenus.value, () => {
 <style lang="scss" scoped>
 @use '@/styles/components/menu-item';
 
-// 如果 menu-item 样式里没有定义高度，可能需要显式指定
 .app-menu-item {
-  height: 100%; // 确保占满高度
-  // 其他微调样式
+  height: 100%;
   transition: all 0.3s;
 
   &:hover {

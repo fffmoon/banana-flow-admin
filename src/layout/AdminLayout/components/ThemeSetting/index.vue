@@ -11,7 +11,7 @@ import { themeDoms, themes, useThemeStore } from '@/theme'
 import BaseWatermark from '@/views/admin/showcase/watermark/BaseWatermark.vue'
 
 const themeStore = useThemeStore()
-const configStore = useConfigStore()
+const globalStore = useGlobalStore()
 const networkRequestStore = useNetworkRequestStore()
 
 const show = ref(false)
@@ -57,7 +57,7 @@ const layoutOptions: LayoutOption[] = [
 ]
 
 // 切换处理
-const handleSelect = (mode: Settings.LayoutMode) => configStore.menu.mode = mode
+const handleSelect = (mode: Settings.LayoutMode) => globalStore.menu.mode = mode
 </script>
 
 <template>
@@ -133,7 +133,7 @@ const handleSelect = (mode: Settings.LayoutMode) => configStore.menu.mode = mode
                 <div
                   class="relative box-border h-12 w-20 cursor-pointer overflow-hidden border-2 rounded-lg border-solid bg-[var(--custom-base-color)] shadow-sm transition-all duration-200"
                   :class="[
-                    configStore.menu.mode === item.value
+                    globalStore.menu.mode === item.value
                       ? 'border-[var(--custom-primary-color)] ring-2 ring-[var(--custom-primary-color)]/20'
                       : 'border-[var(--custom-border-color)] hover:border-[var(--custom-primary-color-hover)] hover:shadow',
                   ]" @click="handleSelect(item.value)"
@@ -226,8 +226,8 @@ const handleSelect = (mode: Settings.LayoutMode) => configStore.menu.mode = mode
         页面切换动画
       </NDivider>
       <NRadioGroup
-        :value="configStore.getTransitionName" name="radiogroup"
-        @update:value="configStore.setTransitionName"
+        :value="globalStore.getTransitionName" name="radiogroup"
+        @update:value="globalStore.setTransitionName"
       >
         <NSpace>
           <NRadio v-for="item in transitionNames" :key="item.class" :value="item.class">

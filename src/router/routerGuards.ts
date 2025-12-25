@@ -24,14 +24,28 @@ export function createRouterGuards(router: Router) {
     // 如果没有载入过路由，先载入一次路由
     if (!asyncRouteStore.routesLoaded) {
       await asyncRouteStore.handleRouterMenu(asyncRouteStore.menus, asyncRouteStore.routesVersion as string)
-      return next({ ...to, replace: true })
+      return next({
+        path: to.path,
+        query: to.query,
+        hash: to.hash,
+        replace: true,
+      })
+    }
+    // 如果是系统错误，则直接放行
+    if (to.name === 'ServerError') {
+      return next()
     }
     // 如果需要更新，则从接口获取路由，如果获取更新失败，则跳转到错误页面
     const needUpdate = await asyncRouteStore.checkRoutesUpdate()
     if (needUpdate) {
       try {
         await userStore.getPermMenu()
-        return next({ ...to, replace: true })
+        return next({
+          path: to.path,
+          query: to.query,
+          hash: to.hash,
+          replace: true,
+        })
       }
       catch (error) {
         console.error(error)
@@ -42,10 +56,6 @@ export function createRouterGuards(router: Router) {
           },
         })
       }
-    }
-    // 如果是系统错误，则直接放行
-    if (to.name === 'ServerError') {
-      return next()
     }
     // 当用户进入 / 页面，如果用户没有token，则前往登录页面，如果用户有token，则前往路由第一个。
     if (to.path === '/') {

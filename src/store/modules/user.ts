@@ -7,8 +7,8 @@
 import type { GetUserInfoResponse } from '@apis/modules/user/type'
 import { defineStore } from 'pinia'
 import { router } from '@/router'
+import { useWatermarkStore } from '@/store/modules/watermark'
 import { Storage } from '@/utils/storage/Storage'
-import { useConfigStore } from './config'
 
 interface LoginParams {
   username: string
@@ -122,8 +122,8 @@ export const useUserStore = defineStore('user', {
           throw new Error('获取权限菜单失败')
 
         // 3. 设置水印效果
-        const configStore = useConfigStore()
-        configStore.setWatermarkName()
+        const watermarkStore = useWatermarkStore()
+        watermarkStore.setWatermarkName()
       }
       catch (error) {
         console.error('初始化用户信息失败:', error)
@@ -190,8 +190,8 @@ export const useUserStore = defineStore('user', {
       Storage.remove('perms')
 
       // 重置水印
-      const configStore = useConfigStore()
-      configStore.resetWatermarkConfig()
+      const watermarkStore = useWatermarkStore()
+      watermarkStore.resetWatermarkConfig()
 
       // 跳转登录页
       await router.push('/user/login')

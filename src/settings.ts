@@ -24,7 +24,7 @@ const SETTINGS: Settings.All = {
     content: '这是默认水印',
     timestamp: false,
     fontSize: 16,
-    textColor: 'rgba(0,0,0,0.15)',
+    fontColor: 'rgba(0,0,0,0.15)',
     customContent: false,
   },
 }
