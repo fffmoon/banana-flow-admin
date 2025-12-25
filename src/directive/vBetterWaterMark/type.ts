@@ -8,7 +8,7 @@ export interface IWaterMarkOptions {
   // 文字大小
   fontSize?: number
   // 文字颜色 rgba
-  textColor?: string
+  fontColor?: string
   // 自定义水印内容
   customContent?: boolean
 }

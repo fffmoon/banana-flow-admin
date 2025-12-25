@@ -59,10 +59,10 @@ function createWatermark(options: IWaterMarkOptions): string {
 // 创建水印图片
 function createBase64(text: string, options: IWaterMarkOptions & { timestampStr?: string }) {
   const { fontSize = 18, timestampStr } = options
-  let textColor = options.textColor || 'rgba(0,0,0,0.15)'
-  // 判断textColor是不是rgba格式，不是的话使用默认颜色。
-  if (!textColor.startsWith('rgba')) {
-    textColor = 'rgba(0,0,0,0.15)'
+  let fontColor = options.fontColor || 'rgba(0,0,0,0.15)'
+  // 判断fontColor是不是rgba格式，不是的话使用默认颜色。
+  if (!fontColor.startsWith('rgba')) {
+    fontColor = 'rgba(0,0,0,0.15)'
   }
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')!
@@ -106,7 +106,7 @@ function createBase64(text: string, options: IWaterMarkOptions & { timestampStr?
   // 绘制逻辑
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillStyle = textColor
+  ctx.fillStyle = fontColor
 
   // 主文字
   ctx.font = `${fontSize}px system-ui, sans-serif`

@@ -4,25 +4,26 @@
  * @Date: 2024-05-22 16:57:14
  * @LastEditTime: 2024-06-04 19:20:21
  */
-/// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  // 环境
+  /** 环境 */
   readonly VITE_ENV: 'development' | 'production'
-  // 标题
+  /** 标题 */
   readonly VITE_APP_TITLE: string
-  // 部署的目录
+  /** 部署的目录 */
   readonly VITE_BASE_URL: string
-  // API接口路径
+  /** API接口路径 */
   readonly VITE_BASE_API: string
-  // console.log 开关
+  /** console.log 开关 */
   readonly VITE_CONSOLE_SW: boolean
-  // vconsole 开关
+  /** vconsole 开关 */
   readonly VITE_VCONSOLE_SW: boolean
-  // 服务端口
+  /** 服务端口 */
   readonly VITE_SERVE_PORT: number
-  // mock 开关
+  /** mock 开关 */
   readonly VITE_MOCK_SW: boolean
+  /** 动态路由开关，关闭后不向后台请求路由更新 */
+  readonly VITE_DYNAMIC_ROUTE_SW: boolean
 }
 
 interface ImportMeta {
