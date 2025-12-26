@@ -25,7 +25,7 @@ const globalStore = useGlobalStore()
 const watermarkStore = useWatermarkStore()
 const networkRequestStore = useNetworkRequestStore()
 const tabsViewStore = useTabsViewStore()
-const { isTablet, isDesktop, screenInfo } = useResponsive()
+const { isTablet, isDesktop, screenInfo, isMobile } = useResponsive()
 const menuStore = useMenuStore()
 const route = useRoute()
 
@@ -55,7 +55,7 @@ const isShowHeaderComputed = computed(() => {
 
 // 移动端模式下的抽屉按钮
 const isShowSiderBtnComputed = computed(() => {
-  return isTablet.value || isDesktop.value
+  return isTablet.value || isMobile.value
 })
 
 const isShowTabsComputed = computed(() => {
@@ -108,18 +108,41 @@ provide(ThemeSettingKey, { openThemeSetting })
 const markOptions = computed((): IWaterMarkOptions => {
   return Object.assign({}, { show: '', content: '' }, watermarkStore.watermarkConfig)
 })
-
-// 页面切换动画
-const getTransitionName = computed(() => {
-  return globalStore.getTransitionName || 'fade-slide'
-})
 </script>
 
 <template>
   <div v-waterMark="markOptions" class="wh-full">
-    <!-- 移动端抽屉 -->
-    <DrawerSider ref="drawerSiderRef" />
-    <div v-if="globalStore.menu.mode === 'vertical-mixed'" class="wh-full flex">
+    <!-- 移动端 -->
+    <div v-if="isTablet || isMobile" class="wh-full flex">
+      <!-- 内容 -->
+      <div
+        class="min-h-0 min-w-0 flex flex-1 flex-col bg-[var(--custom-admin-content-color)]"
+        :native-scrollbar="false"
+      >
+        <!-- 头部 -->
+        <Header v-show="isShowHeaderComputed" :show-sider="isShowSiderBtnComputed" @toggle-drawer="toggleDrawer" />
+        <!-- 标签页 -->
+        <TabsView v-show="isShowTabsComputed" />
+        <!-- 内容 -->
+        <div
+          class="min-h-0 w-full flex-1 px-[var(--admin-content-padding)] pb-[var(--admin-content-padding)]"
+          :class="{ 'pt-[var(--admin-content-padding)]': !isShowTabsComputed }"
+        >
+          <BScrollbar>
+            <RouterView v-slot="{ Component, route }">
+              <!-- 扩展多种路由切换动画，使用 Transition 后，页面需要保持单根 -->
+              <Transition :name="globalStore.getTransitionName" mode="out-in" appear>
+                <KeepAlive :include="asyncRouteStore.keepAliveRouterList">
+                  <component :is="Component" :key="route.name" />
+                </KeepAlive>
+              </Transition>
+            </RouterView>
+          </BScrollbar>
+        </div>
+      </div>
+    </div>
+    <!-- 桌面端 -->
+    <div v-else-if="globalStore.menu.mode === 'vertical-mixed'" class="wh-full flex">
       <!-- 侧边栏 -->
       <Sider v-show="isShowSiderComputed" />
       <!-- 右边菜单 -->
@@ -141,8 +164,8 @@ const getTransitionName = computed(() => {
           <BScrollbar>
             <RouterView v-slot="{ Component, route }">
               <!-- 扩展多种路由切换动画，使用 Transition 后，页面需要保持单根 -->
-              <Transition :name="getTransitionName" mode="out-in" appear>
-                <KeepAlive :include="asyncRouteStore.getKeepAliveRouterList">
+              <Transition :name="globalStore.getTransitionName" mode="out-in" appear>
+                <KeepAlive :include="asyncRouteStore.keepAliveRouterList">
                   <component :is="Component" :key="route.name" />
                 </KeepAlive>
               </Transition>
@@ -154,12 +177,9 @@ const getTransitionName = computed(() => {
     <!-- 顶部模式 top -->
     <div v-else-if="globalStore.menu.mode === 'classic'" class="wh-full flex flex-col">
       <!-- 头部 -->
-      <!-- <Header v-show="isShowHeaderComputed" :show-sider="isShowSiderBtnComputed" @toggle-drawer="toggleDrawer" /> -->
       <TopHeader></TopHeader>
       <!-- 内容 -->
       <div class="min-h-0 min-w-0 flex flex-1">
-        <!-- 侧边栏 -->
-        <!-- <Sider v-show="isShowSiderComputed" :show-logo="false" /> -->
         <!-- 右边菜单 -->
         <SubMenu v-show="isShowSiderComputed" :show-title="false" />
         <div class="min-h-0 min-w-0 flex flex-1 flex-col">
@@ -173,8 +193,8 @@ const getTransitionName = computed(() => {
             <BScrollbar>
               <RouterView v-slot="{ Component, route }">
                 <!-- 扩展多种路由切换动画，使用 Transition 后，页面需要保持单根 -->
-                <Transition :name="getTransitionName" mode="out-in" appear>
-                  <KeepAlive :include="asyncRouteStore.getKeepAliveRouterList">
+                <Transition :name="globalStore.getTransitionName" mode="out-in" appear>
+                  <KeepAlive :include="asyncRouteStore.keepAliveRouterList">
                     <component :is="Component" :key="route.name" />
                   </KeepAlive>
                 </Transition>
@@ -184,6 +204,8 @@ const getTransitionName = computed(() => {
         </div>
       </div>
     </div>
+    <!-- 移动端抽屉 -->
+    <DrawerSider ref="drawerSiderRef" />
     <!-- 设置 -->
     <SettingBtn></SettingBtn>
     <!-- 主题设置 -->

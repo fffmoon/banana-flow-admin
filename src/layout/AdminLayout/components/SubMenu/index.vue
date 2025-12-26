@@ -6,12 +6,12 @@ import { useNaiveMenu } from '../../js/useNaiveMenu'
 import SideTitle from '../SideTitle/index.vue'
 
 interface IProps {
-  hiddenMenuButton?: boolean
+  showCollapsedButton?: boolean
   showTitle?: boolean
 }
 
 const props = withDefaults(defineProps<IProps>(), {
-  hiddenMenuButton: false,
+  showCollapsedButton: true,
   showTitle: true,
 })
 
@@ -54,7 +54,7 @@ const isShowSideTitleComputed = computed(() => props.showTitle && !menuStore.col
 
         <!-- 折叠菜单按钮 -->
         <NButton
-          v-show="!hiddenMenuButton" tertiary :focusable="false" size="small"
+          v-show="showCollapsedButton" tertiary :focusable="false" size="small"
           class="absolute bottom-[12px] right-[12px] z-[100]" @click="menuStore.toggleCollapsed()"
         >
           <template #icon>

@@ -24,19 +24,19 @@ function handleCloseCurrentPage() {
 }
 
 const closeHomePageDisabled = computed(() => {
-  const homeRouteId = asyncRouteStore.getHomeRouteId()
+  const homeRoute = asyncRouteStore.getHomeRoute()
   const list = tabsViewStore.getTabsViewList
-  if (homeRouteId) {
-    const findRes = list.find(item => item.id === homeRouteId)
+  if (homeRoute) {
+    const findRes = list.find(item => item.id === homeRoute.meta.id)
     return !!findRes
   }
   return false
 })
 
 function handleCloseHomePage() {
-  const homeRouteId = asyncRouteStore.getHomeRouteId()
-  if (homeRouteId) {
-    tabsViewStore.handleCloseTabsView(homeRouteId as string)
+  const homeRoute = asyncRouteStore.getHomeRoute()
+  if (homeRoute) {
+    tabsViewStore.handleCloseTabsView(homeRoute.meta.id as string)
   }
 }
 

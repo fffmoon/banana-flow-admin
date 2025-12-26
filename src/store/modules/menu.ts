@@ -81,7 +81,7 @@ export const useMenuStore = defineStore('menu', () => {
 
   /** 点击子菜单，跳转逻辑 */
   function clickSubMenu(key: string) {
-    console.log('点击子菜单', key)
+    // console.log('点击子菜单', key)
     const fla = flattenRoutes(subMenusRaw.value)
     const findRes = fla.find(item => item.raw.meta?.id === key)
 
@@ -99,7 +99,7 @@ export const useMenuStore = defineStore('menu', () => {
 
   /** 根据当前 URL 同步菜单状态 */
   function syncMenuWithRoute(route: any) {
-    console.log('根据当前 URL 同步菜单状态')
+    // console.log('根据当前 URL 同步菜单状态')
     const id = route.meta.id as string
     if (!id)
       return

@@ -7,11 +7,11 @@
 <script lang='ts' setup>
 import type { CustomDropdownOption } from '@ui/BetterUI'
 import type { IRouteItem } from 'types/vue-router'
+import { useLocale } from '@i18n/useLocale'
 import { router } from '@/router'
 import { findRouterById } from '@/router/utils'
 import CONFIG from '@/settings'
 import { themeDoms, useThemeStore } from '@/theme'
-import { useLocale } from '@i18n/useLocale'
 import MessageList from './MessageList/index.vue'
 import SearchModal from './SearchModal/index.vue'
 import UserInfo from './UserInfo/index.vue'
@@ -282,10 +282,10 @@ function handleI18nSelect(key: string | number) {
     <div class="left-menu relative h-full min-w-0 flex shrink-1 items-center">
       <!-- 抽屉按钮 -->
       <NButton
-        v-if="!props.showSider" quaternary :focusable="false" class="menu-btn"
+        v-show="props.showSider" quaternary :focusable="false" class="menu-btn"
         @click="emits('toggleDrawer', true)"
       >
-        <div class="icon icon-base i-mdi-menu" />
+        <div class="icon-base icon i-mdi-menu" />
       </NButton>
 
       <!-- 导航 -->

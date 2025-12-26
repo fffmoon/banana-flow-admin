@@ -63,7 +63,7 @@ const isKeep = computed(() => {
       </NCard>
       <NCard title="当前所有缓存的页面名称">
         <BSpace vertical>
-          <div v-for="(item, idx) in asyncRouteStore.getKeepAliveRouterList" :key="idx">
+          <div v-for="(item, idx) in asyncRouteStore.keepAliveRouterList" :key="idx">
             {{ item }}
           </div>
         </BSpace>

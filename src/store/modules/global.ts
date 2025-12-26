@@ -1,9 +1,11 @@
 /*
  * @Author: Qing
- * @Description:
+ * @Description: 全局设置 Store
  * @Date: 2025-04-14 16:19:21
  * @LastEditTime: 2025-07-21 14:05:13
  */
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
 import CONFIG from '@/settings'
 
 interface IGlobalState extends Settings.All {
@@ -15,27 +17,47 @@ interface IGlobalState extends Settings.All {
   }
 }
 
-export const useGlobalStore = defineStore('global', {
-  state: (): IGlobalState => ({
-    app: {
+export const useGlobalStore = defineStore(
+  'global',
+  () => {
+    // #region ➤ State
+    // ================================================
+    const app = ref<IGlobalState['app']>({
       transitionName: CONFIG.app.transitionName,
-    },
-    menu: {
+    })
+
+    const menu = ref<IGlobalState['menu']>({
       mode: CONFIG.menu.mode,
-    },
-  }),
-  getters: {
-    getTransitionName(): IGlobalState['app']['transitionName'] {
-      return this.app.transitionName
+    })
+    // #endregion
+
+    // #region ➤ Getters
+    // ================================================
+    const getTransitionName = computed(() => app.value.transitionName)
+    // #endregion
+
+    // #region ➤ Actions
+    // ================================================
+    /**
+     * 设置页面切换动画
+     * @param name 动画名称
+     */
+    function setTransitionName(name: IGlobalState['app']['transitionName']) {
+      app.value.transitionName = name
+    }
+    // #endregion
+
+    return {
+      app,
+      menu,
+      getTransitionName,
+      setTransitionName,
+    }
+  },
+  {
+    persist: {
+      storage: sessionStorage,
+      // paths: ['app.transitionName', 'menu.mode'],
     },
   },
-  actions: {
-    // 设置页面切换动画
-    setTransitionName(name: IGlobalState['app']['transitionName']) {
-      this.app.transitionName = name
-    },
-  },
-  persist: {
-    storage: sessionStorage,
-  },
-})
+)

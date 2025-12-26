@@ -23,7 +23,7 @@ export function createRouterGuards(router: Router) {
     const asyncRouteStore = useAsyncRouteStore()
     // 如果没有载入过路由，先载入一次路由
     if (!asyncRouteStore.routesLoaded) {
-      await asyncRouteStore.handleRouterMenu(asyncRouteStore.menus, asyncRouteStore.routesVersion as string)
+      await asyncRouteStore.initRoutes()
       return next({
         path: to.path,
         query: to.query,
@@ -63,7 +63,7 @@ export function createRouterGuards(router: Router) {
         next({ path: '/user/login' })
       }
       else {
-        next({ path: asyncRouteStore.routerMenus[0].path })
+        next({ path: asyncRouteStore.getHomeRoute()?.path || asyncRouteStore.routerMenus[0].path || '/' })
       }
     }
     // 权限路由
@@ -81,7 +81,7 @@ export function createRouterGuards(router: Router) {
     // 将需要缓存的页面添加到缓存中，只有meta.keepAlive为true的页面才会被缓存
     const asyncRouteStore = useAsyncRouteStore()
     if (to.name && to.meta?.keepAlive) {
-      if (!asyncRouteStore.getKeepAliveRouterList.find(i => i === to.meta.id)) {
+      if (!asyncRouteStore.keepAliveRouterList.find(i => i === to.meta.id)) {
         asyncRouteStore.addKeepAlive(to.meta?.id as string)
       }
     }
