@@ -7,6 +7,7 @@
 <script lang='ts' setup>
 import CONFIG from '@/settings'
 import Sider from '../Sider/index.vue'
+import SubMenu from '../SubMenu/index.vue'
 
 const showDrawer = ref<boolean>(false)
 function toggleVisible(value?: boolean) {
@@ -23,11 +24,12 @@ defineExpose({ toggleVisible })
 
 <template>
   <NDrawer v-model:show="showDrawer" placement="left" :width="width" display-directive="show">
-    <div class="scroll-none h-full w-full overflow-auto">
+    <div class="scroll-none h-full w-full flex overflow-hidden">
       <Sider
         :collapsed="false" :hidden-menu-button="true" @update-active-menu-key="() => showDrawer = false"
         @update-sub-menu-status="emitUpdateSubMenuStatus"
       />
+      <SubMenu :show-collapsed-button="false" />
     </div>
   </NDrawer>
 </template>

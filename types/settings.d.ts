@@ -7,16 +7,15 @@
  */
 declare namespace Settings {
   /**
-   * 布局模式
+   * 布局模式'vertical-mixed' // 侧边栏混合
+    | 'classic' // 经典模式 (选中项)
+    | 'sidebar' // 侧边栏
+    | 'vertical' // 极简侧边栏
+    | 'top' // 顶栏
+    | 'mixed' // 分栏布局
+    | 'top-mixed' // 顶栏混合
    */
-  type LayoutMode
-    = | 'vertical-mixed' // 侧边栏混合
-      | 'classic' // 经典模式 (选中项)
-      | 'sidebar' // 侧边栏
-      | 'vertical' // 极简侧边栏
-      | 'top' // 顶栏
-      | 'mixed' // 分栏布局
-      | 'top-mixed' // 顶栏混合
+  type LayoutMode = 'vertical-mixed' | 'classic' | 'sidebar' | 'vertical' | 'top' | 'mixed' | 'top-mixed'
 
   /**
    * 应用设置

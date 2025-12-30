@@ -88,7 +88,7 @@ function handleWindowResize() {
       clearTimeout(timerOnsize)
     }
     timerOnsize = setTimeout(() => {
-      chart!.resize()
+      chart?.resize()
     }, 100)
   }
 }
