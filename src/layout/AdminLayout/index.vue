@@ -114,7 +114,7 @@ const markOptions = computed((): IWaterMarkOptions => {
   <div v-waterMark="markOptions" class="wh-full">
     <!-- 移动端 -->
     <div v-if="isTablet || isMobile" class="wh-full flex">
-      <!-- 内容 -->
+      <!-- 主要内容区 -->
       <div
         class="min-h-0 min-w-0 flex flex-1 flex-col bg-[var(--custom-admin-content-color)]"
         :native-scrollbar="false"
@@ -123,7 +123,7 @@ const markOptions = computed((): IWaterMarkOptions => {
         <Header v-show="isShowHeaderComputed" :show-sider="isShowSiderBtnComputed" @toggle-drawer="toggleDrawer" />
         <!-- 标签页 -->
         <TabsView v-show="isShowTabsComputed" />
-        <!-- 内容 -->
+        <!-- 主要内容区 -->
         <div
           class="min-h-0 w-full flex-1 px-[var(--admin-content-padding)] pb-[var(--admin-content-padding)]"
           :class="{ 'pt-[var(--admin-content-padding)]': !isShowTabsComputed }"
@@ -147,7 +147,7 @@ const markOptions = computed((): IWaterMarkOptions => {
       <Sider v-show="isShowSiderComputed" />
       <!-- 右边菜单 -->
       <SubMenu v-show="isShowSiderComputed" />
-      <!-- 内容 -->
+      <!-- 最右边内容 -->
       <div
         class="min-h-0 min-w-0 flex flex-1 flex-col bg-[var(--custom-admin-content-color)]"
         :native-scrollbar="false"
@@ -156,7 +156,7 @@ const markOptions = computed((): IWaterMarkOptions => {
         <Header v-show="isShowHeaderComputed" :show-sider="isShowSiderBtnComputed" @toggle-drawer="toggleDrawer" />
         <!-- 标签页 -->
         <TabsView v-show="isShowTabsComputed" />
-        <!-- 内容 -->
+        <!-- 主要内容区 -->
         <div
           class="min-h-0 w-full flex-1 px-[var(--admin-content-padding)] pb-[var(--admin-content-padding)]"
           :class="{ 'pt-[var(--admin-content-padding)]': !isShowTabsComputed }"
@@ -178,14 +178,17 @@ const markOptions = computed((): IWaterMarkOptions => {
     <div v-else-if="globalStore.menu.mode === 'classic'" class="wh-full flex flex-col">
       <!-- 头部 -->
       <TopHeader></TopHeader>
-      <!-- 内容 -->
+      <!-- 中间内容 -->
       <div class="min-h-0 min-w-0 flex flex-1">
         <!-- 右边菜单 -->
-        <SubMenu v-show="isShowSiderComputed" :show-title="false" />
-        <div class="min-h-0 min-w-0 flex flex-1 flex-col">
+        <SubMenu v-show="isShowSiderComputed" :show-title="false" class="" />
+        <div
+          class="min-h-0 min-w-0 flex flex-1 flex-col bg-[var(--custom-admin-content-color)]"
+          :native-scrollbar="false"
+        >
           <!-- 标签页 -->
           <TabsView v-show="isShowTabsComputed" />
-          <!-- 内容 -->
+          <!-- 主要内容区 -->
           <div
             class="min-h-0 w-full flex-1 px-[var(--admin-content-padding)] pb-[var(--admin-content-padding)]"
             :class="{ 'pt-[var(--admin-content-padding)]': !isShowTabsComputed }"
