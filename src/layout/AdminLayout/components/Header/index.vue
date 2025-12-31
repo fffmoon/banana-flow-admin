@@ -399,7 +399,7 @@ function handleI18nSelect(key: string | number) {
 </template>
 
 <style lang="scss" scoped>
-@use '@/styles/simple-animation.scss' as *;
+@use '@/styles/components/simple-animation.scss' as *;
 
 .menu-btn {
   --at-apply: "h-36px px-8px active:btn-active hover:btn-hover base-ani";

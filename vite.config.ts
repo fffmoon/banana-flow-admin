@@ -43,7 +43,7 @@ export default ({ mode }: ConfigEnv): UserConfig => {
       },
     },
     server: {
-      port: env.VITE_SERVE_PORT,
+      port: Number(env.VITE_SERVE_PORT),
       proxy: createProxy(),
     },
     optimizeDeps: {
