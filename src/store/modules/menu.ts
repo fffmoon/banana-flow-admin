@@ -5,6 +5,7 @@ import { usePageJump } from '@/hooks/usePageJump'
 import { router } from '@/router'
 import { RedirectLayoutName, RedirectName } from '@/router/modules/fixedRoutes'
 import { findRouterById, flattenRoutes, getRouterTopParent } from '@/router/utils'
+import CONFIG from '@/settings'
 import { useAsyncRouteStore } from '@/store/modules/asyncRoute'
 
 export const useMenuStore = defineStore('menu', () => {
@@ -35,6 +36,8 @@ export const useMenuStore = defineStore('menu', () => {
   const mainMenus = computed(() => {
     return asyncRouteStore.routerMenus.filter(ro => !ro.meta?.hideInMenu)
   })
+
+  const currentWidth = computed(() => `${collapsed.value ? CONFIG.menu.collapsedWidth : CONFIG.menu.subMenuWidth}px`)
 
   // #endregion getters
 
@@ -81,15 +84,13 @@ export const useMenuStore = defineStore('menu', () => {
 
   /** 点击子菜单，跳转逻辑 */
   function clickSubMenu(key: string) {
-    // console.log('点击子菜单', key)
-    const fla = flattenRoutes(subMenusRaw.value)
+    const fla = flattenRoutes(mainMenus.value)
     const findRes = fla.find(item => item.raw.meta?.id === key)
 
     if (!findRes)
       return
     if (findRes.raw.meta?.link)
       return // 外部链接通常在渲染层处理，这里忽略或直接打开
-
     goToShouldConfirm(findRes.raw.path, {
       successCallback: () => {
         currentSubMenuId.value = key
@@ -99,7 +100,7 @@ export const useMenuStore = defineStore('menu', () => {
 
   /** 根据当前 URL 同步菜单状态 */
   function syncMenuWithRoute(route: any) {
-    // console.log('根据当前 URL 同步菜单状态')
+    // console.log('根据当前 URL 同步菜单状态', route)
     const id = route.meta.id as string
     if (!id)
       return
@@ -145,6 +146,7 @@ export const useMenuStore = defineStore('menu', () => {
     currentSubMenuId,
     mainMenus,
     subMenusRaw,
+    currentWidth,
     toggleCollapsed,
     clickMainMenu,
     clickSubMenu,

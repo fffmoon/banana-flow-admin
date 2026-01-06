@@ -3,7 +3,7 @@ import type { Component, VNodeChild } from 'vue'
 import { NEllipsis } from 'naive-ui'
 import { computed, h } from 'vue'
 import { useIconRenderer } from '@/hooks/useIconRenderer'
-import { useMenuStore } from '@/store/modules/menu'
+// import { useMenuStore } from '@/store/modules/menu'
 
 // 定义 Naive UI 菜单需要的类型
 interface INaiveMenuOption {
@@ -67,11 +67,16 @@ export function useNaiveMenu() {
   }
 
   // 计算属性：当 Store 中的原始数据变化时，自动重新生成 UI 结构
+  const naiveMainMenus = computed(() => {
+    return transformRouteToOption(menuStore.mainMenus)
+  })
+
   const naiveSubMenus = computed(() => {
     return transformRouteToOption(menuStore.subMenusRaw)
   })
 
   return {
+    naiveMainMenus,
     naiveSubMenus,
   }
 }

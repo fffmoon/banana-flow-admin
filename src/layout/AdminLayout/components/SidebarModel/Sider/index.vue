@@ -1,9 +1,10 @@
 <script lang='ts' setup>
 import { computed, nextTick, ref, watch } from 'vue'
+import Logo from '@/layout/AdminLayout/components/Logo/index.vue'
+import SideTitle from '@/layout/AdminLayout/components/SideTitle/index.vue'
+import { useNaiveMenu } from '@/layout/AdminLayout/js/useNaiveMenu'
 import CONFIG from '@/settings'
 import { useMenuStore } from '@/store/modules/menu'
-import { useNaiveMenu } from '../../js/useNaiveMenu'
-import SideTitle from '../SideTitle/index.vue'
 
 interface IProps {
   showCollapsedButton?: boolean
@@ -16,7 +17,7 @@ const props = withDefaults(defineProps<IProps>(), {
 })
 
 const menuStore = useMenuStore()
-const { naiveSubMenus } = useNaiveMenu()
+const { naiveMainMenus } = useNaiveMenu()
 // 菜单实例
 const routerMenuRef = ref<InstanceType<typeof BMenu> | null>(null)
 
@@ -25,22 +26,30 @@ watch(() => menuStore.currentSubMenuId, (id) => {
   nextTick(() => routerMenuRef.value && routerMenuRef.value.showOption(id))
 })
 
+// 计算宽度
 const isShowSideTitleComputed = computed(() => props.showTitle && !menuStore.collapsed)
 </script>
 
 <template>
   <Transition name="slide-fade" mode="out-in">
     <!-- 使用 naiveSubMenus.length 判断是否有子菜单 -->
-    <div v-show="naiveSubMenus.length > 0" class="sub-menu h-full flex flex-col p-y-2" :style="{ width: menuStore.currentWidth }">
-      <!-- 标题区域 -->
-      <SideTitle v-if="isShowSideTitleComputed" class="h-[var(--header-height)] w-full p-x-3" />
+    <div
+      v-show="naiveMainMenus.length > 0" class="sub-menu h-full flex flex-col p-y-2"
+      :style="{ width: menuStore.currentWidth }"
+    >
+      <div class="h-[var(--header-height)] w-full flex px-3">
+        <!-- logo -->
+        <Logo class="flex-shrink-0" />
+        <!-- 标题区域 -->
+        <SideTitle v-if="isShowSideTitleComputed" class="m-l-3 h-[var(--header-height)] min-w-0 flex-1" />
+      </div>
 
       <!-- 菜单容器 -->
-      <div class="relative min-w-0 w-full flex-1 overflow-hidden">
+      <div class="relative min-w-0 w-100% flex-1 overflow-hidden">
         <BScrollbar>
           <NMenu
             ref="routerMenuRef" :root-indent="16" :collapsed-width="CONFIG.menu.collapsedWidth"
-            :collapsed="menuStore.collapsed" :collapsed-icon-size="22" :options="naiveSubMenus"
+            :collapsed="menuStore.collapsed" :collapsed-icon-size="22" :options="naiveMainMenus"
             :value="menuStore.currentSubMenuId" :on-update:value="menuStore.clickSubMenu"
             @on-update-value="menuStore.clickSubMenu"
           />
@@ -84,6 +93,7 @@ const isShowSideTitleComputed = computed(() => props.showTitle && !menuStore.col
 
 .sub-menu {
   border-right: 1px solid var(--custom-border-color);
+  // overflow: hidden;
 
   :deep(.n-layout-sider__border) {
     --n-border-color: transparent;

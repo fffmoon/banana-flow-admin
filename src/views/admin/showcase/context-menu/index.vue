@@ -5,7 +5,7 @@
  * @LastEditTime: 2025-03-28 16:00:53
 -->
 <script setup lang="ts">
-import type { CustomContentMenuOption } from '@ui/BetterUI/ContentMenu'
+import type { CustomContentMenuOption } from '@ui/BetterUI'
 import {
   ContextMenu,
   ContextMenuContent,
