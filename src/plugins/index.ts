@@ -13,7 +13,7 @@ export async function setupPlugins(app: App) {
   // console.info('app', app)
 
   // 安装vconsole
-  if (useEnv(import.meta.env).VITE_VCONSOLE_SW) {
+  if (import.meta.env.VITE_VCONSOLE_SW === 'true') {
     try {
       const { default: VConsoleConstructor } = await import('vconsole')
       const vConsole = new VConsoleConstructor()

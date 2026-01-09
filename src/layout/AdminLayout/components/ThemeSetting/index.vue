@@ -49,9 +49,9 @@ interface LayoutOption {
 const layoutOptions: LayoutOption[] = [
   { value: 'vertical-mixed', label: '侧边栏混合模式' },
   { value: 'classic', label: '经典模式 (顶栏+侧栏)' },
-  /* { value: 'sidebar', label: '侧边栏模式' },
-  { value: 'vertical', label: '极简侧边栏' },
-  { value: 'top', label: '顶栏模式' },
+  { value: 'sidebar', label: '侧边栏模式' },
+  // { value: 'vertical', label: '极简侧边栏' },
+  /* { value: 'top', label: '顶栏模式' },
   { value: 'mixed', label: '分栏布局' },
   { value: 'top-mixed', label: '顶栏居中模式' }, */
 ]

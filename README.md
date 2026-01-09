@@ -27,6 +27,10 @@
   </tr>
   <tr>
     <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/home-page-3.png?raw=true" /></td>
+    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/home-page-4.png?raw=true" /></td>
+    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/home-page-5.png?raw=true" /></td>
+  </tr>
+  <tr>
     <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/mobile-1.png?raw=true" /></td>
     <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/mobile-2.png?raw=true" /></td>
   </tr>
@@ -233,7 +237,7 @@ pnpm build
 Unocss + SCSS + CSS 变量注入
 
 ### ​​UI 方案​​
-无头组件 + Shadcn-vue + Reka UI
+无头组件 + Reka UI
 
 ### ​​工具链​​
 Vite 5.0 + ESLint + commitlint

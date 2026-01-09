@@ -1,6 +1,6 @@
 /*
  * @Author: Qing
- * @Description: 本地定义的“动态路由”数据（模拟后端返回格式）
+ * @Description: 本地路由
  * @Date: 2025-01-10
  */
 import type { IRouteDataRaw } from 'types/vue-router'
@@ -300,13 +300,13 @@ export const localRoutesData: IRouteDataRaw[] = [
     icon: 'i-mdi-alert-circle',
     componentPath: 'layout/AdminLayout/index',
     path: '/exception',
-    redirect: '',
+    redirect: '403',
     children: [
       {
         id: 'a6-2',
         title: '403',
         icon: 'i-mdi-alert-circle-outline',
-        componentPath: 'views/exception/403',
+        componentPath: 'views/exception/index',
         path: '403',
         keepAlive: true,
       },
@@ -314,7 +314,7 @@ export const localRoutesData: IRouteDataRaw[] = [
         id: 'a6-3',
         title: '404',
         icon: 'i-mdi-lock-outline',
-        componentPath: 'views/exception/404',
+        componentPath: 'views/exception/index',
         path: '404',
         keepAlive: true,
       },
@@ -322,7 +322,7 @@ export const localRoutesData: IRouteDataRaw[] = [
         id: 'a6-4',
         title: '500',
         icon: 'i-mdi-bug-outline',
-        componentPath: 'views/exception/500',
+        componentPath: 'views/exception/index',
         path: '500',
         keepAlive: true,
       },

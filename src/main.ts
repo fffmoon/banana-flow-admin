@@ -11,7 +11,7 @@ import { setupDirective } from './directive'
 import { setupPlugins } from './plugins'
 import { router, setupRouter } from './router'
 import { setupStore } from './store'
-import '@/styles/reset.scss'
+import './styles/reset.css'
 import '@/styles/global.scss'
 import 'virtual:uno.css'
 

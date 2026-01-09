@@ -22,7 +22,7 @@ interface IProps {
 }
 
 const props = defineProps<IProps>()
-const emits = defineEmits(['toggleDrawer'])
+const menuStore = useMenuStore()
 
 const { t, changeLocale, changeableLocales } = useLocale()
 const route = useRoute()
@@ -283,7 +283,7 @@ function handleI18nSelect(key: string | number) {
       <!-- 抽屉按钮 -->
       <NButton
         v-show="props.showSider" quaternary :focusable="false" class="menu-btn"
-        @click="emits('toggleDrawer', true)"
+        @click="menuStore.setMobileDrawer(true)"
       >
         <div class="icon-base icon i-mdi-menu" />
       </NButton>
@@ -399,7 +399,7 @@ function handleI18nSelect(key: string | number) {
 </template>
 
 <style lang="scss" scoped>
-@use '@/styles/simple-animation.scss' as *;
+@use '@/styles/components/simple-animation.scss' as *;
 
 .menu-btn {
   --at-apply: "h-36px px-8px active:btn-active hover:btn-hover base-ani";

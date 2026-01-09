@@ -59,11 +59,11 @@ export const fixedRoutes: Array<IRouteItem> = [
     ],
   },
   {
-    path: '/server-error',
-    name: 'ServerError',
-    component: () => import('@/views/exception/500.vue'),
+    path: '/500',
+    name: '500',
+    component: () => import('@/views/exception/index.vue'),
     meta: {
-      id: 'server-error',
+      id: '500',
       title: '服务器错误',
       hideInMenu: true,
     },

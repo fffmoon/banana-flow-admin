@@ -5,8 +5,8 @@
  * @LastEditTime: 2025-05-09 15:36:50
  */
 import type { RouteLocationRaw, Router } from 'vue-router'
-import { RedirectName } from '@/router/modules/fixedRoutes'
 import { useRoute } from 'vue-router'
+import { RedirectName } from '@/router/modules/fixedRoutes'
 
 export function usePageJump(_router?: Router) {
   const router = _router || useRouter()

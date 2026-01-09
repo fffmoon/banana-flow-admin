@@ -32,7 +32,7 @@ export function createRouterGuards(router: Router) {
       })
     }
     // 如果是系统错误，则直接放行
-    if (to.name === 'ServerError') {
+    if (String(to.name) === '500') {
       return next()
     }
     // 如果需要更新，则从接口获取路由，如果获取更新失败，则跳转到错误页面
@@ -50,8 +50,9 @@ export function createRouterGuards(router: Router) {
       catch (error) {
         console.error(error)
         return next({
-          name: 'ServerError',
+          name: '500',
           query: {
+            type: '500',
             msg: '获取权限菜单失败，这通常是网络问题，请点击重试',
           },
         })

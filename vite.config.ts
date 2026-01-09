@@ -43,7 +43,7 @@ export default ({ mode }: ConfigEnv): UserConfig => {
       },
     },
     server: {
-      port: env.VITE_SERVE_PORT,
+      port: Number(env.VITE_SERVE_PORT),
       proxy: createProxy(),
     },
     optimizeDeps: {
@@ -55,29 +55,21 @@ export default ({ mode }: ConfigEnv): UserConfig => {
     },
     build: {
       minify: 'esbuild',
-      target: 'es2020',
-      cssTarget: 'chrome85',
+      target: 'esnext',
+      cssTarget: 'chrome80',
       reportCompressedSize: false,
-      // chunkSizeWarningLimit: 2048,
-      /* rollupOptions: {
+      sourcemap: false,
+      chunkSizeWarningLimit: 2000,
+      rollupOptions: {
         output: {
-          manualChunks(id) {
-            if (id.includes('node_modules')) {
-              return 'vendor'
-            }
+          // 稍微优化分包，避免一个巨大的 vendor
+          manualChunks: {
+            'vue-vendor': ['vue', 'vue-router', 'pinia'],
+            'naive-ui': ['naive-ui'],
+            'echarts': ['echarts'],
           },
         },
-      }, */
-      /**
-       * esbuild 不支持 drop_console 功能，但是打包速度快
-       */
-      /* minify: 'terser',
-      terserOptions: {
-        compress: {
-          keep_infinity: true,
-          drop_console: Object.is(env.VITE_CONSOLE_SW, 'true'),
-        },
-      }, */
+      },
     },
   }
 }
