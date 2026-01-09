@@ -109,30 +109,6 @@ export interface IThemeCustomOptions {
   borderRadiusSmall: string
 }
 
-// Shadcnui 配置
-export interface IShadcnuiOptions {
-  '--background': string
-  '--foreground': string
-  '--card': string
-  '--card-foreground': string
-  '--popover': string
-  '--popover-foreground': string
-  '--primary': string
-  '--primary-foreground': string
-  '--secondary': string
-  '--secondary-foreground': string
-  '--muted': string
-  '--muted-foreground': string
-  '--accent': string
-  '--accent-foreground': string
-  '--destructive': string
-  '--destructive-foreground': string
-  '--border': string
-  '--input': string
-  '--ring': string
-  '--radius': string
-}
-
 // 定义配置的类型
 export interface IThemeConfig {
   light: IThemeSeries
@@ -143,7 +119,6 @@ export interface IThemeConfig {
 export interface IThemeSeries {
   naiveui: GlobalThemeOverrides
   custom: IThemeCustomOptions
-  shadcn: IShadcnuiOptions
 }
 
 // 定义主题项

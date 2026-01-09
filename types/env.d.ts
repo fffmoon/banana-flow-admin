@@ -24,6 +24,8 @@ interface ImportMetaEnv {
   readonly VITE_MOCK_SW: string
   /** 动态路由开关，关闭后不向后台请求路由更新 */
   readonly VITE_DYNAMIC_ROUTE_SW: string
+  /** 打包分析开关 */
+  readonly VITE_REPORT_SW: string
 }
 
 interface ImportMeta {

@@ -10,7 +10,6 @@ import { FileSystemIconLoader } from '@iconify/utils/lib/loader/node-loaders'
 import { presetIcons } from '@unocss/preset-icons'
 import { defineConfig, presetAttributify, presetUno, transformerDirectives } from 'unocss'
 import presetAnimations from 'unocss-preset-animations'
-import { presetShadcn } from 'unocss-preset-shadcn'
 import { routeIcons } from './src/router/routeIcons'
 
 // 自定义图标路径
@@ -60,7 +59,6 @@ export default defineConfig({
       prefix: 'i-',
     }),
     presetAnimations(),
-    presetShadcn(),
   ],
   safelist: [...routeIcons],
   transformers: [transformerDirectives()],

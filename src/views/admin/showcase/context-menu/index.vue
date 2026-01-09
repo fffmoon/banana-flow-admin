@@ -6,12 +6,6 @@
 -->
 <script setup lang="ts">
 import type { CustomContentMenuOption } from '@ui/BetterUI'
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from '@/ui/shadcn/ui/context-menu'
 
 const message = useMessage()
 
@@ -123,21 +117,6 @@ function handleSelect(key: string | number, item: CustomContentMenuOption) {
             </div>
           </BContentMenu>
         </BSpace>
-      </NCard>
-      <NCard :bordered="false" title="来自shadcn的右键菜单组件">
-        <ContextMenu>
-          <ContextMenuTrigger
-            class="h-[150px] w-[300px] flex items-center justify-center border rounded-md border-dashed text-sm"
-          >
-            在这个区域鼠标右键
-          </ContextMenuTrigger>
-          <ContextMenuContent>
-            <ContextMenuItem>Profile</ContextMenuItem>
-            <ContextMenuItem>Billing</ContextMenuItem>
-            <ContextMenuItem>Team</ContextMenuItem>
-            <ContextMenuItem>SubscriptionSubscriptionSubscription</ContextMenuItem>
-          </ContextMenuContent>
-        </ContextMenu>
       </NCard>
     </BSpace>
   </FeatureDemo>

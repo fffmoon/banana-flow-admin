@@ -1,3 +1,4 @@
+import type { GlobalThemeOverrides } from 'naive-ui'
 /*
  * @Author: Qing
  * @Description: 主题
@@ -5,7 +6,6 @@
  * @LastEditTime: 2025-07-31 17:19:08
  */
 import type {
-  IShadcnuiOptions,
   ITheme,
   IThemeConfig,
   IThemeCustomOptions,
@@ -13,7 +13,8 @@ import type {
   IThemeSeries,
   IUserThemeMode,
 } from '@/theme'
-import type { GlobalThemeOverrides } from 'naive-ui'
+import { deepMerge } from '@antfu/utils'
+import { defineStore } from 'pinia'
 import CONFIG from '@/settings'
 import { store } from '@/store'
 import {
@@ -21,8 +22,6 @@ import {
   setCssVarsRecursively,
 } from '@/theme'
 import { Storage } from '@/utils/storage/Storage'
-import { deepMerge } from '@antfu/utils'
-import { defineStore } from 'pinia'
 import { themeDefault, themes } from './themes'
 
 interface ThemeState {
@@ -36,8 +35,6 @@ interface ThemeState {
   customOptions: IThemeCustomOptions | null
   // naiveui数据
   naiveuiOptions: GlobalThemeOverrides | null
-  // shadcn数据
-  shadcnuiOptions: IShadcnuiOptions | null
   // 自定义主题数据
   themeCustom: IThemeConfig
 }
@@ -50,7 +47,6 @@ export const useThemeStore = defineStore('theme', {
     themeCustom: Storage.get('themeCustom', JSON.parse(JSON.stringify(themeDefault)) as IThemeConfig),
     customOptions: null,
     naiveuiOptions: null,
-    shadcnuiOptions: null,
   }),
   getters: {
     // 获取主题是否为暗黑模式
@@ -141,7 +137,6 @@ export const useThemeStore = defineStore('theme', {
     resetThemeToDefault() {
       this.customOptions = null
       this.naiveuiOptions = null
-      this.shadcnuiOptions = null
       this.setActiveThemeMode('light')
       this.setThemeColorScheme('themeDefault')
     },
@@ -192,7 +187,6 @@ export const useThemeStore = defineStore('theme', {
 
       this.updateCustomOptions(currentTheme.custom)
       this.updateNaiveuiOptions(currentTheme.naiveui)
-      this.updateShadcnuiOptions(currentTheme.shadcn)
     },
     // 更新自定义的颜色
     updateCustomOptions(customOptions: IThemeCustomOptions) {
@@ -262,13 +256,6 @@ export const useThemeStore = defineStore('theme', {
 
       // 应用样式
       setCssVarsRecursively(this.naiveuiOptions)
-    },
-    // 更新 shadcnui 的颜色
-    updateShadcnuiOptions(shadcnuiOptions: IShadcnuiOptions) {
-      /* 处理 shadcnui 的颜色 */
-      // DOTO
-      this.shadcnuiOptions = shadcnuiOptions
-      Storage.set('shadcnuiOptions', shadcnuiOptions)
     },
   },
 })

@@ -233,7 +233,7 @@ pnpm build
 Unocss + SCSS + CSS 变量注入
 
 ### ​​UI 方案​​
-无头组件 + Shadcn-vue + Reka UI
+无头组件 + Reka UI
 
 ### ​​工具链​​
 Vite 5.0 + ESLint + commitlint
