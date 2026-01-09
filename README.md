@@ -27,6 +27,10 @@
   </tr>
   <tr>
     <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/home-page-3.png?raw=true" /></td>
+    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/home-page-4.png?raw=true" /></td>
+    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/home-page-5.png?raw=true" /></td>
+  </tr>
+  <tr>
     <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/mobile-1.png?raw=true" /></td>
     <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/mobile-2.png?raw=true" /></td>
   </tr>
