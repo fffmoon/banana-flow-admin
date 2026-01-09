@@ -4,7 +4,6 @@
  * @Date: 2024-06-21 20:42:27
  * @LastEditTime: 2025-03-13 21:02:32
  */
-import legacy from '@vitejs/plugin-legacy'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { visualizer } from 'rollup-plugin-visualizer'
@@ -18,20 +17,23 @@ import setupImportToCDNPlugin from './importToCDN'
 import setupMockPlugin from './mock'
 
 export default function setupPlugins(env: ImportMetaEnv) {
-  return [
+  const plugins = [
     vue(),
     vueJsx(),
-    legacy({
-      targets: ['defaults', 'not IE 11'],
-    }),
     autoImport(),
     setupMockPlugin(env),
-    visualizer({ open: true }),
-    vueDevtools(),
     setupImportToCDNPlugin(),
     UnoCSS(),
     progress(),
     AppLoading('loading.html'),
     DefineOptions(),
   ]
+
+  if (env.VITE_ENV === 'development') {
+    plugins.push(vueDevtools())
+  }
+  if (env.VITE_REPORT_SW === 'true') {
+    plugins.push(visualizer({ open: true, gzipSize: true, brotliSize: true }))
+  }
+  return plugins
 }

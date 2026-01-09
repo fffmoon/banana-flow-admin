@@ -15,15 +15,17 @@ interface ImportMetaEnv {
   /** API接口路径 */
   readonly VITE_BASE_API: string
   /** console.log 开关 */
-  readonly VITE_CONSOLE_SW: boolean
+  readonly VITE_CONSOLE_SW: string
   /** vconsole 开关 */
-  readonly VITE_VCONSOLE_SW: boolean
+  readonly VITE_VCONSOLE_SW: string
   /** 服务端口 */
-  readonly VITE_SERVE_PORT: number
+  readonly VITE_SERVE_PORT: string
   /** mock 开关 */
-  readonly VITE_MOCK_SW: boolean
+  readonly VITE_MOCK_SW: string
   /** 动态路由开关，关闭后不向后台请求路由更新 */
-  readonly VITE_DYNAMIC_ROUTE_SW: boolean
+  readonly VITE_DYNAMIC_ROUTE_SW: string
+  /** 打包分析开关 */
+  readonly VITE_REPORT_SW: string
 }
 
 interface ImportMeta {

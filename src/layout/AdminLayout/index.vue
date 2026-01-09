@@ -6,19 +6,18 @@
 -->
 <script setup lang="ts">
 import type { IWaterMarkOptions } from '@/directive/vBetterWaterMark/type'
+import TopHeader from '@/layout/AdminLayout/components/ClassicModel/TopHeader/index.vue'
 import CONFIG from '@/settings'
-import { useMenuStore } from '@/store/modules/menu'
 import DrawerSider from './components/DrawerSider/index.vue'
 import ExitMaximizationButton from './components/ExitMaximizationButton/index.vue'
 import Header from './components/Header/index.vue'
 import { themeLoadingStyles } from './components/NetworkRequest'
 import SettingBtn from './components/SettingBtn/index.vue'
+import SidebarModelSider from './components/SidebarModel/Sider/index.vue'
 import Sider from './components/Sider/index.vue'
 import SubMenu from './components/SubMenu/index.vue'
 import TabsView from './components/TabsView/index.vue'
 import ThemeSetting from './components/ThemeSetting/index.vue'
-
-import TopHeader from './components/TopHeader/index.vue'
 
 const asyncRouteStore = useAsyncRouteStore()
 const globalStore = useGlobalStore()
@@ -76,11 +75,6 @@ watch(() => screenInfo.value, () => {
   }
 })
 
-const drawerSiderRef = ref<InstanceType<typeof DrawerSider> | null>(null)
-// 提供给子组件的方法
-function toggleDrawer(value?: boolean) {
-  drawerSiderRef.value?.toggleVisible(value)
-}
 // #endregion 侧边栏
 
 // #region ➤ 载入效果
@@ -120,7 +114,7 @@ const markOptions = computed((): IWaterMarkOptions => {
         :native-scrollbar="false"
       >
         <!-- 头部 -->
-        <Header v-show="isShowHeaderComputed" :show-sider="isShowSiderBtnComputed" @toggle-drawer="toggleDrawer" />
+        <Header v-show="isShowHeaderComputed" :show-sider="isShowSiderBtnComputed" />
         <!-- 标签页 -->
         <TabsView v-show="isShowTabsComputed" />
         <!-- 主要内容区 -->
@@ -129,11 +123,11 @@ const markOptions = computed((): IWaterMarkOptions => {
           :class="{ 'pt-[var(--admin-content-padding)]': !isShowTabsComputed }"
         >
           <BScrollbar>
-            <RouterView v-slot="{ Component, route }">
+            <RouterView v-slot="{ Component, route: routerRoute }">
               <!-- 扩展多种路由切换动画，使用 Transition 后，页面需要保持单根 -->
               <Transition :name="globalStore.getTransitionName" mode="out-in" appear>
                 <KeepAlive :include="asyncRouteStore.keepAliveRouterList">
-                  <component :is="Component" :key="route.name" />
+                  <component :is="Component" :key="routerRoute.name" />
                 </KeepAlive>
               </Transition>
             </RouterView>
@@ -142,6 +136,7 @@ const markOptions = computed((): IWaterMarkOptions => {
       </div>
     </div>
     <!-- 桌面端 -->
+    <!-- 两栏模式 vertical-mixed -->
     <div v-else-if="globalStore.menu.mode === 'vertical-mixed'" class="wh-full flex">
       <!-- 侧边栏 -->
       <Sider v-show="isShowSiderComputed" />
@@ -153,7 +148,7 @@ const markOptions = computed((): IWaterMarkOptions => {
         :native-scrollbar="false"
       >
         <!-- 头部 -->
-        <Header v-show="isShowHeaderComputed" :show-sider="isShowSiderBtnComputed" @toggle-drawer="toggleDrawer" />
+        <Header v-show="isShowHeaderComputed" :show-sider="isShowSiderBtnComputed" />
         <!-- 标签页 -->
         <TabsView v-show="isShowTabsComputed" />
         <!-- 主要内容区 -->
@@ -162,11 +157,11 @@ const markOptions = computed((): IWaterMarkOptions => {
           :class="{ 'pt-[var(--admin-content-padding)]': !isShowTabsComputed }"
         >
           <BScrollbar>
-            <RouterView v-slot="{ Component, route }">
+            <RouterView v-slot="{ Component, route: routerRoute }">
               <!-- 扩展多种路由切换动画，使用 Transition 后，页面需要保持单根 -->
               <Transition :name="globalStore.getTransitionName" mode="out-in" appear>
                 <KeepAlive :include="asyncRouteStore.keepAliveRouterList">
-                  <component :is="Component" :key="route.name" />
+                  <component :is="Component" :key="routerRoute.name" />
                 </KeepAlive>
               </Transition>
             </RouterView>
@@ -174,7 +169,7 @@ const markOptions = computed((): IWaterMarkOptions => {
         </div>
       </div>
     </div>
-    <!-- 顶部模式 top -->
+    <!-- 顶部模式 classic -->
     <div v-else-if="globalStore.menu.mode === 'classic'" class="wh-full flex flex-col">
       <!-- 头部 -->
       <TopHeader></TopHeader>
@@ -194,11 +189,11 @@ const markOptions = computed((): IWaterMarkOptions => {
             :class="{ 'pt-[var(--admin-content-padding)]': !isShowTabsComputed }"
           >
             <BScrollbar>
-              <RouterView v-slot="{ Component, route }">
+              <RouterView v-slot="{ Component, route: routerRoute }">
                 <!-- 扩展多种路由切换动画，使用 Transition 后，页面需要保持单根 -->
                 <Transition :name="globalStore.getTransitionName" mode="out-in" appear>
                   <KeepAlive :include="asyncRouteStore.keepAliveRouterList">
-                    <component :is="Component" :key="route.name" />
+                    <component :is="Component" :key="routerRoute.name" />
                   </KeepAlive>
                 </Transition>
               </RouterView>
@@ -207,8 +202,39 @@ const markOptions = computed((): IWaterMarkOptions => {
         </div>
       </div>
     </div>
+    <!-- 侧边栏模式 sidebar -->
+    <div v-else-if="globalStore.menu.mode === 'sidebar'" class="wh-full flex">
+      <!-- 侧边栏 -->
+      <SidebarModelSider v-show="isShowSiderComputed" />
+      <!-- 最右边内容 -->
+      <div
+        class="min-h-0 min-w-0 flex flex-1 flex-col bg-[var(--custom-admin-content-color)]"
+        :native-scrollbar="false"
+      >
+        <!-- 头部 -->
+        <Header v-show="isShowHeaderComputed" :show-sider="isShowSiderBtnComputed" />
+        <!-- 标签页 -->
+        <TabsView v-show="isShowTabsComputed" />
+        <!-- 主要内容区 -->
+        <div
+          class="min-h-0 w-full flex-1 px-[var(--admin-content-padding)] pb-[var(--admin-content-padding)]"
+          :class="{ 'pt-[var(--admin-content-padding)]': !isShowTabsComputed }"
+        >
+          <BScrollbar>
+            <RouterView v-slot="{ Component, route: routerRoute }">
+              <!-- 扩展多种路由切换动画，使用 Transition 后，页面需要保持单根 -->
+              <Transition :name="globalStore.getTransitionName" mode="out-in" appear>
+                <KeepAlive :include="asyncRouteStore.keepAliveRouterList">
+                  <component :is="Component" :key="routerRoute.name" />
+                </KeepAlive>
+              </Transition>
+            </RouterView>
+          </BScrollbar>
+        </div>
+      </div>
+    </div>
     <!-- 移动端抽屉 -->
-    <DrawerSider ref="drawerSiderRef" />
+    <DrawerSider />
     <!-- 设置 -->
     <SettingBtn></SettingBtn>
     <!-- 主题设置 -->

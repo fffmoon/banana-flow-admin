@@ -1,6 +1,6 @@
 /**
  * @Author: Qing
- * @description: 转换VITE的环境变量为正确的类型
+ * @description: 转换VITE的环境变量为正确的类型，不允许在vite.config.ts之外的地方中使用，因为会导致按需引入失效的问题
  * @param env 原来的环境
  * @return 正确类型的环境
  */

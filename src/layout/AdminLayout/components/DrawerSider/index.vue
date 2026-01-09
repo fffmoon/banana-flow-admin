@@ -6,30 +6,27 @@
 -->
 <script lang='ts' setup>
 import CONFIG from '@/settings'
+import { useNaiveMenu } from '../../js/useNaiveMenu'
 import Sider from '../Sider/index.vue'
 import SubMenu from '../SubMenu/index.vue'
 
-const showDrawer = ref<boolean>(false)
-function toggleVisible(value?: boolean) {
-  showDrawer.value = value ?? !showDrawer.value
-}
+const { naiveMixSubMenus } = useNaiveMenu()
+const menuStore = useMenuStore()
 
-const width = ref<number>(CONFIG.menu.mainMenuWidth + CONFIG.menu.subMenuWidth)
-function emitUpdateSubMenuStatus(status: boolean) {
-  width.value = status ? CONFIG.menu.mainMenuWidth + CONFIG.menu.subMenuWidth : CONFIG.menu.mainMenuWidth
-}
-
-defineExpose({ toggleVisible })
+// 计算宽度
+const drawerWidth = computed(() => {
+  const subWidth = Number(CONFIG.menu.subMenuWidth)
+  const mainWidth = Number(CONFIG.menu.mainMenuWidth)
+  const hasSubMenu = naiveMixSubMenus.value.length > 0
+  return mainWidth + (hasSubMenu ? subWidth : 0)
+})
 </script>
 
 <template>
-  <NDrawer v-model:show="showDrawer" placement="left" :width="width" display-directive="show">
+  <NDrawer v-model:show="menuStore.mobileDrawerVisible" placement="left" :width="drawerWidth" display-directive="show">
     <div class="scroll-none h-full w-full flex overflow-hidden">
-      <Sider
-        :collapsed="false" :hidden-menu-button="true" @update-active-menu-key="() => showDrawer = false"
-        @update-sub-menu-status="emitUpdateSubMenuStatus"
-      />
-      <SubMenu :show-collapsed-button="false" />
+      <Sider :collapsed="false" :hidden-menu-button="true" />
+      <SubMenu v-if="naiveMixSubMenus.length > 0" :show-collapsed-button="false" />
     </div>
   </NDrawer>
 </template>
