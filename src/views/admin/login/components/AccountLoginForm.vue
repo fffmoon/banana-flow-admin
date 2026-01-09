@@ -15,8 +15,8 @@ const route = useRoute()
 
 const formRef = ref<FormInst | null>(null)
 const loginForm = reactive({
-  username: route.query?.username?.[0] ?? '',
-  password: '',
+  username: route.query?.username?.[0] ?? '13812345678',
+  password: '123456',
 })
 
 const isLoading = ref(false)
