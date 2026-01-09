@@ -1,4 +1,4 @@
-import type { IRouteDataRaw, IRouteItem } from 'types/vue-router'
+import type { IRouteItem } from 'types/vue-router'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { usePageJump } from '@/hooks/usePageJump'
@@ -13,143 +13,156 @@ export const useMenuStore = defineStore('menu', () => {
   const { goToShouldConfirm } = usePageJump(router)
 
   // #region ➤ state
-  // ================================================
-  // #
-  // Qing 2025-12-25 10:33:38
-  // ================================================
+  const collapsed = ref(false)
 
-  const collapsed = ref(false) // 侧边栏折叠状态
-  const currentMainMenuId = ref<IRouteDataRaw['id'] | null>(null) // 当前激活的一级菜单ID
-  const currentSubMenuId = ref<string>('') // 当前激活的子菜单ID（用于高亮）
+  // 当前高亮的菜单 Key
+  const activeMenuKey = ref<string>('')
 
-  // 缓存当前的子菜单列表，原始数据格式
-  const subMenusRaw = ref<IRouteItem[]>([])
+  // 双栏模式，当前选中的一级菜单 ID
+  const currentMixMainId = ref<string>('')
+
+  // 双栏模式，当前显示的二级菜单列表
+  const mixedExtraMenus = ref<IRouteItem[]>([])
+
+  // 移动端抽屉显示状态
+  const mobileDrawerVisible = ref(false)
+
+  // #endregion
 
   // #region ➤ getters
 
-  // ================================================
-  // #
-  // Qing 2025-12-25 10:34:19
-  // ================================================
-
-  // 主菜单列表 (从 asyncRouteStore 过滤)
-  const mainMenus = computed(() => {
+  // 完整菜单树
+  const allMenus = computed(() => {
     return asyncRouteStore.routerMenus.filter(ro => !ro.meta?.hideInMenu)
   })
 
+  // 双栏模式 - 顶部一级菜单
+  const mixMainMenus = computed(() => {
+    return allMenus.value // 后续扩展
+  })
+
+  // 计算侧边栏宽度
   const currentWidth = computed(() => `${collapsed.value ? CONFIG.menu.collapsedWidth : CONFIG.menu.subMenuWidth}px`)
 
-  // #endregion getters
+  // #endregion
 
   // #region ➤ actions
-  // ================================================
-  // #
-  // Qing 2025-12-25 10:34:46
-  // ================================================
 
-  /** 切换折叠状态 */
   function toggleCollapsed(state?: boolean) {
     collapsed.value = state ?? !collapsed.value
   }
 
-  /** 点击主菜单，处理混合导航逻辑 */
-  function clickMainMenu(menu: IRouteItem) {
-    // 逻辑复刻：如果是单列菜单，直接跳转
-    if (menu.meta?.singleMenu) {
-      let path = menu.path
-      if (menu.redirect)
-        path = menu.redirect as string
-      else if (menu.children?.length)
-        path = menu.children[0].path
+  function setMobileDrawer(state: boolean) {
+    mobileDrawerVisible.value = state
+  }
 
-      goToShouldConfirm(path, {
+  /**
+   * 统一路由同步逻辑
+   */
+  function syncMenuWithRoute(route: any) {
+    if (route.name === RedirectName || route.name === RedirectLayoutName)
+      return
+
+    const id = route.meta?.id as string
+    if (!id)
+      return
+
+    // --- 计算高亮 Key ---
+    // 优先取 meta.activeMenu，其次判断是否属于 singleMenu 的子级，最后取自身 ID
+    let targetKey = route.meta?.activeMenu || id
+
+    // 查找当前路由在路由表中的完整信息，用于判断 singleMenu
+    const allRoutesFlat = flattenRoutes(asyncRouteStore.routerMenus)
+    const currentRouteItem = allRoutesFlat.find(item => item.raw.meta?.id === id)
+
+    // 如果当前路由的父级是 singleMenu，则高亮必须强制指向父级 ID
+    // 这样 Sidebar 渲染父级节点时，才能匹配上 active-key
+    if (currentRouteItem) {
+      const parentId = getRouterTopParent(asyncRouteStore.routerMenus, id)
+      if (!parentId)
+        return
+      const parentMenu = findRouterById(asyncRouteStore.routerMenus, parentId)
+
+      // 如果顶层父级是 singleMenu，且当前不在 Mixed 模式的顶部点击场景
+      if (parentMenu && parentMenu.raw.meta?.singleMenu) {
+        targetKey = parentMenu.raw.meta?.id as string
+      }
+    }
+
+    activeMenuKey.value = targetKey
+
+    // --- 处理双栏模式 ---
+    const topId = getRouterTopParent(asyncRouteStore.routerMenus, id) || id
+
+    // 防止重复计算
+    if (currentMixMainId.value !== topId) {
+      currentMixMainId.value = topId
+      const menu = findRouterById(asyncRouteStore.routerMenus, topId)
+
+      // 如果是 singleMenu 或者是没有子级的菜单，混合模式的侧边栏应为空
+      if (!menu || menu.raw.meta?.singleMenu || !menu.raw.children?.length) {
+        mixedExtraMenus.value = []
+      }
+      else {
+        mixedExtraMenus.value = menu.raw.children || []
+      }
+    }
+  }
+
+  /** 点击主菜单 (双栏模式顶部) */
+  function clickMixMainMenu(menu: IRouteItem) {
+    const menuId = menu.meta?.id as string
+
+    // 如果是单个菜单，直接跳转
+    if (menu.meta?.singleMenu) {
+      const path = menu.redirect || menu.path
+      goToShouldConfirm(path as string, {
         successCallback: () => {
-          setMainMenu(menu.meta?.id as string)
+          currentMixMainId.value = menuId
+          mixedExtraMenus.value = []
+          mobileDrawerVisible.value = false
         },
       })
     }
     else {
-      // 仅仅切换显示的子菜单，不跳转
-      setMainMenu(menu.meta?.id as string)
+      // 展开子菜单
+      currentMixMainId.value = menuId
+      mixedExtraMenus.value = menu.children || []
+      // DOTO: 后续可以扩展自动跳转到第一个子菜单
     }
   }
 
-  /** 设置当前主菜单，并计算对应的子菜单列表 */
-  function setMainMenu(id: string) {
-    currentMainMenuId.value = id
-    // 从路由表中查找对应的子菜单
-    const menu = mainMenus.value.find(item => item.meta?.id === id)
-    subMenusRaw.value = menu?.children || []
-  }
-
-  /** 点击子菜单，跳转逻辑 */
-  function clickSubMenu(key: string) {
-    const fla = flattenRoutes(mainMenus.value)
+  /** 点击菜单项 (通用) */
+  function clickMenu(key: string) {
+    const fla = flattenRoutes(asyncRouteStore.routerMenus)
     const findRes = fla.find(item => item.raw.meta?.id === key)
 
-    if (!findRes)
+    if (!findRes || findRes.raw.meta?.link)
       return
-    if (findRes.raw.meta?.link)
-      return // 外部链接通常在渲染层处理，这里忽略或直接打开
+
     goToShouldConfirm(findRes.raw.path, {
       successCallback: () => {
-        currentSubMenuId.value = key
+        activeMenuKey.value = key
+        mobileDrawerVisible.value = false
       },
     })
   }
 
-  /** 根据当前 URL 同步菜单状态 */
-  function syncMenuWithRoute(route: any) {
-    // console.log('根据当前 URL 同步菜单状态', route)
-    const id = route.meta.id as string
-    if (!id)
-      return
-
-    // 1. 处理高亮子菜单 ID
-    // 优先使用 meta.activeMenu，否则使用当前 ID
-    const activeMenu = route.meta.activeMenu as string
-    currentSubMenuId.value = activeMenu || id
-
-    // 2. 处理主菜单归属 (自下而上查找)
-    // 如果是重定向页面，不处理
-    if (route.name === RedirectName || route.name === RedirectLayoutName)
-      return
-
-    const topId = getRouterTopParent(asyncRouteStore.routerMenus, id)
-    if (!topId)
-      return
-
-    // 如果当前主菜单已经是这个，就不重复计算了
-    if (currentMainMenuId.value === topId)
-      return
-
-    const menu = findRouterById(asyncRouteStore.routerMenus, topId)
-    if (!menu)
-      return
-
-    // 如果是单列菜单，清空子菜单
-    if (menu.raw.meta?.singleMenu || !menu.raw.children?.length) {
-      currentMainMenuId.value = topId
-      subMenusRaw.value = []
-    }
-    else {
-      currentMainMenuId.value = topId
-      subMenusRaw.value = menu.raw.children || []
-    }
-  }
-
-  // #endregion actions
+  // #endregion
 
   return {
     collapsed,
-    currentMainMenuId,
-    currentSubMenuId,
-    mainMenus,
-    subMenusRaw,
+    activeMenuKey,
+    currentMixMainId,
+    mobileDrawerVisible,
     currentWidth,
+    allMenus, // 单栏模式用
+    mixMainMenus, // 双栏模式顶部用
+    mixedExtraMenus, // 双栏模式侧边用
+    setMobileDrawer,
     toggleCollapsed,
-    clickMainMenu,
-    clickSubMenu,
+    clickMixMainMenu,
+    clickMenu,
     syncMenuWithRoute,
   }
 })

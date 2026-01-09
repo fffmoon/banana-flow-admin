@@ -19,7 +19,7 @@ export function loadView(view: string, componentName?: string): () => Promise<Co
 
   if (!(path in modules)) {
     console.error(`路由组件 ${path} 未找到`)
-    return () => import('@/views/exception/404.vue')
+    return () => import('@/views/exception/index.vue')
   }
 
   return () => {
@@ -180,6 +180,8 @@ export function flattenRoutes(
  * @returns 找到的路由对象或 undefined
  */
 export function findRouterById(routes: IRouteItem[], id: string) {
+  if (!id)
+    return undefined
   const flatRoutes = flattenRoutes(routes)
   return flatRoutes.find(item => item.id === id)
 }

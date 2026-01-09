@@ -21,7 +21,7 @@ export const routes: Array<IRouteItem> = []
 const notFoundRoute = {
   path: '/:pathMatch(.*)*',
   name: 'NotFound',
-  component: () => import('@/views/exception/404.vue'),
+  component: () => import('@/views/exception/index.vue'),
   meta: {
     id: 'not-found',
     title: '页面未找到',
@@ -111,7 +111,7 @@ export function setupDynamicRoutes(data: IRouteDataRaw[] = []) {
     const routermenus = [...accessRoutes, ...fixedRoutes]
     const asyncRouteStore = useAsyncRouteStore()
     asyncRouteStore.setRouterMenus(routermenus)
-    // console.info('输出路由数据：', routermenus)
+    console.info('输出路由数据：', routermenus)
     // 动态添加路由
     routermenus.forEach((route) => {
       // 判断是否已有该路由

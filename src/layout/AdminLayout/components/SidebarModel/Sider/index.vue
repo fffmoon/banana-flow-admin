@@ -17,41 +17,31 @@ const props = withDefaults(defineProps<IProps>(), {
 })
 
 const menuStore = useMenuStore()
-const { naiveMainMenus } = useNaiveMenu()
-// 菜单实例
+const { naiveAllMenus } = useNaiveMenu()
 const routerMenuRef = ref<InstanceType<typeof BMenu> | null>(null)
 
-// 监听当前选中的菜单ID，滚动到对应位置
-watch(() => menuStore.currentSubMenuId, (id) => {
-  nextTick(() => routerMenuRef.value && routerMenuRef.value.showOption(id))
+// 监听高亮 Key
+watch(() => menuStore.activeMenuKey, (key) => {
+  nextTick(() => routerMenuRef.value && routerMenuRef.value.showOption(key))
 })
 
-// 计算宽度
 const isShowSideTitleComputed = computed(() => props.showTitle && !menuStore.collapsed)
 </script>
 
 <template>
   <Transition name="slide-fade" mode="out-in">
-    <!-- 使用 naiveSubMenus.length 判断是否有子菜单 -->
-    <div
-      v-show="naiveMainMenus.length > 0" class="sub-menu h-full flex flex-col p-y-2"
-      :style="{ width: menuStore.currentWidth }"
-    >
+    <div v-if="true" class="sub-menu h-full flex flex-col p-y-2" :style="{ width: menuStore.currentWidth }">
       <div class="h-[var(--header-height)] w-full flex px-3">
-        <!-- logo -->
         <Logo class="flex-shrink-0" />
-        <!-- 标题区域 -->
         <SideTitle v-if="isShowSideTitleComputed" class="m-l-3 h-[var(--header-height)] min-w-0 flex-1" />
       </div>
 
-      <!-- 菜单容器 -->
       <div class="relative min-w-0 w-100% flex-1 overflow-hidden">
         <BScrollbar>
           <NMenu
             ref="routerMenuRef" :root-indent="16" :collapsed-width="CONFIG.menu.collapsedWidth"
-            :collapsed="menuStore.collapsed" :collapsed-icon-size="22" :options="naiveMainMenus"
-            :value="menuStore.currentSubMenuId" :on-update:value="menuStore.clickSubMenu"
-            @on-update-value="menuStore.clickSubMenu"
+            :collapsed="menuStore.collapsed" :collapsed-icon-size="22" :options="naiveAllMenus"
+            :value="menuStore.activeMenuKey" :on-update:value="menuStore.clickMenu"
           />
         </BScrollbar>
 

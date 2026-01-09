@@ -16,12 +16,12 @@ const props = withDefaults(defineProps<IProps>(), {
 })
 
 const menuStore = useMenuStore()
-const { naiveSubMenus } = useNaiveMenu()
+const { naiveMixSubMenus } = useNaiveMenu()
 // 菜单实例
 const routerMenuRef = ref<InstanceType<typeof BMenu> | null>(null)
 
 // 监听当前选中的菜单ID，滚动到对应位置
-watch(() => menuStore.currentSubMenuId, (id) => {
+watch(() => menuStore.activeMenuKey, (id) => {
   nextTick(() => routerMenuRef.value && routerMenuRef.value.showOption(id))
 })
 
@@ -30,8 +30,11 @@ const isShowSideTitleComputed = computed(() => props.showTitle && !menuStore.col
 
 <template>
   <Transition name="slide-fade" mode="out-in">
-    <!-- 使用 naiveSubMenus.length 判断是否有子菜单 -->
-    <div v-show="naiveSubMenus.length > 0" class="sub-menu h-full flex flex-col p-y-2" :style="{ width: menuStore.currentWidth }">
+    <!-- 使用 naiveMixSubMenus.length 判断是否有子菜单 -->
+    <div
+      v-show="naiveMixSubMenus.length > 0" class="sub-menu h-full flex flex-col p-y-2"
+      :style="{ width: menuStore.currentWidth }"
+    >
       <!-- 标题区域 -->
       <SideTitle v-if="isShowSideTitleComputed" class="h-[var(--header-height)] w-full p-x-3" />
 
@@ -40,9 +43,8 @@ const isShowSideTitleComputed = computed(() => props.showTitle && !menuStore.col
         <BScrollbar>
           <NMenu
             ref="routerMenuRef" :root-indent="16" :collapsed-width="CONFIG.menu.collapsedWidth"
-            :collapsed="menuStore.collapsed" :collapsed-icon-size="22" :options="naiveSubMenus"
-            :value="menuStore.currentSubMenuId" :on-update:value="menuStore.clickSubMenu"
-            @on-update-value="menuStore.clickSubMenu"
+            :collapsed="menuStore.collapsed" :collapsed-icon-size="22" :options="naiveMixSubMenus"
+            :value="menuStore.activeMenuKey" :on-update:value="menuStore.clickMenu"
           />
         </BScrollbar>
 

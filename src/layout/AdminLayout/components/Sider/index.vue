@@ -15,10 +15,9 @@ interface IProps {
 const props = withDefaults(defineProps<IProps>(), {
   showLogo: true,
 })
-
 const menuStore = useMenuStore()
-const { currentMainMenuId, mainMenus } = storeToRefs(menuStore)
-const { clickMainMenu } = menuStore
+const { currentMixMainId, mixMainMenus } = storeToRefs(menuStore)
+const { clickMixMainMenu } = menuStore
 </script>
 
 <template>
@@ -32,9 +31,9 @@ const { clickMainMenu } = menuStore
     <!-- 菜单 -->
     <BScrollbar class="flex-1" content-class=" h-full flex flex-1 flex-col gap-y-[var(--space-sm)] overflow-auto p-2">
       <div
-        v-for="menu in mainMenus" :key="menu.meta?.id"
+        v-for="menu in mixMainMenus" :key="menu.meta?.id"
         class="app-menu-item flex flex-center flex-col gap-4px py-[var(--space-md)]"
-        :class="{ 'is-active': currentMainMenuId === menu.meta?.id }" @click="clickMainMenu(menu)"
+        :class="{ 'is-active': currentMixMainId === menu.meta?.id }" @click="clickMixMainMenu(menu)"
       >
         <div class="app-menu-item__icon" :class="menu.meta?.icon || 'i-mdi-dots-horizontal'" />
 
