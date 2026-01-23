@@ -5,7 +5,7 @@
   "packageManager": "pnpm@9.10.0",
   "homepage": "./",
   "author": {
-    "name": "Qing git@FFFMOON"
+    "name": "Qing FFFMOON@github"
   },
   "license": "MIT",
   "engines": {
@@ -17,7 +17,6 @@
     "build:development": "vite build --mode development",
     "build:test": "npm run build:development",
     "build:production": "vite build --mode production",
-    "build:time": "time vite build",
     "preview": "vite preview",
     "deploy": "gh-pages -d dist",
     "format": "prettier --write ./src",
