@@ -1,0 +1,131 @@
+<style>
+  .app-startup-container {
+    --startup-primary-hue: 210;
+    --startup-primary-color: hsl(var(--startup-primary-hue), 100%, 55%);
+    --startup-secondary-color: hsl(calc(var(--startup-primary-hue) + 40), 100%, 55%);
+  }
+
+  .app-startup-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: hsl(0, 0%, 98%);
+    backdrop-filter: blur(4px);
+  }
+
+  .app-startup-content {
+    text-align: center;
+    transform: translateY(-20%);
+  }
+
+  .app-startup-spinner {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto;
+    position: relative;
+    border-radius: 50%;
+    background: conic-gradient(transparent,
+        var(--startup-primary-color),
+        var(--startup-secondary-color));
+    animation: app-startup-spin 1.2s linear infinite;
+    box-shadow: 0 0 20px hsla(var(--startup-primary-hue), 100%, 55%, 0.1);
+  }
+
+  .app-startup-spinner::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    background: hsl(0, 0%, 98%);
+    border-radius: 50%;
+    z-index: 1;
+  }
+
+  .app-startup-text-base {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-weight: 500;
+    font-size: 1.1rem;
+    color: hsl(0, 0%, 30%);
+    letter-spacing: 0.02em;
+    opacity: 0.9;
+    line-height: 1.5;
+  }
+
+  .app-startup-title {
+    margin-top: 18px;
+  }
+
+  .app-startup-status {
+    position: relative;
+    display: inline-block;
+  }
+
+  .app-startup-status::after {
+    content: '...';
+    position: absolute;
+    animation: app-startup-dots 1.5s steps(3, end) infinite;
+  }
+
+  @keyframes app-startup-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes app-startup-float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes app-startup-dots {
+
+    0%,
+    20% {
+      content: '.';
+    }
+
+    40% {
+      content: '..';
+    }
+
+    60%,
+    100% {
+      content: '...';
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .app-startup-container {
+      background: hsl(220, 15%, 16%);
+    }
+
+    .app-startup-text-base {
+      color: hsl(0, 0%, 85%);
+    }
+
+    .app-startup-spinner::before {
+      background: hsl(220, 15%, 16%);
+    }
+  }
+</style>
+
+<div class="app-startup-container">
+  <div class="app-startup-content">
+    <div class="app-startup-spinner"></div>
+    <div class="app-startup-title app-startup-text-base">%VITE_APP_TITLE%</div>
+    <div class="app-startup-status app-startup-text-base">载入中</div>
+  </div>
+</div>
