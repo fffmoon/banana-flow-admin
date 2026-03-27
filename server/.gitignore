@@ -1,0 +1,41 @@
+# --- Python 基础 ---
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+
+# --- 虚拟环境 ---
+.venv/
+env/
+venv/
+
+# --- FastAPI 环境变量 ---
+.env
+.env.prod
+.env.dev
+.env.test
+!.env.example
+
+# --- 数据库 ---
+*.db
+*.sqlite3
+
+# --- 测试与代码质量 ---
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+import_data/
+
+# --- IDE 与 系统 ---
+.idea/
+.vscode/
+.DS_Store
+
+# --- 日志文件 ---
+logs/
+*.log
+
+# --- 静态文件 ---
+static/
