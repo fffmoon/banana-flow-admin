@@ -20,18 +20,18 @@
 
 <table>
   <tr>
-    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/login.png?raw=true" alt="登录页"/></td>
-    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/home-page-1.png?raw=true" alt="首页1"/></td>
-    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/home-page-2.png?raw=true" alt="首页2"/></td>
+    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/web/docs/login.png?raw=true" alt="登录页"/></td>
+    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/web/docs/home-page-1.png?raw=true" alt="首页1"/></td>
+    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/web/docs/home-page-2.png?raw=true" alt="首页2"/></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/home-page-3.png?raw=true" alt="首页3"/></td>
-    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/home-page-4.png?raw=true" alt="首页4"/></td>
-    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/home-page-5.png?raw=true" alt="首页5"/></td>
+    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/web/docs/home-page-3.png?raw=true" alt="首页3"/></td>
+    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/web/docs/home-page-4.png?raw=true" alt="首页4"/></td>
+    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/web/docs/home-page-5.png?raw=true" alt="首页5"/></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/mobile-1.png?raw=true" alt="移动端1"/></td>
-    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/docs/mobile-2.png?raw=true" alt="移动端2"/></td>
+    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/web/docs/mobile-1.png?raw=true" alt="移动端1"/></td>
+    <td><img src="https://github.com/fffmoon/banana-flow-admin/raw/master/web/docs/mobile-2.png?raw=true" alt="移动端2"/></td>
   </tr>
 </table>
 
