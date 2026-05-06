@@ -6,13 +6,14 @@
 """
 
 from fastapi import Request, status
-from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from starlette.exceptions import HTTPException as StarletteHTTPException
-from sqlalchemy.exc import SQLAlchemyError
+from fastapi.responses import JSONResponse
 from loguru import logger
+from sqlalchemy.exc import SQLAlchemyError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.common.schemas.response import APIResponse
+from app.core.i18n import i18n
 
 
 async def http_exception_handler(
@@ -42,7 +43,7 @@ async def validation_exception_handler(
             success=False,
             status=422,
             data={"errors": exc.errors()},
-            title="参数校验失败",
+            title=i18n.t("global.error.validation_error"),
             biz_code="VALIDATION_ERROR",
         ).model_dump(by_alias=True),
     )
@@ -59,7 +60,7 @@ async def sqlalchemy_exception_handler(
             success=False,
             status=500,
             data=str(exc),
-            title="数据库操作失败",
+            title=i18n.t("global.error.db_error"),
             biz_code="SERVER_ERROR",
         ).model_dump(by_alias=True),
     )
@@ -76,7 +77,7 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
             success=False,
             status=500,
             data=None,  # 生产环境通常不返回具体错误堆栈给前端
-            title="服务器内部错误",
+            title=i18n.t("global.error.server_error"),
             biz_code="SERVER_ERROR",
         ).model_dump(by_alias=True),
     )

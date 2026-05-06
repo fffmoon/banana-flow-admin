@@ -107,24 +107,71 @@ export interface IRouteDataRaw {
 
 ```json
 {
+  // https://github.com/antfu/eslint-config
+  // 禁用默认格式化器，使用eslint代替
   "prettier.enable": false,
   "editor.formatOnSave": false,
+  // 自动修复
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "never",
     "source.fixAll.stylelint": "explicit"
   },
+  // Silent the stylistic rules in you IDE, but still auto fix them
   "eslint.rules.customizations": [
     { "rule": "style/*", "severity": "off", "fixable": true },
     { "rule": "format/*", "severity": "off", "fixable": true },
-    { "rule": "vue/component-name-in-template-casing", "severity": "error", "fixable": true }
+    { "rule": "*-indent", "severity": "off", "fixable": true },
+    { "rule": "*-spacing", "severity": "off", "fixable": true },
+    { "rule": "*-spaces", "severity": "off", "fixable": true },
+    { "rule": "*-order", "severity": "off", "fixable": true },
+    { "rule": "*-dangle", "severity": "off", "fixable": true },
+    { "rule": "*-newline", "severity": "off", "fixable": true },
+    { "rule": "*quotes", "severity": "off", "fixable": true },
+    { "rule": "*semi", "severity": "off", "fixable": true },
+    {
+      "rule": "vue/component-name-in-template-casing",
+      "severity": "error", // 强制报错
+      "fixable": true // 允许自动修复
+    }
   ],
+  // stylelint
   "stylelint.validate": ["css", "scss", "vue"],
+  "stylelint.snippet": ["css", "scss", "vue-html"],
+  // Enable eslint for all supported languages
   "eslint.validate": [
-    "javascript", "typescript", "vue", "html", "json", "scss"
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "",
+    "html",
+    "markdown",
+    "json",
+    "jsonc",
+    "yaml",
+    "toml",
+    "xml",
+    "gql",
+    "graphql",
+    "astro",
+    "css",
+    "less",
+    "scss",
+    "pcss",
+    "postcss"
   ],
-  "vue-i18n.i18nPaths": "i18n,locales"
+  // i18n-ally
+  "vue-i18n.i18nPaths": ["locales"],
+  "i18n-ally.localesPaths": [
+    "locales"
+  ],
+  "i18n-ally.keystyle": "nested",
+  "i18n-ally.sourceLanguage": "zh-CN",
+  "i18n-ally.displayLanguage": "zh-CN",
+  "i18n-ally.extract.autoDetect": true
 }
+
 ```
 </details>
 

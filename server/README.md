@@ -29,14 +29,21 @@
         source .venv/bin/activate
     ```
 
-2.  **安装依赖**
+2.  **配置环境变量**
+    ```bash
+        cp .env.example .env
+        # 编辑 .env 文件，配置数据库、Redis 等参数
+    ```
+
+
+3.  **安装依赖**
     ```bash
         pip install -r requirements-dev.txt
         
         # 生产环境需要安装 gunicorn 和 uvicorn
         pip install gunicorn uvicorn[standard]
     ```
-3. **启动项目**
+4. **启动项目**
     ```bash
         # 方式a：直接运行项目
         python run.py

@@ -5,7 +5,7 @@
  * @LastEditTime: 2025-01-27 15:00:55
  */
 import type { App } from 'vue'
-import i18n from '@i18n/index'
+import { i18n } from '@i18n/index'
 import { createDiscreteMessage } from '@ui/BetterUI'
 import { setupNaiveDiscreteApi } from './setupNaiveDiscreteApi'
 

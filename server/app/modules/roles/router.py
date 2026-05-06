@@ -1,17 +1,20 @@
-from fastapi import APIRouter, Depends, Request, BackgroundTasks
 from typing import List
-from app.core.deps import PermissionChecker
+
+from fastapi import APIRouter, BackgroundTasks, Depends, Request
+
 from app.common.schemas.response import APIResponse
+from app.core.deps import PermissionChecker
+from app.core.i18n import i18n
+from app.modules.operation_log.deps import log_operation
 from app.modules.roles.schemas import (
     RoleCreate,
-    RoleUpdate,
-    RoleResponse,
     RoleMenuUpdate,
+    RoleResponse,
+    RoleUpdate,
     RoleWithEditResponse,
 )
-from app.modules.roles.service import role_service, SysRoleService
+from app.modules.roles.service import SysRoleService, role_service
 from app.modules.users.models import SysUserEntity
-from app.modules.operation_log.deps import log_operation
 
 router = APIRouter(prefix="/api/v1", tags=["角色管理"])
 
@@ -62,7 +65,7 @@ async def delete_role(
     service: SysRoleService = Depends(role_service),
 ):
     await service.delete_role(role_id, current_user)
-    return APIResponse(title="删除成功")
+    return APIResponse(title=i18n.t("role.success.delete"))
 
 
 @router.put("/roles/{role_id}/menus", response_model=APIResponse)
@@ -78,4 +81,4 @@ async def assign_menus_to_role(
     service: SysRoleService = Depends(role_service),
 ):
     await service.update_role_menus(role_id, role_menu.menu_ids, current_user)
-    return APIResponse(title="权限分配成功")
+    return APIResponse(title=i18n.t("role.success.assign_menus"))

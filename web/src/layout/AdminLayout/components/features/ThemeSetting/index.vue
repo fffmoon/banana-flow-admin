@@ -7,8 +7,11 @@
 <script lang="ts" setup>
 import type { IUserThemeMode } from '@/theme'
 import { themeLoadingStyles } from '@/layout/AdminLayout/components/features/NetworkRequest'
-import { themeDoms, themes, useThemeStore } from '@/theme'
+import { useThemeStore } from '@/theme'
 import BaseWatermark from '@/views/tools/showcase/watermark/BaseWatermark.vue'
+
+// 由于您启用了 auto-import，直接使用 useLocale 即可
+const { t } = useLocale()
 
 const themeStore = useThemeStore()
 const globalStore = useGlobalStore()
@@ -21,19 +24,19 @@ function toggleDialog(state?: boolean) {
 }
 /* 色调 */
 function handleConfirm(value: string) {
-  console.info('自定义色调', value)
+  console.info(t('settings.customColor'), value)
   themeStore.setCustomPrimaryColor(value)
 }
 
-/* 页面切换动画 */
-const transitionNames = [
-  { label: '滑动', class: 'fade-slide' },
-  { label: '淡入淡出', class: 'fade' },
-  { label: '向右滑动', class: 'slide-left' },
-  { label: '向左滑动', class: 'slide-right' },
-  { label: '缩放', class: 'zoom' },
-  { label: '翻转', class: 'flip' },
-]
+/* 页面切换动画：使用 computed 保证语言切换时的响应性 */
+const transitionNames = computed(() => [
+  { label: t('settings.transition.slide'), class: 'fade-slide' },
+  { label: t('settings.transition.fade'), class: 'fade' },
+  { label: t('settings.transition.slideRight'), class: 'slide-left' },
+  { label: t('settings.transition.slideLeft'), class: 'slide-right' },
+  { label: t('settings.transition.zoom'), class: 'zoom' },
+  { label: t('settings.transition.flip'), class: 'flip' },
+])
 
 defineExpose({
   toggleDialog,
@@ -46,34 +49,39 @@ interface LayoutOption {
   label: string
 }
 
-const layoutOptions: LayoutOption[] = [
-  { value: 'vertical-mixed', label: '侧边栏混合模式' },
-  { value: 'classic', label: '经典模式 (顶栏+侧栏)' },
-  { value: 'sidebar', label: '侧边栏模式' },
-  // { value: 'vertical', label: '极简侧边栏' },
-  /* { value: 'top', label: '顶栏模式' },
-  { value: 'mixed', label: '分栏布局' },
-  { value: 'top-mixed', label: '顶栏居中模式' }, */
-]
+const layoutOptions = computed<LayoutOption[]>(() => [
+  { value: 'vertical-mixed', label: t('settings.layout.verticalMixed') },
+  { value: 'classic', label: t('settings.layout.classic') },
+  { value: 'sidebar', label: t('settings.layout.sidebar') },
+  // { value: 'vertical', label: t('settings.layout.vertical') },
+  /* { value: 'top', label: t('settings.layout.top') },
+  { value: 'mixed', label: t('settings.layout.mixed') },
+  { value: 'top-mixed', label: t('settings.layout.topMixed') }, */
+])
 
 // 切换处理
 const handleSelect = (mode: Settings.LayoutMode) => globalStore.menu.mode = mode
+
+const themesToShow = computed(() => themeStore.themeColorOptions.filter((item) => item.showMenu))
+
+const themeModeOptions = computed(() => themeStore.themeModeOptions)
+
+/* 主题loading风格选项 */
+const themeLoadingStylesOptions = computed(() => themeLoadingStyles.map((item) => ({ label: t(`loading.labels.${item.label}`), value: item.value })))
 </script>
 
 <template>
   <NDrawer v-model:show="show" :width="320">
-    <NDrawerContent title="设置" :native-scrollbar="false">
+    <NDrawerContent :title="t('settings.title')" :native-scrollbar="false">
       <!-- 主题 -->
       <NDivider title-placement="center">
-        主题
+        {{ t('settings.theme') }}
       </NDivider>
       <BSpace class="settings" vertical align="center">
         <div class="w-full">
-          <NTabs
-            type="segment" :value="themeStore.userThemeMode" animated
-            @update:value="(val: IUserThemeMode) => themeStore.setUserThemeMode(val)"
-          >
-            <NTab v-for="item in themeDoms" :key="item.id" :name="item.value">
+          <NTabs type="segment" :value="themeStore.userThemeMode" animated
+            @update:value="(val: IUserThemeMode) => themeStore.setUserThemeMode(val)">
+            <NTab v-for="item in themeModeOptions" :key="item.id" :name="item.value">
               <div class="flex-center gap-x-[3px]">
                 <div :class="item.icon"></div>
                 <div>{{ item.label }}</div>
@@ -85,12 +93,12 @@ const handleSelect = (mode: Settings.LayoutMode) => globalStore.menu.mode = mode
 
       <!-- 主色调 -->
       <NDivider title-placement="center">
-        主色调
+        {{ t('settings.primaryColor') }}
       </NDivider>
       <BSpace class="w-full" vertical>
         <!-- 切换预设主题 -->
         <div class="flex flex-wrap gap-[10px]">
-          <template v-for="item in themes.filter((item) => item.showMenu)" :key="item.id">
+          <template v-for="item in themesToShow" :key="item.id">
             <NTooltip placement="top" trigger="hover">
               <template #trigger>
                 <div
@@ -99,12 +107,9 @@ const handleSelect = (mode: Settings.LayoutMode) => globalStore.menu.mode = mode
                     'border-[var(--custom-primary-color)]': themeStore.themeColorId === item.id,
                     'border-[var(--custom-border-color)]': themeStore.themeColorId !== item.id,
                     'btn-select': themeStore.themeColorId === item.id,
-                  }" @click="themeStore.setThemeColorScheme(item.id)"
-                >
-                  <div
-                    class="h-100% w-100% rounded-[4px]"
-                    :style="{ backgroundColor: `${item.options[themeStore.themeMode].custom.primaryColor}` }"
-                  />
+                  }" @click="themeStore.setColorTheme(item.id)">
+                  <div class="h-100% w-100% rounded-[4px]"
+                    :style="{ backgroundColor: `${item.options[themeStore.themeMode].custom.primaryColor}` }" />
                 </div>
               </template>
               <span>{{ item.label }}</span>
@@ -112,15 +117,13 @@ const handleSelect = (mode: Settings.LayoutMode) => globalStore.menu.mode = mode
           </template>
         </div>
         <!-- 自定义主题 -->
-        <NColorPicker
-          :default-value="themeStore.getCustomOptions.primaryColor" :show-alpha="false"
-          :actions="['confirm']" @confirm="handleConfirm"
-        />
+        <NColorPicker :default-value="themeStore.getCustomOptions.primaryColor" :show-alpha="false"
+          :actions="['confirm']" @confirm="handleConfirm" />
       </BSpace>
 
-      <!-- 主色调 -->
+      <!-- 导航栏模式 -->
       <NDivider title-placement="center">
-        导航栏模式
+        {{ t('settings.navbarMode') }}
       </NDivider>
 
       <BSpace class="w-full" vertical>
@@ -136,15 +139,13 @@ const handleSelect = (mode: Settings.LayoutMode) => globalStore.menu.mode = mode
                     globalStore.menu.mode === item.value
                       ? 'border-[var(--custom-primary-color)] ring-2 ring-[var(--custom-primary-color)]/20'
                       : 'border-[var(--custom-border-color)] hover:border-[var(--custom-primary-color-hover)] hover:shadow',
-                  ]" @click="handleSelect(item.value)"
-                >
+                  ]" @click="handleSelect(item.value)">
                   <!-- 1. 侧边栏混合模式: 左深窄 | 左浅宽 | 右虚线 -->
                   <div v-if="item.value === 'vertical-mixed'" class="h-full w-full flex gap-1 p-1">
                     <div class="h-full w-2 rounded-l-sm bg-[var(--custom-primary-color)]"></div>
                     <div class="h-full w-5 rounded-sm bg-[var(--custom-primary-color-hover)]/80"></div>
                     <div
-                      class="h-full flex-1 border border-[var(--custom-primary-color)]/60 rounded-sm border-dashed bg-[var(--custom-primary-color-suppl)]"
-                    >
+                      class="h-full flex-1 border border-[var(--custom-primary-color)]/60 rounded-sm border-dashed bg-[var(--custom-primary-color-suppl)]">
                     </div>
                   </div>
 
@@ -154,8 +155,7 @@ const handleSelect = (mode: Settings.LayoutMode) => globalStore.menu.mode = mode
                     <div class="w-full flex flex-1 gap-1 overflow-hidden">
                       <div class="h-full w-6 rounded-bl-sm bg-[var(--custom-primary-color-hover)]/80"></div>
                       <div
-                        class="h-full flex-1 border border-[var(--custom-primary-color)]/60 rounded-br-sm border-dashed bg-[var(--custom-primary-color-suppl)]"
-                      >
+                        class="h-full flex-1 border border-[var(--custom-primary-color)]/60 rounded-br-sm border-dashed bg-[var(--custom-primary-color-suppl)]">
                       </div>
                     </div>
                   </div>
@@ -164,8 +164,7 @@ const handleSelect = (mode: Settings.LayoutMode) => globalStore.menu.mode = mode
                   <div v-else-if="item.value === 'sidebar'" class="h-full w-full flex gap-1 p-1">
                     <div class="h-full w-7 rounded-l-sm bg-[var(--custom-primary-color-hover)]/80"></div>
                     <div
-                      class="h-full flex-1 border border-[var(--custom-primary-color)]/60 rounded-r-sm border-dashed bg-[var(--custom-primary-color-suppl)]"
-                    >
+                      class="h-full flex-1 border border-[var(--custom-primary-color)]/60 rounded-r-sm border-dashed bg-[var(--custom-primary-color-suppl)]">
                     </div>
                   </div>
 
@@ -173,8 +172,7 @@ const handleSelect = (mode: Settings.LayoutMode) => globalStore.menu.mode = mode
                   <div v-else-if="item.value === 'vertical'" class="h-full w-full flex gap-1 p-1">
                     <div class="h-full w-2.5 rounded-l-sm bg-[var(--custom-primary-color)]"></div>
                     <div
-                      class="h-full flex-1 border border-[var(--custom-primary-color)]/60 rounded-r-sm border-dashed bg-[var(--custom-primary-color-suppl)]"
-                    >
+                      class="h-full flex-1 border border-[var(--custom-primary-color)]/60 rounded-r-sm border-dashed bg-[var(--custom-primary-color-suppl)]">
                     </div>
                   </div>
 
@@ -182,8 +180,7 @@ const handleSelect = (mode: Settings.LayoutMode) => globalStore.menu.mode = mode
                   <div v-else-if="item.value === 'top'" class="h-full w-full flex flex-col gap-1 p-1">
                     <div class="h-3.5 w-full rounded-t-sm bg-[var(--custom-primary-color)]"></div>
                     <div
-                      class="w-full flex-1 border border-[var(--custom-primary-color)]/60 rounded-b-sm border-dashed bg-[var(--custom-primary-color-suppl)]"
-                    >
+                      class="w-full flex-1 border border-[var(--custom-primary-color)]/60 rounded-b-sm border-dashed bg-[var(--custom-primary-color-suppl)]">
                     </div>
                   </div>
 
@@ -191,8 +188,7 @@ const handleSelect = (mode: Settings.LayoutMode) => globalStore.menu.mode = mode
                   <div v-else-if="item.value === 'mixed'" class="h-full w-full flex gap-1 p-1">
                     <div class="h-full w-2.5 rounded-l-sm bg-[var(--custom-primary-color)]"></div>
                     <div
-                      class="h-full flex flex-1 items-center justify-center border border-[var(--custom-primary-color)]/60 rounded-r-sm border-dashed bg-[var(--custom-primary-color-suppl)]"
-                    >
+                      class="h-full flex flex-1 items-center justify-center border border-[var(--custom-primary-color)]/60 rounded-r-sm border-dashed bg-[var(--custom-primary-color-suppl)]">
                       <div class="h-5 w-8 rounded-sm bg-[var(--custom-primary-color-hover)]/60"></div>
                     </div>
                   </div>
@@ -201,8 +197,7 @@ const handleSelect = (mode: Settings.LayoutMode) => globalStore.menu.mode = mode
                   <div v-else-if="item.value === 'top-mixed'" class="h-full w-full flex flex-col gap-1 p-1">
                     <div class="h-3.5 w-full rounded-t-sm bg-[var(--custom-primary-color)]"></div>
                     <div
-                      class="w-full flex flex-1 items-center justify-center border border-[var(--custom-primary-color)]/60 rounded-b-sm border-dashed bg-[var(--custom-primary-color-suppl)]"
-                    >
+                      class="w-full flex flex-1 items-center justify-center border border-[var(--custom-primary-color)]/60 rounded-b-sm border-dashed bg-[var(--custom-primary-color-suppl)]">
                       <div class="h-5 w-10 rounded-sm bg-[var(--custom-primary-color-hover)]/60"></div>
                     </div>
                   </div>
@@ -217,18 +212,16 @@ const handleSelect = (mode: Settings.LayoutMode) => globalStore.menu.mode = mode
 
       <!-- 页面水印 -->
       <NDivider title-placement="center">
-        页面水印
+        {{ t('settings.watermark') }}
       </NDivider>
       <BaseWatermark orientation="horizontal"></BaseWatermark>
 
       <!-- 页面切换动画类名 -->
       <NDivider title-placement="center">
-        页面切换动画
+        {{ t('settings.pageTransition') }}
       </NDivider>
-      <NRadioGroup
-        :value="globalStore.getTransitionName" name="radiogroup"
-        @update:value="globalStore.setTransitionName"
-      >
+      <NRadioGroup :value="globalStore.getTransitionName" name="radiogroup"
+        @update:value="globalStore.setTransitionName">
         <NSpace>
           <NRadio v-for="item in transitionNames" :key="item.class" :value="item.class">
             {{ item.label }}
@@ -238,15 +231,13 @@ const handleSelect = (mode: Settings.LayoutMode) => globalStore.menu.mode = mode
 
       <!-- 网络请求效果 -->
       <NDivider title-placement="center">
-        网络请求效果
+        {{ t('settings.networkRequest') }}
       </NDivider>
       <div class="flex justify-between">
-        <NRadioGroup
-          :value="networkRequestStore.getThemeLoadingStyle" name="radiogroup"
-          @update:value="networkRequestStore.setThemeModeLoadingStyle"
-        >
+        <NRadioGroup :value="networkRequestStore.getThemeLoadingStyle" name="radiogroup"
+          @update:value="networkRequestStore.setThemeModeLoadingStyle">
           <NSpace>
-            <NRadio v-for="item in themeLoadingStyles" :key="item.value" :value="item.value">
+            <NRadio v-for="item in themeLoadingStylesOptions" :key="item.value" :value="item.value">
               {{ item.label }}
             </NRadio>
           </NSpace>

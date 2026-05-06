@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.schemas.pages import PagedData, PageParams
 from app.core.deps import get_db
+from app.core.i18n import i18n
 from app.modules.files.service import FileService, file_service
 from app.modules.users.models import SysUserEntity
 
@@ -39,9 +40,7 @@ class ImageManagementService:
 
     async def create_directory(self, req: CreateDirReq, current_user: SysUserEntity):
         parent_id = req.dir_id or await self.get_or_create_root(current_user)
-        new_dir = ImageDirectoryEntity(
-            name=req.name, parent_id=parent_id, user_id=current_user.id
-        )
+
         # 检查当前目录下是否存在同名目录
         is_duplicate = await self.repo.check_same_dir_name_in_dir(
             current_user.id, parent_id, req.name
@@ -50,7 +49,7 @@ class ImageManagementService:
         if is_duplicate:
             raise HTTPException(
                 status_code=400,
-                detail=f"当前目录下已存在名为 '{req.name}' 的目录，无法创建同名目录。",
+                detail=i18n.t("image_management.error.dir_name_exists", name=req.name),
             )
 
         new_dir = ImageDirectoryEntity(
@@ -62,11 +61,12 @@ class ImageManagementService:
         dir_obj = await self.repo.get_dir_by_id(req.dir_id, current_user.id)
         if not dir_obj:
             raise HTTPException(
-                status_code=404, detail="系统未查询到相关目录记录，可能已被移除。"
+                status_code=404, detail=i18n.t("image_management.error.dir_not_found")
             )
         if dir_obj.parent_id is None:
             raise HTTPException(
-                status_code=403, detail="受系统保护机制限制，根目录无法被重命名。"
+                status_code=403,
+                detail=i18n.t("image_management.error.root_dir_rename_forbidden"),
             )
 
         # 检查当前目录下是否存在同名目录
@@ -77,7 +77,9 @@ class ImageManagementService:
         if is_duplicate:
             raise HTTPException(
                 status_code=400,
-                detail=f"当前目录下已存在名为 '{req.name}' 的目录，无法重命名到同名目录。",
+                detail=i18n.t(
+                    "image_management.error.rename_dir_name_exists", name=req.name
+                ),
             )
 
         dir_obj.name = req.name
@@ -86,17 +88,21 @@ class ImageManagementService:
     async def delete_directory(self, dir_id: int, current_user: SysUserEntity):
         dir_obj = await self.repo.get_dir_by_id(dir_id, current_user.id)
         if not dir_obj:
-            raise HTTPException(status_code=404, detail="系统未查询到相关目录记录。")
+            raise HTTPException(
+                status_code=404,
+                detail=i18n.t("image_management.error.delete_dir_not_found"),
+            )
         if dir_obj.parent_id is None:
             raise HTTPException(
-                status_code=403, detail="受系统保护机制限制，核心根目录无法被删除。"
+                status_code=403,
+                detail=i18n.t("image_management.error.root_dir_delete_forbidden"),
             )
 
         has_content = await self.repo.check_dir_has_content(dir_id)
         if has_content:
             raise HTTPException(
                 status_code=400,
-                detail="当前目录层级下包含有效的文件或子目录，受数据保护机制限制，请先清空内容后再执行删除操作。",
+                detail=i18n.t("image_management.error.dir_not_empty"),
             )
 
         await self.repo.delete_dir(dir_id)
@@ -105,13 +111,14 @@ class ImageManagementService:
         if req.dir_id == req.target_dir_id:
             raise HTTPException(
                 status_code=400,
-                detail="受系统逻辑限制，目标路径与原路径相同，无法执行移动操作。",
+                detail=i18n.t("image_management.error.move_dir_same_target"),
             )
 
         dir_obj = await self.repo.get_dir_by_id(req.dir_id, current_user.id)
         if not dir_obj or dir_obj.parent_id is None:
             raise HTTPException(
-                status_code=403, detail="受系统保护机制限制，无法移动根目录或无效目录。"
+                status_code=403,
+                detail=i18n.t("image_management.error.move_root_dir_forbidden"),
             )
 
         # 防止将目录移动到自己的子目录中（环路检测）
@@ -123,7 +130,7 @@ class ImageManagementService:
             if curr_parent == req.dir_id:
                 raise HTTPException(
                     status_code=400,
-                    detail="受层级系统逻辑关联限制，无法将目标目录移动至其自身的子目录中。",
+                    detail=i18n.t("image_management.error.move_dir_loop"),
                 )
             curr_parent = dir_dict.get(curr_parent)
 
@@ -134,7 +141,9 @@ class ImageManagementService:
         if is_duplicate:
             raise HTTPException(
                 status_code=400,
-                detail=f"目标目录下已存在名为 '{dir_obj.name}' 的目录，无法移动到同名目录。",
+                detail=i18n.t(
+                    "image_management.error.move_dir_name_exists", name=dir_obj.name
+                ),
             )
 
         dir_obj.parent_id = req.target_dir_id
@@ -159,7 +168,9 @@ class ImageManagementService:
     async def rename_image(self, req: RenameImageReq, current_user: SysUserEntity):
         img_obj = await self.repo.get_image_by_id(req.images_id, current_user.id)
         if not img_obj:
-            raise HTTPException(status_code=404, detail="系统未查询到相关文件记录。")
+            raise HTTPException(
+                status_code=404, detail=i18n.t("image_management.error.image_not_found")
+            )
         # 检查当前目录下是否存在同名文件
         is_duplicate = await self.repo.check_same_name_in_dir(
             current_user.id, img_obj.dir_id, req.name
@@ -167,7 +178,9 @@ class ImageManagementService:
         if is_duplicate:
             raise HTTPException(
                 status_code=400,
-                detail=f"当前目录下已存在名为 '{req.name}' 的文件，无法重命名到同名文件。",
+                detail=i18n.t(
+                    "image_management.error.rename_image_name_exists", name=req.name
+                ),
             )
         img_obj.name = req.name
         await self.db.commit()
@@ -179,7 +192,9 @@ class ImageManagementService:
     async def move_image(self, req: MoveImageReq, current_user: SysUserEntity):
         img_obj = await self.repo.get_image_by_id(req.images_id, current_user.id)
         if not img_obj:
-            raise HTTPException(status_code=404, detail="系统未查询到相关文件记录。")
+            raise HTTPException(
+                status_code=404, detail=i18n.t("image_management.error.image_not_found")
+            )
         # 检查目标目录下是否存在同名文件
         is_duplicate = await self.repo.check_same_name_in_dir(
             current_user.id, req.dir_id, img_obj.name
@@ -187,7 +202,9 @@ class ImageManagementService:
         if is_duplicate:
             raise HTTPException(
                 status_code=400,
-                detail=f"目标目录下已存在名为 '{img_obj.name}' 的文件，无法移动到同名文件。",
+                detail=i18n.t(
+                    "image_management.error.move_image_name_exists", name=img_obj.name
+                ),
             )
         img_obj.dir_id = req.dir_id
         await self.db.commit()

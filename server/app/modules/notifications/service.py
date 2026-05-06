@@ -1,19 +1,21 @@
 # app/modules/notifications/service.py
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Depends, HTTPException
 from sqlalchemy import select
-from fastapi import Depends, HTTPException, BackgroundTasks
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.common.schemas.pages import PageParams
 from app.core.deps import get_db
+from app.core.i18n import i18n
 from app.modules.users.models import SysUserEntity
+
 from .repository import NotificationRepository
 from .schemas import (
-    NoticeCreate,
-    UserNoticeResponse,
-    UnreadCountResponse,
     ListMyNoticesQuery,
+    NoticeCreate,
+    UnreadCountResponse,
+    UserNoticeResponse,
 )
-from app.common.schemas.pages import PageParams
 
 
 class NotificationService:
@@ -87,7 +89,9 @@ class NotificationService:
         row = await self.repo.get_user_notice_detail(user_id, notice_id)
 
         if not row:
-            raise HTTPException(status_code=404, detail="消息不存在或已被删除")
+            raise HTTPException(
+                status_code=404, detail=i18n.t("notification.error.notice_not_found")
+            )
 
         return UserNoticeResponse.from_orm_tuple(row)
 

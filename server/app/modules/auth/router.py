@@ -1,14 +1,16 @@
 from fastapi import APIRouter, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.core.deps import get_current_active_user
 from app.common.schemas.response import APIResponse
+from app.core.deps import get_current_active_user
+from app.core.i18n import i18n  # 引入 i18n
 from app.modules.auth.schemas import TokenResponse
-from app.modules.users.schemas import UserResponse, UserLogin, UserCreate
-from app.modules.users.models import SysUserEntity
 from app.modules.permissions.schemas import PermMenuResponse, PermVersionResponse
-from app.modules.permissions.service import permission_service, PermissionService
-from .service import auth_service, AuthService
+from app.modules.permissions.service import PermissionService, permission_service
+from app.modules.users.models import SysUserEntity
+from app.modules.users.schemas import UserCreate, UserLogin, UserResponse
+
+from .service import AuthService, auth_service
 
 router = APIRouter(prefix="/api/v1", tags=["认证管理"])
 
@@ -24,7 +26,7 @@ async def login_json(
     access_token = await service.login_json(login_data)
     return APIResponse(
         data=TokenResponse(access_token=access_token, token_type="bearer"),
-        title="登录成功",
+        title=i18n.t("auth.success.login"),
     )
 
 
@@ -40,7 +42,7 @@ async def login_access_token(
     access_token = await service.login_access_token(form_data)
     return APIResponse(
         data=TokenResponse(access_token=access_token, token_type="bearer"),
-        title="登录成功",
+        title=i18n.t("auth.success.login"),
     )
 
 
@@ -51,7 +53,7 @@ async def logout(
     service: AuthService = Depends(auth_service),
 ):
     await service.logout(request)
-    return APIResponse(title="退出登录成功")
+    return APIResponse(title=i18n.t("auth.success.logout"))
 
 
 @router.get(
@@ -60,7 +62,7 @@ async def logout(
 async def read_users_me(
     current_user: SysUserEntity = Depends(get_current_active_user),
 ) -> APIResponse[UserResponse]:
-    return APIResponse(data=current_user, title="获取用户信息成功")
+    return APIResponse(data=current_user, title=i18n.t("auth.success.get_info"))
 
 
 @router.post(
@@ -71,7 +73,7 @@ async def register_user(
     service: AuthService = Depends(auth_service),
 ) -> APIResponse[UserResponse]:
     user = await service.register_user(user_in)
-    return APIResponse(data=user, title="注册成功")
+    return APIResponse(data=user, title=i18n.t("auth.success.register"))
 
 
 @router.get(
@@ -85,7 +87,7 @@ async def get_user_perm_menu(
     current_user: SysUserEntity = Depends(get_current_active_user),
 ):
     data = await service.get_user_permission_data(current_user.id)
-    return APIResponse(data=data, title="获取权限菜单成功")
+    return APIResponse(data=data, title=i18n.t("auth.success.get_perm_menu"))
 
 
 @router.get(
@@ -100,5 +102,6 @@ async def get_user_perm_version(
 ):
     version = await service.get_permission_version(current_user.id)
     return APIResponse(
-        data=PermVersionResponse(version=version), title="获取版本号成功"
+        data=PermVersionResponse(version=version),
+        title=i18n.t("auth.success.get_version"),
     )

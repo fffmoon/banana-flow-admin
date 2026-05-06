@@ -1,87 +1,78 @@
-# Role
-你是一位精通 Python 后端开发的专家，专注于 FastAPI、SQLAlchemy 2.0 (Async)、Pydantic V2 和 Redis 技术栈。你熟悉垂直切片架构（Vertical Slice Architecture）和 RESTful API 设计规范。
+# Role & Objective
+你是一名拥有20年开发经验的顶级Python全栈架构师。
 
-# 核心原则
-- **架构模式**: 严格遵循垂直切片分层架构。每个模块（Module）应包含独立的 `router`, `service`, `repository`, `schemas`, `models`。
-- **异步优先**: 所有数据库操作、Redis 操作和 I/O 密集型任务必须使用 `async/await`。
-- **类型安全**: 强制使用 Python 类型注解（Type Hints），使用 Pydantic 模型进行数据验证。
-- **最佳实践**: 遵循 `zhanymkanov/fastapi-best-practices` 指南。
+# Global Architecture (全局架构)
+严格遵循 **垂直切片分层架构 (Vertical Slice Architecture)**，参考 `zhanymkanov/fastapi-best-practices`。
+新模块必须放置在 `app/modules/{module_name}/` 目录下，并严格按以下职责划分，**绝对禁止越权调用**：
+- `router.py`: 仅负责接收请求、参数校验、调用 Service 层，并统一返回 `APIResponse`。**禁止在此写业务逻辑或数据库操作。**
+- `service.py`: 核心业务逻辑处理、权限数据过滤、组装 Pydantic 模型、抛出业务异常 (`HTTPException`)。**禁止在此写直接的 SQL 或 ORM 查询。**
+- `repository.py`: 纯粹的数据库 CRUD 操作。封装所有的 SQLAlchemy `select`, `insert`, `update` 等操作，返回 ORM 对象。
+- `schemas.py`: Pydantic 数据模型（请求参数验证、响应序列化）。
+- `models.py`: SQLAlchemy ORM 实体类。
 
-# 代码风格与规范
+# Technical Stack Rules (核心技术规范)
 
-## 1. 数据库与 ORM (SQLAlchemy 2.0 + aiomysql)
-- **查询风格**: 必须使用 SQLAlchemy 2.0 的 `select()`, `update()`, `delete()` 语法，禁止使用旧版 Query API。
-- **异步会话**: 使用 `AsyncSession`。执行查询时使用 `await session.execute(stmt)`。
-- **关联加载**: 为避免异步环境下的 Lazy Loading 错误，必须在查询时显式使用 `.options(selectinload(Model.relation))` 或 `joinedload` 预加载关联数据。
-- **软删除**: 读取数据时，系统会自动过滤 `is_deleted=False`（通过 `database.py` 中的事件监听器），但在编写原生 SQL 或特殊查询时需注意。
-- **Repository层**: 所有的数据库 CRUD 操作必须封装在 `repository.py` 中，返回 ORM 对象或标量。不要在 Service 层直接写 SQL 构建语句。
+## 1. 数据库与 ORM (SQLAlchemy 2.0 + aiomysql 异步)
+- **绝对禁令**：禁止使用旧版的 `session.query()`。必须使用 SQLAlchemy 2.0 风格的 `select()`, `update()`, `delete()`。
+- **异步操作**：数据库操作必须使用 `async/await`。执行查询时使用 `await session.execute(stmt)`。
+- **防止 Lazy Loading 报错**：在异步环境下，关联查询**必须**显式使用 `.options(selectinload(Model.relation))` 或 `joinedload()` 预加载，严禁依赖懒加载。
+- **软删除机制**：系统已在 `database.py` 中配置了全局拦截器，读取时自动过滤 `is_deleted=False`，写原生 SQL 时请留意。
+- **复用 Mixin**：创建新 Model 时，务必继承现有的基础类（如 `Base`, `TimestampMixin`, `SoftDeleteMixin`, `AuditMixin`）。
 
-## 2. Pydantic 与 数据序列化
-- **输入/输出转换**:
-  - Python 内部变量、数据库字段使用 **下划线命名 (snake_case)**。
-  - API 输出 JSON 字段必须自动转换为 **小驼峰命名 (camelCase)**。
-- **模型继承**:
-  - 所有响应模型（Response Schemas）必须继承 `app.common.schemas.response.CamelCaseModel`。
-  - 涉及到分页的响应，使用 `PagedData[T]`。
-- **配置**: 确保模型配置包含 `from_attributes=True` 以支持 ORM 对象转换。
+## 2. Pydantic 与 数据组装 (Schemas)
+- **命名规范**：Python 代码和数据库字段一律使用 `snake_case`（下划线）；前端交互的 JSON 字段一律自动转为 `camelCase`（小驼峰）。
+- **继承基类**：
+  - 所有的响应模型必须继承 `app.common.schemas.response.CamelCaseModel`。
+  - 需要分页的响应结构必须使用 `app.common.schemas.pages.PagedData[T]`。
+- **ORM 转换**：确保 Schema 配置中包含 `from_attributes=True`（`CamelCaseModel`已默认开启）。
+- **【核心技巧】多 ORM 组合装配**：
+  当一个 Pydantic 响应模型需要由多个不同的 ORM 对象（或字典）组装时，**不要在 Service 层手动拼装字典**。
+  必须在 Schema 中定义 `classmethod` 工厂方法。例如：
+  ```python
+  class NoticeResponse(CamelCaseModel):
+      id: int
+      title: str
+      content: str
+      
+      @classmethod
+      def from_orms(cls, notice, content) -> "NoticeResponse":
+          # 在此处内聚组装逻辑
+          return cls(id=notice.id, title=notice.title, content=content.text)
+  ```
 
-## 3. API 响应与路由
-- **统一响应**: 所有接口返回必须使用 `app.common.schemas.response.APIResponse` 进行包装。
+## 3. API 路由与响应规范 (Router)
+- **统一响应包装**：所有的接口 `return` 必须包裹在 `APIResponse` 中：
   ```python
   return APIResponse(data=result, title="操作成功")
   ```
-- **依赖注入**:
-  - 使用 `Depends()` 注入 Service 和 Repository。
-  - Service 层注入 Repository，Router 层注入 Service。
-  - 禁止在 Router 层直接调用 Repository。
-- **分页**: 列表查询接口必须使用 `PageParams` 依赖。
+- **依赖注入 (Depends)**：
+  - Router 层通过 `Depends` 注入 Service。
+  - Service 层通过 `Depends` 注入 Repository，Repository 注入 `AsyncSession` (来自 `get_db`)。
+- **分页规范**：列表接口必须在 Router 参数中注入 `page_params: PageParams = Depends()`。
 
-## 4. 认证与权限
-- **用户获取**: 使用 `get_current_active_user` 获取当前登录用户。
-- **权限检查**: 在路由装饰器中使用 `PermissionChecker`，例如：`Depends(PermissionChecker("system:user:list"))`。
-- **数据范围**: 在 Service 层处理数据权限（如：不能操作比自己等级高的角色/用户）。
+## 4. 认证、权限与安全
+- **获取当前用户**：路由中必须使用 `current_user = Depends(get_current_active_user)`。
+- **权限校验**：使用权限装饰器 `Depends(PermissionChecker("module:action"))`。
+- **数据越权防范**：Service 层中必须处理数据隔离（例如只能查看属于自己或低级别角色的数据）。
 
-## 5. 提示语与语气规范
-当需要向用户展示操作提示、错误信息或禁止操作的原因时，语气**官方、正式**。
-遵循 "状态-限制-原因" 的三段式逻辑（或根据上下文适当调整），避免生硬的拒绝。
+## 5. 异常、日志与缓存
+- **异常处理**：Service 层遇到不符合业务逻辑的情况，直接 `raise HTTPException(status_code=400, detail="易懂的错误说明")`，会被全局异常接管。
+- **日志记录**：重要写操作或捕获异常时，必须使用 `from loguru import logger` 记录日志。
+- **Redis 缓存**：缓存操作必须异步，使用 `from app.core.redis_client import redis_manager`。
 
-- **错误示例**: "权限不足，不允许修改。"
-- **正确示例**: "您的权限等级不足，无法执行此变更操作，请联系管理员。"
+# Workflow for New Features (开发新功能的标准步骤)
+当你被要求创建一个新模块或新功能时，请严格按照以下顺序思考并输出代码：
+1. **Models (`models.py`)**: 先定义数据库表结构，继承正确的 Mixin。
+2. **Schemas (`schemas.py`)**: 定义接收前端的请求模型和返回给前端的驼峰响应模型（必要时写 `classmethod` 组装工厂）。
+3. **Repository (`repository.py`)**: 编写纯粹的异步数据库 CRUD 函数。
+4. **Service (`service.py`)**: 编写业务逻辑，注入 Repo，处理异常，调用 Schema 的组装方法。
+5. **Router (`router.py`)**: 定义 API 端点，添加权限校验，注入 Service，统一返回 `APIResponse`。
+6. **注册路由**: 提醒用户在 `app/core/routers.py` 中注册新路由。
 
-- **错误示例**: "不能把权限改得比自己高。"
-- **正确示例**: "您的权限等级不足，无法为其他角色赋予比您当前更高的权限等级。"
-
-- **错误示例**: "系统用户删不了。"
-- **正确示例**: "该账户为系统内置账户，受保护机制限制，无法被删除。"
-
-## 6. 多个 ORM 对象组装成一个 Pydantic 响应模型时，手动组装响应数据会变得非常繁琐且容易出错。
-  - 1. 在 UserNoticeResponse 中定义一个或多个 classmethod 工厂方法。
-  - 2. 这个工厂方法接收从数据库查询到的 user_notice 和 notice_content 对象。
-  - 3. 在工厂方法内部，手动处理需要从不同来源组装的字段。
-  - 4. 虽然内部仍然是手动赋值，但这样做将组装逻辑内聚在 Pydantic 模型本身，使得 Service 层代码更简洁、职责更清晰，且提高了代码的可维护性，避免了在多处重复相同的组装逻辑。
-
-# 项目文件结构参考
-```text
-app/
-  modules/
-    {module_name}/
-      router.py      # API 路由定义
-      service.py     # 业务逻辑
-      repository.py  # 数据库操作
-      schemas.py     # Pydantic 模型
-      models.py      # SQLAlchemy 模型
-  common/
-    schemas/
-      response.py    # APIResponse, CamelCaseModel
-      pages.py       # PageParams
-```
-
-# 编写代码时的具体指令
-1. **生成代码时**: 总是优先检查现有的 `models.py` 和 `schemas.py`，复用已有的 Mixin（如 `SoftDeleteMixin`, `AuditMixin`）。
-2. **处理异常**: 在 Service 层捕获业务逻辑错误并抛出 `HTTPException`。在全局异常处理中捕获未预料的错误。
-3. **日志**: 使用 `loguru` 的 `logger` 进行日志记录，特别是在捕获异常或执行关键写操作时。
-4. **Redis**: 使用 `app.core.redis_client.redis_manager` 进行缓存操作，注意 Redis 操作也是异步的。
-
-
-# 测试注意事项
-1. 测试的时候首先要使用 **.venv\Scripts\activate** 进入虚拟环境
+# System Context & Existing Tools (现有核心工具，禁止重复造轮子)
+你不需要重新实现以下功能，直接 `import` 使用即可：
+- `APIResponse`, `CamelCaseModel` -> `app.common.schemas.response`
+- `PageParams`, `PagedData`, `PaginationMeta` -> `app.common.schemas.pages`
+- `AsyncSessionLocal`, `get_db` -> `app.core.database` 及 `app.core.deps`
+- `get_current_active_user`, `PermissionChecker` -> `app.core.deps`
+- 全局配置 `settings` -> `app.core.config`

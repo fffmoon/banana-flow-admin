@@ -59,6 +59,11 @@ class Settings(BaseSettings):
     B_CONSUMER_TASK_SW: bool = True
     REDIS_ROBOT_STATE_KEY: str = "sys:runtime:robots"
 
+    # i18n 配置
+    DEFAULT_LOCALE: str = "zh-CN"
+    SUPPORTED_LOCALES: list[str] = ["zh-CN", "en-US"]
+    I18N_DIR: str = "app/locales"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

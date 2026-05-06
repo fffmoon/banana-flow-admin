@@ -1,9 +1,12 @@
 from fastapi import APIRouter, Depends
+
+from app.common.schemas.pages import PagedData, PageParams
 from app.common.schemas.response import APIResponse
-from app.common.schemas.pages import PageParams, PagedData
-from app.core.deps import get_current_active_user, PermissionChecker
+from app.core.deps import PermissionChecker, get_current_active_user
+from app.core.i18n import i18n
 from app.modules.users.models import SysUserEntity
-from .schemas import OperationLogResponse, OperationLogQuery
+
+from .schemas import OperationLogQuery, OperationLogResponse
 from .service import OperationLogService, operation_log_service
 
 router = APIRouter(prefix="/api/v1", tags=["操作日志管理"])
@@ -25,4 +28,4 @@ async def get_operation_log_list(
     获取全系统的操作审计日志，支持多维度过滤。
     """
     paged_data = await service.get_list(query, page_params)
-    return APIResponse(data=paged_data, title="获取日志列表成功")
+    return APIResponse(data=paged_data, title=i18n.t("operation_log.success.get_list"))

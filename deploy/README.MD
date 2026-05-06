@@ -1,4 +1,13 @@
-# BananaFlowAdmin 部署说明
+# 部署说明
+
+## 名词
+
+- 前端项目名称：`banana-flow-admin-web-v3`
+- 后端项目名称：`banana-flow-admin-server-py`
+- 部署路径：`/opt/banana-flow-admin-platform`
+- 版本号规范：`v年月日.当日序号.组件标识`
+  - 前端版本示例：`v20260403.1.web`
+  - 后端版本示例：`v20260403.1.server`
 
 ## 1. 环境准备
 
@@ -20,8 +29,8 @@
 ├── .env                     # 全局环境变量配置
 ├── images/                  # 离线镜像包文件夹
 │   ├── database-images.tar   # mysql, redis 基础镜像
-│   ├── banana-flow-admin-server-py-v1.0.tar
-│   └── banana-flow-admin-web-v3-v1.0.tar
+│   ├── banana-flow-admin-server-py-v20260403.1.server.tar
+│   └── banana-flow-admin-web-v3-v20260403.1.web.tar
 ├── server/                  # 后端挂载目录
 │   ├── logs/                # 运行日志
 │   └── import_data/         # 导入数据
@@ -43,8 +52,8 @@ cd /opt/banana-flow-admin-platform
 docker load -i images/database-images.tar
 
 # 导入应用镜像
-docker load -i images/banana-flow-admin-server-py.tar
-docker load -i images/banana-flow-admin-web-v3.tar
+docker load -i images/banana-flow-admin-server-py-v20260403.1.server.tar.gz
+docker load -i images/banana-flow-admin-web-v3-v20260403.1.web.tar.gz
 
 # 验证镜像是否导入成功
 docker images
@@ -52,6 +61,8 @@ docker images
 ```
 
 ### 3.2 配置文件检查
+
+*如果没有必要，3.2不需要修改，直接看3.3*
 
 **1. 修改环境变量 `.env`**
 
@@ -126,13 +137,20 @@ docker-compose restart banana-flow-admin-web-v3
 
 如果需要更新后端或前端版本：
 
-1.  将新的 `.tar` 镜像包放入 `images/` 目录。
-2.  导入新镜像：`docker load -i images/new-image.tar`。
-3.  修改 `docker-compose.yml` 中的镜像版本号 (Tag)。
-4.  执行更新命令：
-    ```bash
-    docker compose up -d
-    ```
+1. 将新的 `.tar` 镜像包放入 `images/` 目录。
+
+2. 导入新镜像：
+
+   ```sh
+   docker load -i images/banana-flow-admin-server-py-v20260403.1.server.tar.gz
+   ```
+
+3. 修改 `env` 中的镜像版本号 *（docker-compose从env中读取tag）*。
+
+4. 执行更新命令：
+   ```bash
+   docker compose up -d
+   ```
 
 ### 4.4 数据备份
 

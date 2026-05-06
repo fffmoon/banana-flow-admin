@@ -238,7 +238,7 @@ INIT_MENUS = [
                 "path": "refresh",
                 "componentPath": "views/tools/showcase/refresh/index",
                 "icon": "i-mdi-refresh",
-                "keepAlive": false,
+                "keepAlive": False,
                 "isLogin": True,
                 "sort": 7,
             },

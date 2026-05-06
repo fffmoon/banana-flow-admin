@@ -1,19 +1,21 @@
-from fastapi import APIRouter, Depends, Request, BackgroundTasks
-from app.core.deps import PermissionChecker
+from fastapi import APIRouter, BackgroundTasks, Depends, Request
+
+from app.common.schemas.pages import PagedData, PageParams
 from app.common.schemas.response import APIResponse
-from app.common.schemas.pages import PageParams, PagedData
-from .schemas import (
-    UserResponse,
-    UserCreate,
-    UserAdminUpdate,
-    UserFilter,
-    UserProfileUpdate,
-    UserPasswordUpdate,
-)
-from .models import SysUserEntity
-from .service import user_service, UserService
+from app.core.deps import PermissionChecker, get_current_active_user
+from app.core.i18n import i18n
 from app.modules.operation_log.deps import log_operation
-from app.core.deps import get_current_active_user
+
+from .models import SysUserEntity
+from .schemas import (
+    UserAdminUpdate,
+    UserCreate,
+    UserFilter,
+    UserPasswordUpdate,
+    UserProfileUpdate,
+    UserResponse,
+)
+from .service import UserService, user_service
 
 router = APIRouter(prefix="/api/v1", tags=["用户管理"])
 
@@ -43,7 +45,7 @@ async def create_user(
     current_user: SysUserEntity = Depends(PermissionChecker("system:users:create")),
 ):
     user = await service.create_user(user_in, current_user)
-    return APIResponse(data=user, title="用户创建成功")
+    return APIResponse(data=user, title=i18n.t("user.success.create"))
 
 
 @router.put(
@@ -61,7 +63,7 @@ async def update_me(
     更新当前登录用户的个人信息 (昵称, 邮箱, 手机号, 头像, 性别)
     """
     user = await service.update_me(current_user.id, user_in, current_user)
-    return APIResponse(data=user, title="个人资料更新成功")
+    return APIResponse(data=user, title=i18n.t("user.success.profile_update"))
 
 
 @router.put("/users/me/password", response_model=APIResponse, summary="修改个人密码")
@@ -77,7 +79,7 @@ async def change_password(
     修改当前登录用户的密码，需要提供旧密码进行验证
     """
     await service.change_password(current_user.id, password_in)
-    return APIResponse(title="密码修改成功，请重新登录")
+    return APIResponse(title=i18n.t("user.success.password_change"))
 
 
 @router.put(
@@ -94,13 +96,14 @@ async def update_user(
 ):
     user = await service.update_user(user_id, user_in, current_user)
 
-    action = "更新"
     if user_in.is_active is True:
-        action = "启用"
+        title = i18n.t("user.success.enable")
     elif user_in.is_active is False:
-        action = "停用"
+        title = i18n.t("user.success.disable")
+    else:
+        title = i18n.t("user.success.update")
 
-    return APIResponse(data=user, title=f"用户{action}成功")
+    return APIResponse(data=user, title=title)
 
 
 @router.delete("/users/{user_id}", response_model=APIResponse, summary="删除用户")
@@ -113,4 +116,4 @@ async def delete_user(
     current_user: SysUserEntity = Depends(PermissionChecker("system:users:delete")),
 ):
     await service.delete_user(user_id, current_user)
-    return APIResponse(title="删除成功")
+    return APIResponse(title=i18n.t("user.success.delete"))

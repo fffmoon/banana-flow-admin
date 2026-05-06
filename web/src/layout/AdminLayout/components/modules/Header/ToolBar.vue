@@ -9,7 +9,7 @@ import UserInfo from './UserInfo/index.vue'
 import { useLocale } from '@i18n/useLocale'
 import { router } from '@/router'
 import CONFIG from '@/settings'
-import { themeDoms, useThemeStore } from '@/theme'
+import { useThemeStore } from '@/theme'
 import { useSearchModal } from '../../features/SearchModal'
 import { useMessageStore } from '@/store/modules/message'
 
@@ -92,10 +92,10 @@ function handleSelect(key: string) {
         case 'openSettingClick': openSettingClick(); break;
         case 'logout':
             window.$dialog.info({
-                title: '退出登录',
-                content: '您确定要退出登录吗？',
-                positiveText: '确定',
-                negativeText: '取消',
+                title: t('user.store.logout'),
+                content: t('user.store.logoutConfirm'),
+                positiveText: t('common.confirm'),
+                negativeText: t('common.cancel'),
                 draggable: true,
                 onPositiveClick: () => userStore.logout(),
             })
@@ -114,7 +114,7 @@ function handleSelect(key: string) {
 
 function getThemeIcon() {
     if (themeStore.userThemeMode) {
-        const findRes = themeDoms.find(item => item.value === themeStore.themeMode)
+        const findRes = themeStore.themeModeOptions.find(item => item.value === themeStore.themeMode)
         return findRes?.icon
     }
     return ''

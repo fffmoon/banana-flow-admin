@@ -5,6 +5,7 @@
  * @LastEditTime: 2025-07-30 17:31:44
  */
 import type { GetUserInfoResponse } from '@apis/modules/auth/type'
+import { i18n, globalT as t } from '@i18n/index'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { router } from '@/router'
@@ -61,13 +62,14 @@ export const useUserStore = defineStore('user', () => {
     return Object.assign({}, {
       id: '-1',
       userName: 'unknown',
-      nickname: '未登录用户',
+      nickname: t('user.store.unknownUser'),
       avatar: 'https://img.dashixiong.site/20250301-000454-cjpdw8yd4a.png',
       email: '',
       mobilePhone: '',
       createTime: '1970-01-01 00:00:00',
       roles: [],
       roleLevel: 999,
+      locale: i18n.global.locale.value,
     }, userInfo.value)
   })
   // #endregion
@@ -124,9 +126,9 @@ export const useUserStore = defineStore('user', () => {
       }
 
       if (!result || !result.token)
-        throw new Error('登录失败：未获取到token')
+        throw new Error(t('user.store.loginFailNoToken'))
 
-      window.$message.success('登录成功')
+      window.$message.success(t('user.store.loginSuccess'))
 
       accessToken.value = result.token
       // 注意：这里保留了原有的 Storage 逻辑，包含过期时间处理

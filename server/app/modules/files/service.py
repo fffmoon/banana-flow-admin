@@ -1,16 +1,19 @@
 import os
 import uuid
-import aiofiles
 from datetime import datetime
-from fastapi import UploadFile, HTTPException, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from loguru import logger
 
-from app.core.deps import get_db
+import aiofiles
+from fastapi import Depends, HTTPException, UploadFile
+from loguru import logger
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.config import settings
+from app.core.deps import get_db
+from app.core.i18n import i18n
 from app.modules.users.models import SysUserEntity
-from .repository import FileRepository
+
 from .models import SysFileEntity
+from .repository import FileRepository
 
 ALLOWED_IMAGE_TYPES = settings.FILE_ALLOWED_IMAGE_TYPES
 MAX_FILE_SIZE = settings.FILE_MAX_SIZE
@@ -33,7 +36,10 @@ class FileService:
         if file.content_type not in ALLOWED_IMAGE_TYPES:
             raise HTTPException(
                 status_code=400,
-                detail=f"不支持的文件格式。仅允许上传图片文件 ({', '.join(ALLOWED_IMAGE_TYPES)}。",
+                detail=i18n.t(
+                    "file.error.invalid_file_type",
+                    allowed_types=", ".join(ALLOWED_IMAGE_TYPES),
+                ),
             )
 
         # 校验文件大小，一般通常在 Nginx 处理
@@ -44,7 +50,9 @@ class FileService:
         if file_size > MAX_FILE_SIZE:
             raise HTTPException(
                 status_code=400,
-                detail=f"文件大小超出限制。允许的最大上传大小为 {MAX_FILE_SIZE / 1024 / 1024}MB。",
+                detail=i18n.t(
+                    "file.error.file_too_large", max_size_mb=MAX_FILE_SIZE / 1024 / 1024
+                ),
             )
 
         # 存储路径
@@ -69,7 +77,7 @@ class FileService:
         except Exception as e:
             logger.error(f"文件写入失败: {e}")
             raise HTTPException(
-                status_code=500, detail="文件上传失败，服务器内部存储错误。"
+                status_code=500, detail=i18n.t("file.error.upload_failed")
             )
 
         # 写入数据库

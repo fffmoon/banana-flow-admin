@@ -1,16 +1,18 @@
-from fastapi import APIRouter, Depends, Request, BackgroundTasks
-from app.core.deps import get_current_active_user, PermissionChecker
+from fastapi import APIRouter, Depends
+
+from app.common.schemas.pages import PagedData, PageParams, PaginationMeta
 from app.common.schemas.response import APIResponse
-from app.common.schemas.pages import PageParams, PagedData, PaginationMeta
+from app.core.deps import PermissionChecker, get_current_active_user
+from app.core.i18n import i18n
 from app.modules.users.models import SysUserEntity
 
 from .schemas import (
-    NoticeCreate,
-    UserNoticeResponse,
-    UnreadCountResponse,
     ListMyNoticesQuery,
+    NoticeCreate,
+    UnreadCountResponse,
+    UserNoticeResponse,
 )
-from .service import notification_service, NotificationService
+from .service import NotificationService, notification_service
 
 router = APIRouter(prefix="/api/v1/notifications", tags=["消息通知"])
 
@@ -67,7 +69,7 @@ async def read_all_notices(
     service: NotificationService = Depends(notification_service),
 ):
     await service.read_all(current_user.id)
-    return APIResponse(title="操作成功")
+    return APIResponse(title=i18n.t("notification.success.operation"))
 
 
 @router.put(
@@ -81,7 +83,7 @@ async def read_one_notice(
     service: NotificationService = Depends(notification_service),
 ):
     data = await service.read_notice(current_user.id, notice_id)
-    return APIResponse(data=data, title="操作成功")
+    return APIResponse(data=data, title=i18n.t("notification.success.operation"))
 
 
 @router.delete("/{notice_id}", response_model=APIResponse, summary="删除我的消息")
@@ -91,7 +93,7 @@ async def delete_my_notice(
     service: NotificationService = Depends(notification_service),
 ):
     await service.delete_my_notice(current_user.id, notice_id)
-    return APIResponse(title="删除成功")
+    return APIResponse(title=i18n.t("notification.success.delete"))
 
 
 # 获取单条消息详情
@@ -120,4 +122,4 @@ async def publish_notice(
     await service.publish_notice(
         notice_in, current_user.id, current_user.nickname or current_user.username
     )
-    return APIResponse(title="发布成功")
+    return APIResponse(title=i18n.t("notification.success.publish"))

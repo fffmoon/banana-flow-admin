@@ -149,7 +149,7 @@ service.interceptors.request.use(
   (config: CustomInternalAxiosRequestConfig) => {
     const requestCacheStore = useRequestCacheStore()
 
-    // 1. 缓存处理 (读取)
+    // 缓存处理 (读取)
     if (config.cacheTime) {
       const source = CancelToken.source()
       config.cancelToken = source.token
@@ -163,13 +163,18 @@ service.interceptors.request.use(
       }
     }
 
-    // 2. Token 注入
+    // i18n 语言处理
+    if (config.headers) {
+      config.headers['Accept-Language'] = localStorage.getItem('locale') || 'zh-CN'
+    }
+
+    // Token 注入
     const userStore = useUserStore()
     if (userStore.getToken && config.headers) {
       config.headers.Authorization = userStore.getToken
     }
 
-    // 3. 数据格式转换
+    // 数据格式转换
     const contentType = config.headers?.['content-type'] || config.headers?.['Content-Type']
     if (config.method?.toUpperCase() === 'POST' && config.data) {
       if (contentType === ContentTypeEnum.FORM_DATA) {
