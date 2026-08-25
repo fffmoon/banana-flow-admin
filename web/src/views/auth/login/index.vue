@@ -65,10 +65,10 @@ async function handleDemoLogin(type: 'superAdmin' | 'admin' | 'user') {
         </div>
       </div>
       <div class="pt-36px text-center text-[1.5rem] text-[var(--custom-text-color-1)] font-600">
-        开箱即用，后台、前端、设计师的解决方案
+        {{ t('login.slogan1') }}
       </div>
       <div class="pt-36px text-center text-[1.1rem] text-[var(--custom-text-color-2)]">
-        多生态支持、功能丰富、高颜值模板
+        {{ t('login.slogan2') }}
       </div>
       <div class="mx-auto mb-0px mt-50px h-auto max-w-440px w-40%">
         <img src="https://img.dashixiong.site/2025/04/eac334aef7d98bc0c63b57a561308181.png" alt=""
@@ -85,20 +85,20 @@ async function handleDemoLogin(type: 'superAdmin' | 'admin' | 'user') {
             <template v-if="isLogin">
               <div class="m-y-20px text-left">
                 <div class="form-title">
-                  登录你的账户
+                  {{ t('login.loginAccount') }}
                 </div>
                 <div>
-                  <span class="mr-4px text-[var(--custom-text-color-2)]">没有账户？</span>
+                  <span class="mr-4px text-[var(--custom-text-color-2)]">{{ t('login.noAccount') }}</span>
                   <NButton type="primary" text @click="isLogin = false">
-                    去注册
+                    {{ t('login.goRegister') }}
                   </NButton>
                 </div>
               </div>
               <NTabs type="segment" animated :value="loginTabValue">
-                <NTabPane name="account" tab="账号登录">
+                <NTabPane name="account" :tab="t('login.accountLogin')">
                   <AccountLoginForm ref="accountLoginFormRef" />
                 </NTabPane>
-                <NTabPane name="sms" tab="短信登录">
+                <NTabPane name="sms" :tab="t('login.smsLogin')">
                   <PhoneLoginForm />
                 </NTabPane>
               </NTabs>
@@ -108,20 +108,20 @@ async function handleDemoLogin(type: 'superAdmin' | 'admin' | 'user') {
             <template v-else>
               <div class="m-y-20px text-left">
                 <div class="form-title">
-                  注册你的账户
+                  {{ t('login.registerAccount') }}
                 </div>
                 <div>
-                  <span>已经有账户？</span>
+                  <span>{{ t('login.hasAccount') }}</span>
                   <NButton type="primary" text @click="isLogin = true">
-                    去登录
+                    {{ t('login.goLogin') }}
                   </NButton>
                 </div>
               </div>
               <NTabs type="segment" animated>
-                <NTabPane name="chap1" tab="手机号注册">
+                <NTabPane name="chap1" :tab="t('login.phoneRegister')">
                   <PhoneRegister />
                 </NTabPane>
-                <NTabPane name="chap2" tab="邮箱注册">
+                <NTabPane name="chap2" :tab="t('login.emailRegister')">
                   <EmailRegister />
                 </NTabPane>
               </NTabs>
@@ -132,22 +132,22 @@ async function handleDemoLogin(type: 'superAdmin' | 'admin' | 'user') {
         <!-- 使用演示账号直接登录 -->
         <NDivider>
           <template #default>
-            <span class="text-14px text-[var(--custom-text-color-3)]">使用演示账号直接登录</span>
+            <span class="text-14px text-[var(--custom-text-color-3)]">{{ t('login.demoLogin') }}</span>
           </template>
         </NDivider>
         <div class="pb-8">
           <NSpace justify="space-around">
             <NButton class="hover:shadow-md transition-transform! duration-248! hover:scale-110!" ghost size="small"
               @click="handleDemoLogin('superAdmin')">
-              超级管理员
+              {{ t('login.superAdmin') }}
             </NButton>
             <NButton class="hover:shadow-md transition-transform! duration-248! hover:scale-110!" ghost size="small"
               @click="handleDemoLogin('admin')">
-              管理员
+              {{ t('login.admin') }}
             </NButton>
             <NButton class="hover:shadow-md transition-transform! duration-248! hover:scale-110!" ghost size="small"
               @click="handleDemoLogin('user')">
-              普通用户
+              {{ t('login.normalUser') }}
             </NButton>
           </NSpace>
         </div>
@@ -157,6 +157,7 @@ async function handleDemoLogin(type: 'superAdmin' | 'admin' | 'user') {
 </template>
 
 <style lang="scss" scoped>
+/* 保持原有样式不变 */
 .login-container {
   .login-section {
     --at-apply: "m-0 flex-row flex-grow-0";

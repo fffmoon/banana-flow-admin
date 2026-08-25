@@ -5,7 +5,7 @@
  * @LastEditTime: 2025-04-16 19:47:40
  */
 
-import type { ColorScale, IThemeConfig, IThemeSeries } from './type'
+import type { ColorScale, IColorThemeConfig, IThemeSeries } from './type'
 import chroma from 'chroma-js'
 
 /**
@@ -148,7 +148,7 @@ export function generateStateColors(baseColor: string): ColorScale {
 /**
  * 在link中创建所有主题的类名
  */
-export function createAllThemeClass(options: IThemeConfig) {
+export function createAllThemeClass(options: IColorThemeConfig) {
   // 生成主题的类名
   // 定义样式标签的唯一标识属性
   const THEME_STYLE_TAG_ID = 'data-theme-style'

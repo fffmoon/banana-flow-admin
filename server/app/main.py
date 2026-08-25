@@ -1,6 +1,7 @@
 import os
 import sys
 from contextlib import asynccontextmanager
+import json
 
 import uvicorn
 from fastapi import FastAPI
@@ -12,10 +13,9 @@ from app.common.schemas.response import APIResponse
 from app.core.config import settings
 from app.core.database import check_database_connection, engine
 from app.core.exceptions import register_exception_handlers
+from app.core.i18n import I18nMiddleware, i18n
 from app.core.redis_client import redis_manager
 from app.core.routers import register_routers
-
-# 处理自动化生成页面报错
 
 # 挂载日志
 logger.remove()
@@ -46,10 +46,10 @@ async def lifespan(app: FastAPI):
     if hasattr(app.state, "worker_manager"):
         await app.state.worker_manager.stop()
 
-    # 关闭 Redis
-    await redis_manager.close()
     # 关闭数据库连接
     await engine.dispose()
+    # 关闭 Redis
+    await redis_manager.close()
 
 
 app = FastAPI(
@@ -59,13 +59,16 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# 中间件注册
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(I18nMiddleware)
 
 # 挂载静态文件目录
 os.makedirs(settings.FILE_UPLOAD_DIR, exist_ok=True)
@@ -89,10 +92,9 @@ async def root():
             "version": settings.VERSION,
             "env": settings.APP_ENV,
         },
-        title="服务运行正常",
+        title=i18n.t("global.success.ok"),
     )
-
-
+    
 if __name__ == "__main__":
     uvicorn.run(
         "app.main:app", host=settings.HOST, port=settings.PORT, reload=settings.DEBUG

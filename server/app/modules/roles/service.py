@@ -1,15 +1,18 @@
 from typing import List
-from fastapi import HTTPException, status, Depends
+
+from fastapi import Depends, HTTPException
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 
-from .repository import RoleRepository
-from .models import SysRoleEntity, sys_user_role
-from app.modules.users.models import SysUserEntity
-from app.modules.permissions.service import PermissionService, permission_service
-from app.utils.handler_permission import has_permission
 from app.core.deps import get_db
+from app.core.i18n import i18n
+from app.modules.permissions.service import PermissionService, permission_service
+from app.modules.users.models import SysUserEntity
+from app.utils.handler_permission import has_permission
+
+from .models import SysRoleEntity, sys_user_role
+from .repository import RoleRepository
 from .schemas import (
     RoleCreate,
     RoleUpdate,
@@ -43,13 +46,19 @@ class SysRoleService:
         self, role_in: RoleCreate, current_user: SysUserEntity
     ) -> SysRoleEntity:
         if await self.repo.get_by_code(role_in.role_code):
-            raise HTTPException(status_code=400, detail="角色编码已存在")
+            raise HTTPException(
+                status_code=400, detail=i18n.t("role.error.code_exists")
+            )
 
         if await self.repo.get_by_name(role_in.role_name):
-            raise HTTPException(status_code=400, detail="角色名称已存在")
+            raise HTTPException(
+                status_code=400, detail=i18n.t("role.error.name_exists")
+            )
 
         if not has_permission(current_user.role_level, role_in.role_level):
-            raise HTTPException(status_code=403, detail="无法创建比自己等级高的角色")
+            raise HTTPException(
+                status_code=403, detail=i18n.t("role.error.cannot_create_higher_role")
+            )
 
         return await self.repo.create(role_in)
 
@@ -58,33 +67,46 @@ class SysRoleService:
     ) -> SysRoleEntity:
         role = await self.repo.get(role_id)
         if not role:
-            raise HTTPException(status_code=404, detail="角色不存在")
+            raise HTTPException(
+                status_code=404, detail=i18n.t("role.error.role_not_found")
+            )
 
         if role.role_level == 0 and not current_user.is_super_admin:
-            raise HTTPException(status_code=400, detail="不允许修改超级管理员角色")
+            raise HTTPException(
+                status_code=400, detail=i18n.t("role.error.cannot_modify_super_admin")
+            )
 
         if role_in.role_code and role_in.role_code != role.role_code:
             if await self.repo.get_by_code(role_in.role_code):
-                raise HTTPException(status_code=400, detail="角色编码已存在")
+                raise HTTPException(
+                    status_code=400, detail=i18n.t("role.error.code_exists")
+                )
 
         if (
             role_in.role_level is not None
             and not has_permission(current_user.role_level, role_in.role_level)
             and not current_user.is_super_admin
         ):
-            raise HTTPException(status_code=403, detail="权限等级不足")
+            raise HTTPException(
+                status_code=403,
+                detail=i18n.t("role.error.permission_level_insufficient"),
+            )
 
         return await self.repo.update(role, role_in)
 
     async def delete_role(self, role_id: int, current_user: SysUserEntity):
         role = await self.repo.get(role_id)
         if not role:
-            raise HTTPException(status_code=404, detail="角色不存在")
+            raise HTTPException(
+                status_code=404, detail=i18n.t("role.error.role_not_found")
+            )
         if role.is_deleted:
             return True
 
         if role.is_system or role.role_code == "super_admin":
-            raise HTTPException(status_code=400, detail="系统内置角色无法删除")
+            raise HTTPException(
+                status_code=400, detail=i18n.t("role.error.system_role_forbidden")
+            )
 
         # 异步检查是否有用户关联
         user_count_stmt = (
@@ -94,7 +116,9 @@ class SysRoleService:
         )
         user_count_res = await self.db.execute(user_count_stmt)
         if user_count_res.scalar() > 0:
-            raise HTTPException(status_code=400, detail="该角色下存在用户，无法删除")
+            raise HTTPException(
+                status_code=400, detail=i18n.t("role.error.role_has_users")
+            )
 
         return await self.repo.soft_delete(role)
 
@@ -109,13 +133,17 @@ class SysRoleService:
         role = result.scalar_one_or_none()
 
         if not role:
-            raise HTTPException(status_code=404, detail="角色不存在")
+            raise HTTPException(
+                status_code=404, detail=i18n.t("role.error.role_not_found")
+            )
 
         if (
             not has_permission(current_user.role_level, role.role_level)
             and not current_user.is_super_admin
         ):
-            raise HTTPException(status_code=403, detail="权限不足")
+            raise HTTPException(
+                status_code=403, detail=i18n.t("role.error.permission_denied")
+            )
 
         await self.repo.update_role_menus(role, menu_ids)
         await self.permission_service.clear_all_user_cache()

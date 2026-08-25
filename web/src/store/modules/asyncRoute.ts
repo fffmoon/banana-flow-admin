@@ -11,8 +11,14 @@ import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 import { setupDynamicRoutes } from '@/router'
 import { localRoutesData } from '@/router/modules/localRoutes'
-import { findRouterById } from '@/router/utils'
+import { findRouterById, flattenRoutes, normalizePath } from '@/router/utils'
 import { Storage } from '@/utils/storage/Storage'
+
+interface IKeepAliveCacheTarget {
+  id?: string
+  name?: string
+  path?: string
+}
 
 export const useAsyncRouteStore = defineStore('asyncRoute', () => {
   // #region ➤ state
@@ -82,6 +88,49 @@ export const useAsyncRouteStore = defineStore('asyncRoute', () => {
       return
 
     keepAliveRouterList.value = keepAliveRouterList.value.filter(n => n !== route.raw.name)
+  }
+
+  function normalizeKeepAlivePath(path: string) {
+    try {
+      const url = new URL(path, 'http://localhost')
+      return normalizePath(url.pathname)
+    }
+    catch {
+      return normalizePath(path.split('?')[0].split('#')[0])
+    }
+  }
+
+  function getKeepAliveRouteName(target: IKeepAliveCacheTarget) {
+    const flatRoutes = flattenRoutes(routerMenus.value)
+    const matched = flatRoutes.find((route) => {
+      const routeName = route.raw.name ? String(route.raw.name) : ''
+      const routePath = normalizeKeepAlivePath(route.raw.path)
+
+      return (
+        (target.id && route.id === target.id)
+        || (target.name && routeName === target.name)
+        || (target.path && routePath === normalizeKeepAlivePath(target.path))
+      )
+    })
+
+    return matched?.raw.name ? String(matched.raw.name) : undefined
+  }
+
+  /**
+   * 清理指定页面的 KeepAlive 缓存。
+   * 推荐按 path 调用，业务页面无需关心 KeepAlive include 实际存储的 route name。
+   */
+  function removeKeepAliveCache(target: IKeepAliveCacheTarget | IKeepAliveCacheTarget[]) {
+    const targets = Array.isArray(target) ? target : [target]
+    const names = targets
+      .map(getKeepAliveRouteName)
+      .filter((name): name is string => !!name)
+
+    if (!names.length)
+      return
+
+    const nameSet = new Set(names)
+    keepAliveRouterList.value = keepAliveRouterList.value.filter(name => !nameSet.has(name))
   }
 
   /**
@@ -223,6 +272,7 @@ export const useAsyncRouteStore = defineStore('asyncRoute', () => {
     setRouterMenus: (val: IRouteItem[]) => { routerMenus.value = val },
     addKeepAlive,
     removeKeepAlive,
+    removeKeepAliveCache,
     handleRouterMenu,
     initRoutes,
     initLocalRoutes,

@@ -1,13 +1,17 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, and_, or_
-from fastapi import HTTPException
 from datetime import datetime
-from .models import SysUserEntity
-from app.modules.roles.models import SysRoleEntity
-from .schemas import UserCreate, UserAdminUpdate, UserFilter
-from app.modules.auth.security import get_password_hash
-from typing import List, Optional, Union, Dict, Any
+from typing import Any, Dict, Optional
+
+from fastapi import HTTPException
+from sqlalchemy import or_, select, update
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+
+from app.core.i18n import i18n
+from app.modules.auth.security import get_password_hash
+from app.modules.roles.models import SysRoleEntity
+
+from .models import SysUserEntity
+from .schemas import UserAdminUpdate, UserCreate, UserFilter
 
 
 class UserRepository:
@@ -33,7 +37,9 @@ class UserRepository:
 
     async def create(self, obj_in: UserCreate) -> SysUserEntity:
         if await self.get_by_username(obj_in.username):
-            raise HTTPException(status_code=400, detail="用户名已存在")
+            raise HTTPException(
+                status_code=400, detail=i18n.t("user.error.username_taken")
+            )
 
         db_obj = SysUserEntity(
             username=obj_in.username,
@@ -64,7 +70,9 @@ class UserRepository:
         db_obj = result.scalar_one_or_none()
 
         if not db_obj:
-            raise HTTPException(status_code=404, detail="用户不存在")
+            raise HTTPException(
+                status_code=404, detail=i18n.t("user.error.user_not_found")
+            )
 
         update_data = obj_in.model_dump(exclude_unset=True)
 
@@ -102,7 +110,9 @@ class UserRepository:
         if filters.email:
             stmt = stmt.where(SysUserEntity.email == filters.email)
         if filters.mobile_phone:
-            stmt = stmt.where(SysUserEntity.mobile_phone.like(f"%{filters.mobile_phone}%"))
+            stmt = stmt.where(
+                SysUserEntity.mobile_phone.like(f"%{filters.mobile_phone}%")
+            )
         if filters.is_active is not None:
             stmt = stmt.where(SysUserEntity.is_active == filters.is_active)
 

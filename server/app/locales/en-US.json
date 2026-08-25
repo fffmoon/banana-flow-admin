@@ -1,0 +1,132 @@
+{
+  "global": {
+    "success": {
+      "ok": "Request successful"
+    },
+    "error": {
+      "server_error": "Server error",
+      "validation_error": "Validation error",
+      "db_error": "Database error",
+      "unauthorized": "Unauthorized"
+    }
+  },
+  "auth": {
+    "success": {
+      "login": "Login successful",
+      "logout": "Logout successful",
+      "get_info": "Get user info successful",
+      "register": "Registration successful",
+      "get_perm_menu": "Get permission menu successful",
+      "get_version": "Get version successful"
+    },
+    "error": {
+      "invalid_credentials": "Invalid credentials or password",
+      "user_frozen": "User is frozen",
+      "username_taken": "Username is taken"
+    }
+  },
+  "permission": {
+    "error": {
+      "forbidden": "Forbidden: {perm}"
+    }
+  },
+  "file": {
+    "success": {
+      "upload": "Upload successful"
+    },
+    "error": {
+      "invalid_file_type": "Unsupported file format. Only image files are allowed ({allowed_types}).",
+      "file_too_large": "File size exceeds limit. Maximum allowed upload size is {max_size_mb}MB.",
+      "upload_failed": "File upload failed due to server internal storage error."
+    }
+  },
+  "user": {
+    "success": {
+      "create": "User created successfully",
+      "update": "User updated successfully",
+      "enable": "User enabled successfully",
+      "disable": "User disabled successfully",
+      "profile_update": "Profile updated successfully",
+      "password_change": "Password changed successfully, please log in again",
+      "delete": "Delete successful"
+    },
+    "error": {
+      "username_taken": "Username already exists",
+      "user_not_found": "User not found",
+      "operation_super_admin_forbidden": "Operation failed, super admin cannot be modified",
+      "insufficient_permission": "Operation failed, insufficient permission",
+      "cannot_assign_higher_role": "Cannot assign roles with higher level than yours",
+      "cannot_disable_self": "Cannot disable your own account",
+      "email_taken": "Email is already in use by another user",
+      "phone_taken": "Phone number is already in use by another user",
+      "system_user_forbidden": "System built-in user, cannot be deleted",
+      "cannot_delete_self": "Cannot delete your own account",
+      "old_password_incorrect": "Old password is incorrect, please try again"
+    }
+  },
+  "role": {
+    "success": {
+      "delete": "Delete successful",
+      "assign_menus": "Permissions assigned successfully"
+    },
+    "error": {
+      "code_exists": "Role code already exists",
+      "name_exists": "Role name already exists",
+      "cannot_create_higher_role": "Cannot create a role with a higher level than yours",
+      "role_not_found": "Role not found",
+      "cannot_modify_super_admin": "Cannot modify super admin role",
+      "permission_level_insufficient": "Insufficient permission level",
+      "system_role_forbidden": "System built-in roles cannot be deleted",
+      "role_has_users": "Role has associated users, cannot be deleted",
+      "permission_denied": "Permission denied"
+    }
+  },
+  "operation_log": {
+    "success": {
+      "get_list": "Get operation log list successful"
+    },
+    "error": {
+      "time_range_too_long": "The time range you selected is too long. System audit logs query range cannot exceed 90 natural days. This is to ensure the query performance of the database in a high concurrency environment and prevent system overload due to large-scale data retrieval."
+    }
+  },
+  "notification": {
+    "success": {
+      "operation": "Operation successful",
+      "delete": "Delete successful",
+      "publish": "Publish successful"
+    },
+    "error": {
+      "notice_not_found": "Message not found or has been deleted"
+    }
+  },
+  "image_management": {
+    "success": {
+      "operation": "Operation successful",
+      "query": "Query successful",
+      "create_dir": "Directory created successfully",
+      "rename_dir": "Directory renamed successfully",
+      "move_dir": "Directory moved successfully",
+      "delete_dir": "Directory deleted successfully",
+      "upload_image": "Image uploaded successfully",
+      "rename_image": "Image renamed successfully",
+      "move_image": "Image moved successfully",
+      "delete_image": "Image deleted successfully"
+    },
+    "error": {
+      "dir_name_exists": "A directory named '{name}' already exists in the current directory. Cannot create a directory with the same name.",
+      "dir_not_found": "The system could not find the relevant directory record. It may have been removed.",
+      "root_dir_rename_forbidden": "Due to system protection mechanisms, the root directory cannot be renamed.",
+      "rename_dir_name_exists": "A directory named '{name}' already exists in the current directory. Cannot rename to the same name.",
+      "delete_dir_not_found": "The system could not find the relevant directory record.",
+      "root_dir_delete_forbidden": "Due to system protection mechanisms, the core root directory cannot be deleted.",
+      "dir_not_empty": "The current directory contains valid files or subdirectories. Due to data protection mechanisms, please clear the contents before performing the delete operation.",
+      "move_dir_same_target": "Due to system logic restrictions, the target path is the same as the original path. Cannot perform move operation.",
+      "move_root_dir_forbidden": "Due to system protection mechanisms, the root directory or invalid directories cannot be moved.",
+      "move_dir_loop": "Due to hierarchical system logic constraints, the target directory cannot be moved into its own subdirectory.",
+      "move_dir_name_exists": "A directory named '{name}' already exists in the target directory. Cannot move to a directory with the same name.",
+      "image_not_found": "The system could not find the relevant file record.",
+      "rename_image_name_exists": "A file named '{name}' already exists in the current directory. Cannot rename to the same name.",
+      "move_image_name_exists": "A file named '{name}' already exists in the target directory. Cannot move to a file with the same name."
+    }
+  }
+}

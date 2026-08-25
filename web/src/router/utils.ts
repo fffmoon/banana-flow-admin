@@ -27,6 +27,9 @@ export function loadView(view: string, componentName?: string): () => Promise<Co
     `/src/${cleanPath}.vue`,
     `/src/${cleanPath}.tsx`,
     `/src/${cleanPath}/index.vue`,
+    `/src/views/${cleanPath}.vue`,
+    `/src/views/${cleanPath}.tsx`,
+    `/src/views/${cleanPath}/index.vue`,
   ]
 
   const finalPath = possiblePaths.find(p => p in modules)

@@ -11,7 +11,6 @@ import { useRoute, useRouter } from 'vue-router'
 import HorizontalScroller from '@/components/HorizontalScroller/index.vue'
 import { usePageJump } from '@/hooks/usePageJump'
 import CONFIG from '@/settings'
-import { findRouterById, flattenRoutes } from '@/router/utils'
 
 const tabsViewStore = useTabsViewStore()
 const router = useRouter()
@@ -19,7 +18,33 @@ const route = useRoute()
 const { go, refresh } = usePageJump(router)
 const tabsBlockRef = ref<HTMLElement | null>(null)
 const scrollerRef = ref<InstanceType<typeof HorizontalScroller> | null>(null)
-const asyncRouteStore = useAsyncRouteStore()
+const isRestoringFromMaximize = ref(false)
+let restoreMotionTimer: ReturnType<typeof window.setTimeout> | undefined
+
+watch(() => tabsViewStore.getIsMaximized, (isMaximized, wasMaximized) => {
+  window.clearTimeout(restoreMotionTimer)
+
+  if (isMaximized) {
+    isRestoringFromMaximize.value = false
+    return
+  }
+
+  if (!wasMaximized)
+    return
+
+  isRestoringFromMaximize.value = true
+  nextTick(() => {
+    window.requestAnimationFrame(() => {
+      restoreMotionTimer = window.setTimeout(() => {
+        isRestoringFromMaximize.value = false
+      }, 300)
+    })
+  })
+})
+
+onBeforeUnmount(() => {
+  window.clearTimeout(restoreMotionTimer)
+})
 
 // #region ➤ 页面操作
 // ================================================
@@ -60,21 +85,15 @@ watch(() => tabsViewStore.unPinTabsViewList, () => {
     // 如果当前（上次）的页面比当前数组大，则移动到当前数组的最后一个，如果当前（上次）的页面比当前数组小，则移动到原来的位置
     const nextIdx = tabsViewStore.getTabsViewList.length - 1 >= currentTabsViewIndex.value ? currentTabsViewIndex.value : tabsViewStore.getTabsViewList.length - 1
     const targetTab = tabsViewStore.getTabsViewList[nextIdx]
-    const findRes = findRouterById(asyncRouteStore.routerMenus, targetTab.id)
-    if (!findRes) return
-    go(findRes.raw.path, { checkUnsaved: true, query: findRes.raw.meta.query, })
+    go(targetTab.fullPath, { checkUnsaved: true })
   }
 })
 
 // 处理点击
-function handleClickTab(id: string) {
-  const findRes = findRouterById(asyncRouteStore.routerMenus, id)
-  if (!findRes) return
-
-  go(findRes.raw.path, {
+function handleClickTab(tab: ITabsViewItem) {
+  go(tab.fullPath, {
     replace: true,
     checkUnsaved: true,
-    query: findRes.raw.meta.query,
   })
 }
 
@@ -272,31 +291,50 @@ function handleDragEnter(e: DragEvent, tab: ITabsViewItem) {
 </script>
 
 <template>
-  <div ref="tabsBlockRef"
-    class="tabs-container relative h-[var(--tabs-view-height)] w-full select-none bg-[var(--custom-admin-content-color)] px-[var(--admin-content-padding)]">
+  <div
+    ref="tabsBlockRef"
+    class="tabs-container relative h-[var(--tabs-view-height)] w-full select-none bg-[var(--custom-admin-content-color)] px-[var(--admin-content-padding)]"
+    :class="{ 'tabs-restoring-layout': isRestoringFromMaximize }"
+  >
     <HorizontalScroller ref="scrollerRef" class="custom-scroller-mask">
-      <TransitionGroup name="tabs-move" tag="div" class="h-full flex flex-nowrap items-center gap-x-8px pr-4">
-        <BContentMenu v-for="tab in tabsViewStore.getTabsViewList" :key="tab.id" :options="handleSelectTab(tab)"
-          trigger="manual" placement="bottom-start" :data-id="tab.id">
-          <div draggable="true" class="tab-item" :class="{
-            '!btn-select': tab.id === currentTabsViewId,
-            'dragging': dragState.draggingId === tab.id,
-          }" @click.stop="handleClickTab(tab.id)" @dragstart="handleDragStart($event, tab)" @dragend="handleDragEnd"
-            @dragenter="handleDragEnter($event, tab)">
+      <TransitionGroup
+        name="tabs-move"
+        tag="div"
+        class="h-full flex flex-nowrap items-center gap-x-8px pr-4"
+        :css="!isRestoringFromMaximize"
+      >
+        <BContentMenu
+          v-for="tab in tabsViewStore.getTabsViewList" :key="tab.id" :options="handleSelectTab(tab)"
+          trigger="manual" placement="bottom-start" :data-id="tab.id"
+        >
+          <div
+            draggable="true" class="tab-item" :class="{
+              '!btn-select': tab.id === currentTabsViewId,
+              'dragging': dragState.draggingId === tab.id,
+            }" @click.stop="handleClickTab(tab)" @dragstart="handleDragStart($event, tab)" @dragend="handleDragEnd"
+            @dragenter="handleDragEnter($event, tab)"
+          >
             <!-- 图标 -->
-            <div v-if="CONFIG.tabbar.enableIcon" class="ml-2 box-content cursor-pointer font-size-16px"
-              :class="tab.icon" />
+            <div
+              v-if="CONFIG.tabbar.enableIcon" class="ml-2 box-content cursor-pointer font-size-16px"
+              :class="tab.icon"
+            />
             <!-- 标题 -->
             <div class="ml-6px text-nowrap">
               {{ tab.title }}
             </div>
             <!-- 操作区域 -->
-            <div class="operation-box group h-full w-24px flex-center"
-              @click.stop="() => tab.isPin ? tabsViewStore.unpinTabsView(tab.id) : tabsViewStore.handleCloseTabsView(tab.id)">
+            <div
+              class="group operation-box h-full w-24px flex-center"
+              @click.stop="() => tab.isPin ? tabsViewStore.unpinTabsView(tab.id) : tabsViewStore.handleCloseTabsView(tab.id)"
+            >
               <div
-                class="icon flex-center rounded-[var(--custom-border-radius-small)] group-hover:bg-[var(--custom-hover-color)] w-20px h-20px">
-                <div class="box-content cursor-pointer font-size-14px"
-                  :class="tab.isPin ? 'i-mdi-pin' : 'i-mdi-close'" />
+                class="icon h-20px w-20px flex-center rounded-[var(--custom-border-radius-small)] group-hover:bg-[var(--custom-hover-color)]"
+              >
+                <div
+                  class="box-content cursor-pointer font-size-14px"
+                  :class="tab.isPin ? 'i-mdi-pin' : 'i-mdi-close'"
+                />
               </div>
             </div>
           </div>
@@ -325,6 +363,16 @@ function handleDragEnter(e: DragEvent, tab: ITabsViewItem) {
     &:active {
       transform: scale(0.95);
       cursor: grabbing;
+    }
+  }
+
+  &.tabs-restoring-layout {
+    .tab-item,
+    .tabs-move-enter-active,
+    .tabs-move-leave-active,
+    .tabs-move-move {
+      animation: none !important;
+      transition: none !important;
     }
   }
 

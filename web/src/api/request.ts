@@ -5,6 +5,7 @@
  * @LastEditTime: 2025-03-31 10:00:00
  */
 import type { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import fpPromise from '@fingerprintjs/fingerprintjs'
 import { useRequestCacheStore } from '@stores/requestCache'
 import axios from 'axios'
 import CryptoJS from 'crypto-js'
@@ -146,10 +147,10 @@ const service = axios.create({
 
 // --- 请求拦截器 ---
 service.interceptors.request.use(
-  (config: CustomInternalAxiosRequestConfig) => {
+  async (config: CustomInternalAxiosRequestConfig) => {
     const requestCacheStore = useRequestCacheStore()
 
-    // 1. 缓存处理 (读取)
+    // 缓存处理 (读取)
     if (config.cacheTime) {
       const source = CancelToken.source()
       config.cancelToken = source.token
@@ -163,13 +164,26 @@ service.interceptors.request.use(
       }
     }
 
-    // 2. Token 注入
+    // i18n 语言处理
+    if (config.headers) {
+      config.headers['Accept-Language'] = localStorage.getItem('locale') || 'zh-CN'
+    }
+
+    // Token 注入
     const userStore = useUserStore()
     if (userStore.getToken && config.headers) {
       config.headers.Authorization = userStore.getToken
     }
 
-    // 3. 数据格式转换
+    // 发送唯一设备码
+    const fp = await fpPromise.load()
+    const result = await fp.get()
+    const visitorId = result.visitorId
+    if (config.headers) {
+      config.headers['X-Device-ID'] = visitorId
+    }
+
+    // 数据格式转换
     const contentType = config.headers?.['content-type'] || config.headers?.['Content-Type']
     if (config.method?.toUpperCase() === 'POST' && config.data) {
       if (contentType === ContentTypeEnum.FORM_DATA) {

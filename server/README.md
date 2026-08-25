@@ -29,14 +29,21 @@
         source .venv/bin/activate
     ```
 
-2.  **安装依赖**
+2.  **配置环境变量**
+    ```bash
+        cp .env.example .env
+        # 编辑 .env 文件，配置数据库、Redis 等参数
+    ```
+
+
+3.  **安装依赖**
     ```bash
         pip install -r requirements-dev.txt
         
         # 生产环境需要安装 gunicorn 和 uvicorn
         pip install gunicorn uvicorn[standard]
     ```
-3. **启动项目**
+4. **启动项目**
     ```bash
         # 方式a：直接运行项目
         python run.py
@@ -90,7 +97,6 @@ project/
 │   ├── __init__.py
 │   ├── main.py                   # 应用实例和启动文件
 │   ├── core/                     # 核心配置
-│   │   ├── __init__.py
 │   │   ├── config.py             # 配置文件
 │   │   ├── security.py           # 认证安全相关
 │   │   ├── deps.py               # get_redis、get_db
@@ -105,8 +111,9 @@ project/
 │   ├── libs/                     # 存放C库文件
 │   │   └── libgdmifcso.so   
 │   ├── utils/                    # 工具函数
-│   │   ├── __init__.py
 │   │   └── common.py
+│   ├── scripts/                    # 工具函数
+│   │   └── init_db.py              # 初始化数据库脚本
 │   └── tests/                    # 测试文件
 │       ├── __init__.py
 │       ├── conftest.py

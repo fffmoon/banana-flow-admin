@@ -1,12 +1,13 @@
-<!-- src/layout/AdminLayout/components/modules/Header/MessageList/index.vue -->
 <script lang="ts" setup>
 import { API } from '@/api'
 import type { NotificationItem } from '@/api/modules/account/notification/api'
 import MessageItem from './MessageItem.vue'
+import { useLocale } from '@i18n/index'
 
 const emit = defineEmits(['close'])
 const router = useRouter()
 const { go } = usePageJump(router)
+const { t } = useLocale()
 
 const activeTab = ref('message')
 const loading = ref(false)
@@ -47,24 +48,24 @@ function handleViewAll() {
 <template>
   <div class="w-320px">
     <NTabs v-model:value="activeTab" type="segment" animated class="p-10px pb-0">
-      <NTabPane name="message" tab="消息">
+      <NTabPane name="message" :label="t('notificationPopover.tabs.message')">
         <div class="min-h-0px">
           <div v-if="loading" class="flex-center py-6">
             <NSpin size="small" />
           </div>
-          <NEmpty v-else-if="messageList.length === 0" description="暂无消息" class="py-6" />
+          <NEmpty v-else-if="messageList.length === 0" :description="t('notificationPopover.empty.message')" class="py-6" />
           <MessageItem v-else :messages="messageList" @close="handleClose" />
 
           <!-- 底部按钮 -->
           <div class="border-t border-gray-100 dark:border-gray-700 py-2 text-center bg-[var(--n-color)]">
             <NButton text size="small" type="primary" @click="handleViewAll">
-              查看全部消息
+              {{ t('notificationPopover.actions.viewAll') }}
             </NButton>
           </div>
         </div>
       </NTabPane>
-      <NTabPane name="todo" tab="待办">
-        <NEmpty description="暂无待办事项" class="py-6" />
+      <NTabPane name="todo" :label="t('notificationPopover.tabs.todo')">
+        <NEmpty :description="t('notificationPopover.empty.todo')" class="py-6" />
       </NTabPane>
     </NTabs>
   </div>

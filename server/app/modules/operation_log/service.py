@@ -1,9 +1,12 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends, HTTPException
-from .repository import OperationLogRepository
-from .schemas import OperationLogQuery
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.common.schemas.pages import PageParams
 from app.core.deps import get_db
+from app.core.i18n import i18n
+
+from .repository import OperationLogRepository
+from .schemas import OperationLogQuery
 
 
 class OperationLogService:
@@ -17,11 +20,7 @@ class OperationLogService:
             if delta.days > 90:
                 raise HTTPException(
                     status_code=400,
-                    detail={
-                        "status": "您当前选择的时间筛选跨度过长",
-                        "restriction": "系统审计日志查询范围不得超过 90 个自然日",
-                        "reason": "这是为了保障数据库在高并发环境下的查询响应性能，防止大规模数据检索导致系统负载过载。",
-                    },
+                    detail=i18n.t("operation_log.error.time_range_too_long"),
                 )
 
         return await self.repo.get_multi(query, page_params)

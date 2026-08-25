@@ -1,10 +1,13 @@
-from fastapi import APIRouter, UploadFile, File, Depends, Request, BackgroundTasks
-from app.core.deps import get_current_active_user, PermissionChecker
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Request, UploadFile
+
 from app.common.schemas.response import APIResponse
-from app.modules.users.models import SysUserEntity
+from app.core.deps import get_current_active_user
+from app.core.i18n import i18n
 from app.modules.operation_log.deps import log_operation
-from .service import file_service, FileService
+from app.modules.users.models import SysUserEntity
+
 from .schemas import FileResponse
+from .service import FileService, file_service
 
 router = APIRouter(prefix="/api/v1", tags=["文件管理"])
 
@@ -27,4 +30,4 @@ async def upload_image(
     上传的文件将存储在服务器本地，并返回访问 URL。
     """
     result = await service.upload_image(file, current_user)
-    return APIResponse(data=result, title="上传成功")
+    return APIResponse(data=result, title=i18n.t("file.success.upload"))

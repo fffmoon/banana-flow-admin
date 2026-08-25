@@ -5,7 +5,7 @@
  * @LastEditTime: 2025-04-03 14:27:34
 -->
 <script lang='ts' setup>
-import { themeDoms, themes, useThemeStore } from '@/theme'
+import { useThemeStore } from '@/theme'
 
 const { toggleThemeAnimation } = useAnimation()
 const themeStore = useThemeStore()
@@ -43,7 +43,7 @@ function renderIcon(themeId: string, color: string) {
 
 // 主题下拉配置
 const themesOptions = computed(() => {
-  return themes.filter(item => item.showMenu).map((item) => {
+  return themeStore.themeColorOptions.filter(item => item.showMenu).map((item) => {
     return {
       key: item.id,
       label: item.label,
@@ -55,7 +55,7 @@ const themesOptions = computed(() => {
 
 function getThemeIcon() {
   if (themeStore.userThemeMode) {
-    const findRes = themeDoms.find(item => item.value === themeStore.themeMode)
+    const findRes = themeStore.themeModeOptions.find(item => item.value === themeStore.themeMode)
     return findRes?.icon
   }
   return ''
@@ -70,10 +70,7 @@ function getThemeIcon() {
         <div class="icon-base--md" :class="getThemeIcon()" />
       </NFloatButton>
       <!-- 切换主题色 -->
-      <NDropdown
-        trigger="click" :options="themesOptions"
-        @select="(key: string) => { themeStore.setThemeColorScheme(key) }"
-      >
+      <NDropdown trigger="click" :options="themesOptions" @select="(key: string) => { themeStore.setColorTheme(key) }">
         <NFloatButton>
           <div class="icon-base--md i-mdi-palette" />
         </NFloatButton>

@@ -7,6 +7,7 @@ import ClickCaptchaPopup from '@/components/biz/ClickCaptchaPopup/index.vue'
 import * as ionicons5 from '@vicons/ionicons5'
 import { reactive, ref } from 'vue'
 
+const { t } = useLocale()
 const userStore = useUserStore()
 let messageReactive: IMessageInstance | null = null
 
@@ -29,26 +30,26 @@ const step1Rules = {
   phone: {
     required: true,
     pattern: /^1[3-9]\d{9}$/,
-    message: '请输入有效的手机号码',
+    message: t('login.validPhone'),
     trigger: 'blur',
   },
   smsCode: {
     required: true,
     len: 4,
-    message: '请输入4位验证码',
+    message: t('login.input4Code'),
     trigger: 'blur',
   },
   password: {
     required: true,
     min: 6,
-    message: '密码必须至少包含6个字符',
+    message: t('login.passwordMinRule'),
     trigger: 'blur',
   },
   confirmPassword: {
     required: true,
     validator: (rule: any, value: any) => {
       if (value !== registerForm.password)
-        return new Error('确认密码与密码不一致')
+        return new Error(t('login.passwordMismatch2'))
       return Promise.resolve()
     },
     trigger: 'blur',
@@ -65,7 +66,7 @@ const captchaPopupRef = ref<typeof CaptchaPopup | null>(null)
 // 发送短信按钮
 function sendSmsCode() {
   if (!registerForm.phone) {
-    message.error('请先填写手机号')
+    message.error(t('login.fillPhoneFirst'))
     return
   }
   if (isSending.value) {
@@ -78,7 +79,7 @@ function sendSmsCode() {
 // 发送短信验证码
 async function validateCallback({ validateInfo, finish, close }: ISendValidateCaptchaPayload) {
   if (!registerForm.phone) {
-    message.error('请先填写手机号')
+    message.error(t('login.fillPhoneFirst'))
     return
   }
 
@@ -95,7 +96,7 @@ async function validateCallback({ validateInfo, finish, close }: ISendValidateCa
       }
     }, 1000)
     close()
-    message.success('验证码发送成功')
+    message.success(t('login.smsSentSuccess'))
   }
   catch (error: any) {
     console.error(error)
@@ -111,14 +112,14 @@ async function validateCallback({ validateInfo, finish, close }: ISendValidateCa
 async function handleRegister() {
   try {
     await formRef.value?.validate()
-    messageReactive = message.loading('注册中...', { duration: 0 })
+    messageReactive = message.loading(t('login.registering'), { duration: 0 })
     await API.auth.registerWithSMS({
       mobilePhone: registerForm.phone,
       password: registerForm.password,
       code: registerForm.smsCode,
     })
     messageReactive?.destroy()
-    messageReactive = message.success('注册成功，正在登录中...')
+    messageReactive = message.success(t('login.registerSuccess2'))
     await userStore.login('mobilePassword', { username: registerForm.phone, password: registerForm.password })
     messageReactive?.destroy()
   }
@@ -131,9 +132,9 @@ async function handleRegister() {
 
 <template>
   <NForm ref="formRef" :model="registerForm" :rules="step1Rules" label-width="80">
-    <NFormItem label="手机号" path="phone">
+    <NFormItem :label="t('login.phone')" path="phone">
       <NInput
-        v-model:value="registerForm.phone" placeholder="请输入手机号" :input-props="{
+        v-model:value="registerForm.phone" :placeholder="t('login.inputPhone')" :input-props="{
           'autocomplete': 'tel',
           'inputmode': 'tel',
           'pattern': '[0-9]*',
@@ -147,9 +148,9 @@ async function handleRegister() {
       </NInput>
     </NFormItem>
 
-    <NFormItem label="密码" path="password">
+    <NFormItem :label="t('login.password')" path="password">
       <NInput
-        v-model:value="registerForm.password" type="password" placeholder="8-20位字母+数字组合" :input-props="{
+        v-model:value="registerForm.password" type="password" :placeholder="t('login.passwordFormat')" :input-props="{
           'autocomplete': 'new-password',
           'aria-describedby': 'password-hint',
         }"
@@ -160,9 +161,9 @@ async function handleRegister() {
       </NInput>
     </NFormItem>
 
-    <NFormItem label="确认密码" path="confirmPassword">
+    <NFormItem :label="t('login.confirmPassword')" path="confirmPassword">
       <NInput
-        v-model:value="registerForm.confirmPassword" type="password" placeholder="请再次输入密码" :input-props="{
+        v-model:value="registerForm.confirmPassword" type="password" :placeholder="t('login.inputConfirmPassword')" :input-props="{
           'autocomplete': 'new-password',
           'aria-describedby': 'confirm-password-hint',
         }"
@@ -173,10 +174,10 @@ async function handleRegister() {
       </NInput>
     </NFormItem>
 
-    <NFormItem label="验证码" path="smsCode">
+    <NFormItem :label="t('login.code')" path="smsCode">
       <div class="grid grid-cols-3 w-full gap-2">
         <NInput
-          v-model:value="registerForm.smsCode" class="col-span-2" placeholder="请输入短信验证码" :input-props="{
+          v-model:value="registerForm.smsCode" class="col-span-2" :placeholder="t('login.inputSmsCode')" :input-props="{
             'autocomplete': 'one-time-code',
             'inputmode': 'numeric',
             'pattern': '[0-9]*',
@@ -189,14 +190,14 @@ async function handleRegister() {
           </template>
         </NInput>
         <NButton class="col-span-1" :disabled="isSending" type="primary" @click="sendSmsCode">
-          {{ isSending ? `${countdown}s` : '发送' }}
+          {{ isSending ? `${countdown}s` : t('login.send') }}
         </NButton>
       </div>
     </NFormItem>
 
     <NFormItem :show-label="false">
       <NButton class="w-full" type="primary" @click="handleRegister">
-        注册
+        {{ t('login.register') }}
       </NButton>
     </NFormItem>
   </NForm>

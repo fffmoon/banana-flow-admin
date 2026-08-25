@@ -1,0 +1,307 @@
+{
+  "app": {
+    "title": "Banana Flow Admin Platform"
+  },
+  "common": {
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },
+  "message": {
+    "hello": "Hello",
+    "welcome": "Welcome"
+  },
+  "navbar": {
+    "action": {
+      "locale": "Switch Language"
+    }
+  },
+  "language": {
+    "zh-CN": "Chinese",
+    "en-US": "English"
+  },
+  "user": {
+    "menu": {
+      "profile": "Profile Settings",
+      "preferences": "Preferences",
+      "logout": "Logout"
+    },
+    "store": {
+      "loginSuccess": "Login successful",
+      "loginFailNoToken": "Login failed: Token not obtained",
+      "fetchUserInfoFail": "Failed to fetch user info",
+      "fetchMenuFail": "Failed to fetch permission menu",
+      "unknownUser": "Unknown User",
+      "logout": "Logout",
+      "logoutConfirm": "Are you sure you want to logout?"
+    },
+    "profile": {
+      "tabs": {
+        "editProfile": "Edit Profile",
+        "changePassword": "Change Password"
+      },
+      "basicInfo": "Basic Information",
+      "securitySettings": "Security Settings",
+      "avatar": {
+        "change": "Click to change",
+        "uploading": "Uploading...",
+        "uploadSuccess": "Avatar uploaded successfully, please remember to save",
+        "uploadFail": "Avatar upload failed",
+        "sizeExceeded": "Image size cannot exceed 5MB"
+      },
+      "genderOptions": {
+        "unknown": "Unknown",
+        "male": "Male",
+        "female": "Female"
+      },
+      "form": {
+        "username": "Username",
+        "usernamePlaceholder": "Username cannot be modified",
+        "nickname": "Nickname",
+        "nicknamePlaceholder": "Please enter nickname",
+        "gender": "Gender",
+        "phone": "Phone Number",
+        "phonePlaceholder": "Please enter phone number",
+        "email": "Email",
+        "emailPlaceholder": "Please enter email",
+        "oldPassword": "Old Password",
+        "oldPasswordPlaceholder": "Please enter current password",
+        "newPassword": "New Password",
+        "newPasswordPlaceholder": "Please enter new password",
+        "confirmPassword": "Confirm Password",
+        "confirmPasswordPlaceholder": "Please enter new password again"
+      },
+      "validation": {
+        "nicknameRequired": "Please enter nickname",
+        "emailRequired": "Please enter email",
+        "emailInvalid": "Email format is incorrect",
+        "phoneRequired": "Please enter phone number",
+        "phoneInvalid": "Phone number format is incorrect",
+        "oldPasswordRequired": "Please enter old password",
+        "newPasswordRequired": "Please enter new password",
+        "newPasswordMin": "Password must be at least 6 characters",
+        "confirmPasswordRequired": "Please confirm password",
+        "confirmPasswordMismatch": "Passwords do not match"
+      },
+      "buttons": {
+        "save": "Save Changes",
+        "confirmChange": "Confirm Change",
+        "reset": "Reset"
+      },
+      "messages": {
+        "updateSuccess": "Update successful",
+        "changePasswordSuccess": "Password changed successfully, please login again"
+      }
+    }
+  },
+  "search": {
+    "placeholder": "Enter the navigation you want to search",
+    "search": "Search",
+    "support": "Support title, first letter, URL fuzzy query",
+    "confirm": "Confirm",
+    "switch": "Switch",
+    "exit": "Exit",
+    "noResult": "No results found"
+  },
+  "i18nPage": {
+    "title": "Localization",
+    "content": "Localization Demo",
+    "language": {
+      "title": "Language Settings",
+      "select": "Select Interface Language"
+    },
+    "display": {
+      "basic": "Basic Text",
+      "greeting": "Hello! Welcome to our system!",
+      "welcome": "Welcome back, {name}!",
+      "datetime": "Date & Time",
+      "dateFormat": "MM/dd/yyyy",
+      "timeFormat": "hh:mm a",
+      "number": "Numbers & Currency",
+      "plural": "Pluralization",
+      "messageCount": "You have {count} messages | You have one message | You have {count} messages"
+    }
+  },
+  "login": {
+    "signIn": "Log In",
+    "signingIn": "Logging in",
+    "signingInDots": "Logging in...",
+    "register": "Register",
+    "registering": "Registering...",
+    "registerNow": "Register Now",
+    "account": "Account",
+    "password": "Password",
+    "phone": "Phone",
+    "phoneDesc": "Phone Number",
+    "email": "Email",
+    "smsCode": "SMS Code",
+    "code": "Code",
+    "emailCode": "Email Code",
+    "send": "Send",
+    "getCode": "Get Code",
+    "setPassword": "Set Password",
+    "confirmPassword": "Confirm Password",
+    "inputUsername": "Please enter username",
+    "inputPassword": "Please enter password",
+    "inputPhone": "Please enter phone number",
+    "inputPhoneDesc": "Please enter phone number",
+    "inputSmsCode": "Please enter SMS code",
+    "inputEmail": "Example: yourname@example.com",
+    "input6Code": "6-digit code",
+    "inputConfirmPassword": "Please enter password again",
+    "passwordFormat": "8-20 letters & numbers",
+    "emptyAccountWarning": "Account and password cannot be empty",
+    "emptyPhoneWarning": "Phone and SMS code cannot be empty",
+    "fillPhoneFirst": "Please fill in the phone number first",
+    "fillEmailFirst": "Please fill in the email address first",
+    "smsSentSuccess": "SMS code sent successfully",
+    "emailSentSuccess": "Code sent to your email successfully",
+    "registerSuccess": "Registration successful, logging in...",
+    "registerSuccess2": "Registration successful, logging in...",
+    "validEmail": "Please enter a valid email address",
+    "input4Code": "Please enter a 4-digit code",
+    "passwordRule": "Requires 8-20 letters and numbers",
+    "passwordMismatch": "The two passwords entered do not match",
+    "passwordMismatch2": "Confirm password does not match password",
+    "validPhone": "Please enter a valid phone number",
+    "passwordMinRule": "Password must contain at least 6 characters",
+    "slogan1": "Out-of-the-box solution for backend, frontend, and designers",
+    "slogan2": "Multi-ecosystem support, feature-rich, beautiful templates",
+    "loginAccount": "Log in to your account",
+    "noAccount": "No account?",
+    "goRegister": "Sign up",
+    "accountLogin": "Account Login",
+    "smsLogin": "SMS Login",
+    "registerAccount": "Create your account",
+    "hasAccount": "Already have an account?",
+    "goLogin": "Log in",
+    "phoneRegister": "Phone Registration",
+    "emailRegister": "Email Registration",
+    "demoLogin": "Login directly with demo account",
+    "superAdmin": "Super Admin",
+    "admin": "Admin",
+    "normalUser": "User"
+  },
+  "notificationPopover": {
+    "tabs": {
+      "message": "Messages",
+      "todo": "To-Do"
+    },
+    "empty": {
+      "message": "No messages",
+      "todo": "No to-do items"
+    },
+    "actions": {
+      "viewAll": "View All Messages"
+    }
+  },
+  "notificationList": {
+    "tabs": {
+      "unread": "Unread",
+      "read": "Read"
+    },
+    "type": {
+      "options": {
+        "all": "All",
+        "notice": "Notice",
+        "announcement": "Announcement",
+        "privateMessage": "Private Message"
+      },
+      "notice": "Notice",
+      "announcement": "Announcement",
+      "privateMessage": "Private Message",
+      "unknown": "Unknown"
+    },
+    "table": {
+      "columns": {
+        "type": "Type",
+        "title": "Title",
+        "content": "Content",
+        "publisher": "Publisher",
+        "time": "Time",
+        "actions": "Actions"
+      },
+      "defaultPublisher": "System",
+      "paginationPrefix": "Total {count} items"
+    },
+    "search": {
+      "titleLabel": "Title",
+      "titlePlaceholder": "Enter title to search",
+      "publisherLabel": "Publisher",
+      "publisherPlaceholder": "Enter publisher to search",
+      "typeLabel": "Type",
+      "typePlaceholder": "All"
+    },
+    "actions": {
+      "search": "Search",
+      "reset": "Reset",
+      "markAllRead": {
+        "button": "Mark All as Read",
+        "title": "Confirm Action",
+        "content": "Are you sure you want to mark all unread messages as read?",
+        "success": "Operation successful"
+      },
+      "view": "View",
+      "delete": "Delete",
+      "deleteConfirm": "Are you sure you want to delete this message?",
+      "deleteSuccess": "Deleted successfully"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "theme": "Theme",
+    "primaryColor": "Primary Color",
+    "customColor": "Custom Color",
+    "navbarMode": "Navbar Mode",
+    "watermark": "Page Watermark",
+    "pageTransition": "Page Transition Animation",
+    "networkRequest": "Network Request Effect",
+    "transition": {
+      "slide": "Slide",
+      "fade": "Fade",
+      "slideRight": "Slide Right",
+      "slideLeft": "Slide Left",
+      "zoom": "Zoom",
+      "flip": "Flip"
+    },
+    "layout": {
+      "verticalMixed": "Vertical Mixed Mode",
+      "classic": "Classic Mode (Top + Sidebar)",
+      "sidebar": "Sidebar Mode",
+      "vertical": "Minimalist Sidebar",
+      "top": "Top Bar Mode",
+      "mixed": "Split Layout",
+      "topMixed": "Top Centered Mode"
+    }
+  },
+  "themes": {
+    "theme": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "color": {
+      "default": "Default Theme",
+      "custom": "Custom Theme",
+      "pink": "Pink Theme",
+      "orange": "Orange Theme",
+      "green": "Green Theme"
+    }
+  },
+  "loading": {
+    "labels": {
+      "dot": "Flashing Dot",
+      "load": "Spinning Circle"
+    }
+  },
+  "watermark": {
+    "global": "Global Watermark",
+    "showTimestamp": "Show Timestamp",
+    "customContent": "Custom Content",
+    "inputContent": "Input Watermark Content",
+    "inputPlaceholder": "Please enter watermark content",
+    "fontSize": "Font Size",
+    "fontColor": "Font Color",
+    "resetConfig": "Reset Watermark Configuration",
+    "reset": "Reset"
+  }
+}

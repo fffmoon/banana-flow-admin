@@ -110,7 +110,7 @@ export interface IThemeCustomOptions {
 }
 
 // 定义配置的类型
-export interface IThemeConfig {
+export interface IColorThemeConfig {
   light: IThemeSeries
   dark: IThemeSeries
 }
@@ -122,10 +122,10 @@ export interface IThemeSeries {
 }
 
 // 定义主题项
-export interface ITheme {
+export interface IThemeColorOption {
   id: string
   label: string
-  options: IThemeConfig
+  options: IColorThemeConfig
   showMenu: boolean
 }
 
@@ -137,4 +137,11 @@ export interface ColorScale {
   suppl: string
   disabled: string
   // contrastText: string
+}
+
+export interface IThemeModeOption {
+  id: number
+  label: string
+  icon: string
+  value: IUserThemeMode
 }

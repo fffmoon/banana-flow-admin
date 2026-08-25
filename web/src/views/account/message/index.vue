@@ -11,19 +11,21 @@ import DetailModal from './components/DetailModal.vue'
 import moment from 'moment'
 import TabLayout, { type TabItem } from '@/layout/ContentLayout/TabLayout/index.vue'
 import { useMessageStore } from '@/store/modules/message'
+import { useLocale } from '@i18n/index'
 
 const message = useMessage()
 const dialog = useDialog()
 const messageStore = useMessageStore()
 const route = useRoute()
 const router = useRouter()
+const { t } = useLocale()
 
 // #region ➤ 状态定义
 const activeTab = ref(0) // 0: 未读, 1: 已读
-const tabList: TabItem<number>[] = [
-    { id: 0, label: '未读消息' },
-    { id: 1, label: '已读消息' }
-]
+const tabList: Ref<TabItem<number>[]> = computed(() => [
+    { id: 0, label: t('notificationList.tabs.unread') },
+    { id: 1, label: t('notificationList.tabs.read') }
+])
 
 const loading = ref(false)
 const tableData = ref<NotificationItem[]>([])
@@ -37,10 +39,10 @@ const searchForm = reactive({
 })
 
 const noticeTypeOptions = [
-    { label: '全部', value: 0 },
-    { label: '通知', value: 1 },
-    { label: '公告', value: 2 },
-    { label: '私信', value: 3 }
+    { label: t('notificationList.type.options.all'), value: 0 },
+    { label: t('notificationList.type.options.notice'), value: 1 },
+    { label: t('notificationList.type.options.announcement'), value: 2 },
+    { label: t('notificationList.type.options.privateMessage'), value: 3 }
 ]
 
 const pagination = reactive<PaginationProps>({
@@ -49,7 +51,7 @@ const pagination = reactive<PaginationProps>({
     itemCount: 0,
     showSizePicker: true,
     pageSizes: [10, 20, 50],
-    prefix: ({ itemCount }) => `共 ${itemCount} 条`
+    prefix: ({ itemCount }) => t('notificationList.table.paginationPrefix', { count: itemCount })
 })
 // #endregion
 
@@ -57,16 +59,16 @@ const pagination = reactive<PaginationProps>({
 
 const getNoticeTypeMeta = (type: number) => {
     const map: Record<number, { text: string; type: 'info' | 'warning' | 'success' | 'default' }> = {
-        1: { text: '通知', type: 'info' },
-        2: { text: '公告', type: 'warning' },
-        3: { text: '私信', type: 'success' }
+        1: { text: t('notificationList.type.notice'), type: 'info' },
+        2: { text: t('notificationList.type.announcement'), type: 'warning' },
+        3: { text: t('notificationList.type.privateMessage'), type: 'success' }
     }
-    return map[type] || { text: '未知', type: 'default' }
+    return map[type] || { text: t('notificationList.type.unknown'), type: 'default' }
 }
 
 const columns = computed<DataTableColumns<NotificationItem>>(() => [
     {
-        title: '类型',
+        title: t('notificationList.table.columns.type'),
         key: 'noticeType',
         width: 80,
         align: 'center',
@@ -76,13 +78,13 @@ const columns = computed<DataTableColumns<NotificationItem>>(() => [
         }
     },
     {
-        title: '标题',
+        title: t('notificationList.table.columns.title'),
         key: 'title',
         width: 200,
         ellipsis: { tooltip: true }
     },
     {
-        title: '内容',
+        title: t('notificationList.table.columns.content'),
         key: 'content',
         minWidth: 300,
         render: (row) => {
@@ -94,19 +96,19 @@ const columns = computed<DataTableColumns<NotificationItem>>(() => [
         }
     },
     {
-        title: '发布人',
+        title: t('notificationList.table.columns.publisher'),
         key: 'publisherName',
         width: 120,
-        render: (row) => row.publisherName || '系统'
+        render: (row) => row.publisherName || t('notificationList.table.defaultPublisher')
     },
     {
-        title: '时间',
+        title: t('notificationList.table.columns.time'),
         key: 'createTime',
         width: 180,
         render: (row) => moment(row.createTime).format('YYYY-MM-DD HH:mm:ss')
     },
     {
-        title: '操作',
+        title: t('notificationList.table.columns.actions'),
         key: 'actions',
         width: 150,
         fixed: 'right',
@@ -123,21 +125,34 @@ const columns = computed<DataTableColumns<NotificationItem>>(() => [
                         text: true,
                         onClick: () => handleViewDetail(row.id)
                     },
-                    { default: () => '查看', icon: () => h('div', { class: 'i-mdi-eye-outline' }) }
+                    {
+                        default: () => t('notificationList.actions.view'),
+                        icon: () => h('div', { class: 'i-mdi-eye-outline' })
+                    }
                 )
             )
-            // 仅在“已读”列表显示删除按钮
+            // 仅在"已读"列表显示删除按钮
             if (activeTab.value === 1) {
                 actions.push(
                     h(
                         NPopconfirm,
-                        { onPositiveClick: () => handleDelete(row) },
                         {
-                            default: () => '确认删除该条消息吗？',
+                            onPositiveClick: () => handleDelete(row)
+                        },
+                        {
+                            default: () => t('notificationList.actions.deleteConfirm'),
                             trigger: () => h(
                                 NButton,
-                                { size: 'small', type: 'error', text: true, class: 'ml-3' },
-                                { default: () => '删除', icon: () => h('div', { class: 'i-mdi-trash-can-outline' }) }
+                                {
+                                    size: 'small',
+                                    type: 'error',
+                                    text: true,
+                                    class: 'ml-3'
+                                },
+                                {
+                                    default: () => t('notificationList.actions.delete'),
+                                    icon: () => h('div', { class: 'i-mdi-trash-can-outline' })
+                                }
                             )
                         }
                     )
@@ -201,14 +216,14 @@ async function handleViewDetail(id: number) {
 // 全部已读
 function handleReadAll() {
     dialog.warning({
-        title: '确认操作',
-        content: '确定要将所有未读消息标记为已读吗？',
-        positiveText: '确定',
-        negativeText: '取消',
+        title: t('notificationList.actions.markAllRead.title'),
+        content: t('notificationList.actions.markAllRead.content'),
+        positiveText: t('common.confirm'),
+        negativeText: t('common.cancel'),
         onPositiveClick: async () => {
             try {
                 await API.account.notification.readAll()
-                message.success('操作成功')
+                message.success(t('notificationList.actions.markAllRead.success'))
                 handleSearch()
                 messageStore.getUnreadCount()
             } catch (error) {
@@ -222,7 +237,7 @@ function handleReadAll() {
 async function handleDelete(row: NotificationItem) {
     try {
         await API.account.notification.deleteOne(row.id)
-        message.success('删除成功')
+        message.success(t('notificationList.actions.deleteSuccess'))
         fetchData()
         if (!row.isRead) {
             messageStore.getUnreadCount()
@@ -291,17 +306,19 @@ onMounted(async () => {
                 <NCard class="title">
                     <NForm class="flex flex-wrap gap-y-[--space-md]" inline label-width="auto" :show-feedback="false"
                         label-placement="left" :model="searchForm">
-                        <NFormItem label="标题">
-                            <NInput v-model:value="searchForm.title" placeholder="输入标题搜索" clearable
+                        <NFormItem :label="t('notificationList.search.titleLabel')">
+                            <NInput v-model:value="searchForm.title"
+                                :placeholder="t('notificationList.search.titlePlaceholder')" clearable
                                 @keyup.enter="handleSearch" />
                         </NFormItem>
-                        <NFormItem label="发布人">
-                            <NInput v-model:value="searchForm.publisherName" placeholder="输入发布人搜索" clearable
+                        <NFormItem :label="t('notificationList.search.publisherLabel')">
+                            <NInput v-model:value="searchForm.publisherName"
+                                :placeholder="t('notificationList.search.publisherPlaceholder')" clearable
                                 @keyup.enter="handleSearch" />
                         </NFormItem>
-                        <NFormItem label="类型">
-                            <NSelect v-model:value="searchForm.noticeType" :options="noticeTypeOptions" placeholder="全部"
-                                class="w-120px" />
+                        <NFormItem :label="t('notificationList.search.typeLabel')">
+                            <NSelect v-model:value="searchForm.noticeType" :options="noticeTypeOptions"
+                                :placeholder="t('notificationList.search.typePlaceholder')" class="w-120px" />
                         </NFormItem>
 
                         <!-- 搜索/重置按钮组 -->
@@ -311,13 +328,13 @@ onMounted(async () => {
                                     <template #icon>
                                         <div class="i-mdi-magnify" />
                                     </template>
-                                    搜索
+                                    {{ t('notificationList.actions.search') }}
                                 </NButton>
                                 <NButton :disabled="loading" @click="handleReset">
                                     <template #icon>
                                         <div class="i-mdi-refresh" />
                                     </template>
-                                    重置
+                                    {{ t('notificationList.actions.reset') }}
                                 </NButton>
                             </BSpace>
                         </NFormItem>
@@ -333,7 +350,7 @@ onMounted(async () => {
                                 <template #icon>
                                     <div class="i-mdi-playlist-check" />
                                 </template>
-                                全部已读
+                                {{ t('notificationList.actions.markAllRead.button') }}
                             </NButton>
                         </BSpace>
                         <!-- 占位 -->

@@ -1,14 +1,16 @@
 from datetime import timedelta
-from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import Depends, HTTPException, status, Request
-from fastapi.security import OAuth2PasswordRequestForm
 
-from app.modules.auth import security
+from fastapi import Depends, HTTPException, Request, status
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.config import settings
-from app.core.redis_client import redis_manager
 from app.core.deps import get_db
+from app.core.i18n import i18n
+from app.core.redis_client import redis_manager
+from app.modules.auth import security
 from app.modules.users.repository import UserRepository
-from app.modules.users.schemas import UserResponse, UserLogin, UserCreate
+from app.modules.users.schemas import UserCreate, UserLogin, UserResponse
 
 
 class AuthService:
@@ -37,10 +39,13 @@ class AuthService:
             login_data.password, user.password_hash
         ):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="用户名或密码错误"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=i18n.t("auth.error.invalid_credentials"),
             )
         elif not user.is_active:
-            raise HTTPException(status_code=400, detail="用户已被冻结")
+            raise HTTPException(
+                status_code=400, detail=i18n.t("auth.error.user_frozen")
+            )
 
         # 更新最后登录时间
         await self.user_repo.update_login_time(user.id)
@@ -55,10 +60,13 @@ class AuthService:
             form_data.password, user.password_hash
         ):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="用户名或密码错误"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=i18n.t("auth.error.invalid_credentials"),
             )
         elif not user.is_active:
-            raise HTTPException(status_code=400, detail="用户已被冻结")
+            raise HTTPException(
+                status_code=400, detail=i18n.t("auth.error.user_frozen")
+            )
 
         await self.user_repo.update_login_time(user.id)
         return await self.create_token(user.id)
@@ -76,7 +84,9 @@ class AuthService:
     async def register_user(self, user_in: UserCreate) -> UserResponse:
         user = await self.user_repo.get_by_username(username=user_in.username)
         if user:
-            raise HTTPException(status_code=400, detail="该用户名已被注册")
+            raise HTTPException(
+                status_code=400, detail=i18n.t("auth.error.username_taken")
+            )
 
         new_user = await self.user_repo.create(obj_in=user_in)
         return new_user

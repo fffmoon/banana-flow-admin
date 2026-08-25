@@ -13,6 +13,7 @@ import ClickCaptchaPopup from '@/components/biz/ClickCaptchaPopup/index.vue'
 import * as ionicons5 from '@vicons/ionicons5'
 import { reactive, ref } from 'vue'
 
+const { t } = useLocale()
 const userStore = useUserStore()
 const message = useMessage()
 let messageReactive: IMessageInstance | null = null
@@ -30,13 +31,13 @@ const step1Rules = {
   email: {
     required: true,
     pattern: /^[\w.%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-    message: '请输入有效的邮箱地址',
+    message: t('login.validEmail'),
     trigger: ['blur', 'input'],
   },
   verificationCode: {
     required: true,
     len: 4,
-    message: '请输入4位验证码',
+    message: t('login.input4Code'),
     trigger: 'blur',
   },
   password: {
@@ -44,14 +45,14 @@ const step1Rules = {
     min: 8,
     max: 20,
     pattern: /^(?=.*[A-Z])(?=.*\d).+/i,
-    message: '需8-20位字母+数字组合',
+    message: t('login.passwordRule'),
     trigger: 'blur',
   },
   confirmPassword: {
     required: true,
     validator: (rule: any, value: string) => {
       if (value !== registerForm.password)
-        return new Error('两次输入的密码不一致')
+        return new Error(t('login.passwordMismatch'))
       return true
     },
     trigger: 'blur',
@@ -69,7 +70,7 @@ const captchaPopupRef = ref<typeof CaptchaPopup | null>(null)
 // 发送验证码
 function sendVerificationCode() {
   if (!registerForm.email) {
-    message.error('请先填写邮箱地址')
+    message.error(t('login.fillEmailFirst'))
     return
   }
   captchaPopupRef.value?.toggleModal(true)
@@ -93,7 +94,7 @@ async function validateCallback({ validateInfo, finish, close }: ISendValidateCa
         isSending.value = false
       }
     }, 1000)
-    message.success('验证码已发送至您的邮箱')
+    message.success(t('login.emailSentSuccess'))
     close()
   }
   catch (error: any) {
@@ -110,7 +111,7 @@ async function validateCallback({ validateInfo, finish, close }: ISendValidateCa
 async function handleRegister() {
   try {
     await formRef.value?.validate()
-    messageReactive = message.loading('注册中...', { duration: 0 })
+    messageReactive = message.loading(t('login.registering'), { duration: 0 })
 
     // 调用邮箱注册接口
     await API.auth.registerWithEmail({
@@ -121,7 +122,7 @@ async function handleRegister() {
 
     // 自动登录
     messageReactive.destroy()
-    message.success('注册成功，正在登录...')
+    message.success(t('login.registerSuccess'))
     await userStore.login('emailPassword', {
       username: registerForm.email,
       password: registerForm.password,
@@ -137,9 +138,9 @@ async function handleRegister() {
 <template>
   <NForm ref="formRef" :model="registerForm" :rules="step1Rules" label-width="80">
     <!-- 邮箱输入 -->
-    <NFormItem label="邮箱地址" path="email">
+    <NFormItem :label="t('login.email')" path="email">
       <NInput
-        v-model:value="registerForm.email" placeholder="示例：yourname@example.com" :input-props="{
+        v-model:value="registerForm.email" :placeholder="t('login.inputEmail')" :input-props="{
           'autocomplete': 'email',
           'inputmode': 'email',
           'aria-describedby': 'email-hint',
@@ -153,9 +154,9 @@ async function handleRegister() {
     </NFormItem>
 
     <!-- 密码输入 -->
-    <NFormItem label="设置密码" path="password">
+    <NFormItem :label="t('login.setPassword')" path="password">
       <NInput
-        v-model:value="registerForm.password" type="password" placeholder="8-20位字母+数字组合" :input-props="{
+        v-model:value="registerForm.password" type="password" :placeholder="t('login.passwordFormat')" :input-props="{
           'autocomplete': 'new-password',
           'aria-describedby': 'password-hint',
         }"
@@ -167,9 +168,9 @@ async function handleRegister() {
     </NFormItem>
 
     <!-- 确认密码 -->
-    <NFormItem label="确认密码" path="confirmPassword">
+    <NFormItem :label="t('login.confirmPassword')" path="confirmPassword">
       <NInput
-        v-model:value="registerForm.confirmPassword" type="password" placeholder="请再次输入密码" :input-props="{
+        v-model:value="registerForm.confirmPassword" type="password" :placeholder="t('login.inputConfirmPassword')" :input-props="{
           'autocomplete': 'new-password',
           'aria-describedby': 'confirm-password-hint',
         }"
@@ -181,10 +182,10 @@ async function handleRegister() {
     </NFormItem>
 
     <!-- 验证码 -->
-    <NFormItem label="邮箱验证码" path="verificationCode">
+    <NFormItem :label="t('login.emailCode')" path="verificationCode">
       <div class="grid grid-cols-3 w-full gap-2">
         <NInput
-          v-model:value="registerForm.verificationCode" class="col-span-2" placeholder="6位数字验证码" :input-props="{
+          v-model:value="registerForm.verificationCode" class="col-span-2" :placeholder="t('login.input6Code')" :input-props="{
             'autocomplete': 'one-time-code',
             'inputmode': 'numeric',
             'pattern': '[0-9]*',
@@ -197,7 +198,7 @@ async function handleRegister() {
           </template>
         </NInput>
         <NButton class="col-span-1" :disabled="isSending" type="primary" @click="sendVerificationCode">
-          {{ isSending ? `${countdown}s` : '获取验证码' }}
+          {{ isSending ? `${countdown}s` : t('login.getCode') }}
         </NButton>
       </div>
     </NFormItem>
@@ -205,7 +206,7 @@ async function handleRegister() {
     <!-- 提交按钮 -->
     <NFormItem :show-label="false">
       <NButton type="primary" class="mt-4 w-full" size="large" @click="handleRegister">
-        立即注册
+        {{ t('login.registerNow') }}
       </NButton>
     </NFormItem>
   </NForm>

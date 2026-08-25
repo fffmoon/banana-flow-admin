@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile
 from app.common.schemas.pages import PagedData, PageParams
 from app.common.schemas.response import APIResponse
 from app.core.deps import get_current_active_user
+from app.core.i18n import i18n
 from app.modules.operation_log.deps import log_operation
 from app.modules.users.models import SysUserEntity
 
@@ -31,7 +32,7 @@ async def get_root_directory_id(
     current_user: SysUserEntity = Depends(get_current_active_user),
 ):
     root_id = await service.get_or_create_root(current_user)
-    return APIResponse(data=root_id, title="操作成功")
+    return APIResponse(data=root_id, title=i18n.t("image_management.success.operation"))
 
 
 @router.get(
@@ -49,7 +50,7 @@ async def get_directory_structure(
     result = await service.get_directory_content(
         dir_id, search_name, page_params, current_user
     )
-    return APIResponse(data=result, title="查询成功")
+    return APIResponse(data=result, title=i18n.t("image_management.success.query"))
 
 
 @router.get(
@@ -63,7 +64,7 @@ async def get_directory_structure_by_id(
     current_user: SysUserEntity = Depends(get_current_active_user),
 ):
     result = await service.get_breadcrumbs(dir_id, current_user)
-    return APIResponse(data=result, title="查询成功")
+    return APIResponse(data=result, title=i18n.t("image_management.success.query"))
 
 
 @router.get(
@@ -76,7 +77,7 @@ async def get_tree_directory_structures(
     current_user: SysUserEntity = Depends(get_current_active_user),
 ):
     result = await service.get_tree_structure(current_user)
-    return APIResponse(data=result, title="查询成功")
+    return APIResponse(data=result, title=i18n.t("image_management.success.query"))
 
 
 # ==================== 目录操作 ====================
@@ -90,7 +91,7 @@ async def create_directory(
     current_user: SysUserEntity = Depends(get_current_active_user),
 ):
     await service.create_directory(req, current_user)
-    return APIResponse(title="目录创建成功")
+    return APIResponse(title=i18n.t("image_management.success.create_dir"))
 
 
 @router.put("/directories/rename", response_model=APIResponse, summary="重命名目录")
@@ -101,7 +102,7 @@ async def rename_directory(
     current_user: SysUserEntity = Depends(get_current_active_user),
 ):
     await service.rename_directory(req, current_user)
-    return APIResponse(title="目录重命名成功")
+    return APIResponse(title=i18n.t("image_management.success.rename_dir"))
 
 
 @router.put("/directories/move", response_model=APIResponse, summary="移动目录")
@@ -112,7 +113,7 @@ async def move_directory(
     current_user: SysUserEntity = Depends(get_current_active_user),
 ):
     await service.move_directory(req, current_user)
-    return APIResponse(title="目录移动成功")
+    return APIResponse(title=i18n.t("image_management.success.move_dir"))
 
 
 @router.delete("/directories/{dir_id}", response_model=APIResponse, summary="删除目录")
@@ -123,7 +124,7 @@ async def delete_directory(
     current_user: SysUserEntity = Depends(get_current_active_user),
 ):
     await service.delete_directory(dir_id, current_user)
-    return APIResponse(title="目录删除成功")
+    return APIResponse(title=i18n.t("image_management.success.delete_dir"))
 
 
 # ==================== 图片文件操作 ====================
@@ -138,7 +139,7 @@ async def upload_images(
     current_user: SysUserEntity = Depends(get_current_active_user),
 ):
     await service.upload_image(dirId, file, current_user)
-    return APIResponse(title="图片上传成功")
+    return APIResponse(title=i18n.t("image_management.success.upload_image"))
 
 
 @router.put("/images/rename", response_model=APIResponse, summary="重命名图片")
@@ -149,7 +150,7 @@ async def rename_image(
     current_user: SysUserEntity = Depends(get_current_active_user),
 ):
     await service.rename_image(req, current_user)
-    return APIResponse(title="图片重命名成功")
+    return APIResponse(title=i18n.t("image_management.success.rename_image"))
 
 
 @router.put("/images/move", response_model=APIResponse, summary="移动图片")
@@ -160,7 +161,7 @@ async def move_image(
     current_user: SysUserEntity = Depends(get_current_active_user),
 ):
     await service.move_image(req, current_user)
-    return APIResponse(title="图片移动成功")
+    return APIResponse(title=i18n.t("image_management.success.move_image"))
 
 
 @router.delete("/images/{images_id}", response_model=APIResponse, summary="删除图片")
@@ -171,4 +172,4 @@ async def delete_image(
     current_user: SysUserEntity = Depends(get_current_active_user),
 ):
     await service.delete_image(images_id, current_user)
-    return APIResponse(title="图片删除成功")
+    return APIResponse(title=i18n.t("image_management.success.delete_image"))

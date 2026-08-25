@@ -115,18 +115,16 @@ const transitionVars = computed(() => {
 <template>
   <Teleport to="body">
     <!-- 消息层 -->
-    <div class="pointer-events-none fixed left-0 top-0 z-1 h-full w-full flex px-5 py-10" :style="{ zIndex: props.zIndex }" :class="computedPlacement">
+    <div class="pointer-events-none fixed left-0 top-0 z-1 h-full w-full flex px-5 py-10"
+      :style="{ zIndex: props.zIndex }" :class="computedPlacement" @mouseenter="handleDeskHover(true)"
+      @mouseleave="handleDeskHover(false)">
       <!-- 设置排列方式 -->
-      <TransitionGroup
-        name="msg" tag="div" class="relative h-full w-full flex flex-col items-center !md:w-388px"
-        :style="transitionVars"
-      >
+      <TransitionGroup name="msg" tag="div" class="relative h-full w-full flex flex-col items-center !md:w-388px"
+        :style="transitionVars">
         <!-- 设置移入移出 -->
-        <div
-          v-for="(msg, index) in messagesComputed" :key="msg.id" class="pointer-events-auto w-full pb-2"
+        <div v-for="(msg, index) in messagesComputed" :key="msg.id" class="pointer-events-auto w-full pb-2"
           :class="[isTopPlacement ? 'pb-2' : 'pt-2', computedMsgClass.wrapper]" :style="getMsgStyles(index).wrapper"
-          @mouseenter="handleDeskHover(true)" @mouseleave="handleDeskHover(false)" @click="handleMobileTap"
-        >
+          @click="handleMobileTap">
           <!-- 设置缩放 -->
           <div class="w-full" :style="getMsgStyles(index).item" :class="computedMsgClass.item">
             <MessageItem :msg="msg" @remove="(e) => emit('remove', e)">

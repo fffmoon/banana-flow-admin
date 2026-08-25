@@ -5,7 +5,6 @@ services:
   # 数据库服务
   # ----------------------------------------
   mysql:
-    container_name: mysql-container
     image: mysql:8.0
     restart: always
     ports:
@@ -24,7 +23,6 @@ services:
       - banana-flow-admin-network
 
   redis:
-    container_name: redis-container
     image: redis:7.0
     restart: always
     ports:
@@ -49,13 +47,10 @@ services:
       - "${HOST_PORT_SERVER:-8000}:${PORT:-8000}"
     env_file:
       - .env
-    environment:
-      - APP_ENV=production
-      - DB_HOST=mysql
-      - REDIS_HOST=redis
     volumes:
       - ./server/logs:/app/logs
       - ./server/import_data:/app/import_data
+      - ./static:/app/static
     depends_on:
       - mysql
       - redis
@@ -73,6 +68,7 @@ services:
       - "${HOST_PORT_WEB:-18000}:80"
     volumes:
       - ./web/default.conf:/etc/nginx/conf.d/default.conf
+      - ./static:/usr/share/nginx/static
     depends_on:
       - banana-flow-admin-server-py
     networks:

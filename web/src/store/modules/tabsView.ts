@@ -51,8 +51,14 @@ export const useTabsViewStore = defineStore('tabsView', {
     // 添加一个标签页
     addTabsView(tabsView: ITabsViewItem) {
       // console.info('添加一个标签页', tabsView)
-      // 如果存在，则不添加
-      if (this.getTabsViewList.some(item => item.id === tabsView.id)) {
+      const existingTab = this.getTabsViewList.find(item => item.id === tabsView.id)
+      // 如果存在，则更新完整路径，避免 query/hash 丢失
+      if (existingTab) {
+        existingTab.fullPath = tabsView.fullPath
+        existingTab.title = tabsView.title
+        existingTab.name = tabsView.name
+        existingTab.icon = tabsView.icon
+        existingTab.hideBreadcrumb = tabsView.hideBreadcrumb
         return
       }
       // 如果 hideBreadcrumb = true 则不添加

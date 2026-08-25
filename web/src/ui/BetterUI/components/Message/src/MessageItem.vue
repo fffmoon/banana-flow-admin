@@ -1,6 +1,6 @@
 <script lang='ts' setup>
 import type { IconType, IMessage } from './types'
-// 逻辑，处理
+
 interface IProps {
   msg: IMessage
 }
@@ -50,17 +50,12 @@ function handleIconClose(msg: IMessage) {
   .content {
     --at-apply: flex-grow;
   }
-
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
+  from { transform: rotate(0deg); }
 
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 .icon-status--loading {
@@ -69,23 +64,13 @@ function handleIconClose(msg: IMessage) {
   animation: spin 1s linear infinite;
 }
 
-.icon-status--primary {
-  --at-apply: bg-[var(--custom-primary-color)];
-}
+.icon-status--primary { --at-apply: bg-[var(--custom-primary-color)]; }
 
-.icon-status--success {
-  --at-apply: bg-[var(--custom-success-color)];
-}
+.icon-status--success { --at-apply: bg-[var(--custom-success-color)]; }
 
-.icon-status--error {
-  --at-apply: bg-[var(--custom-error-color)];
-}
+.icon-status--error { --at-apply: bg-[var(--custom-error-color)]; }
 
-.icon-status--warning {
-  --at-apply: bg-[var(--custom-warning-color)];
-}
+.icon-status--warning { --at-apply: bg-[var(--custom-warning-color)]; }
 
-.icon-status--info {
-  --at-apply: bg-[var(--custom-info-color)];
-}
+.icon-status--info { --at-apply: bg-[var(--custom-info-color)]; }
 </style>

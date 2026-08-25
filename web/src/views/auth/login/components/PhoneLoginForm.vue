@@ -6,6 +6,7 @@ import type { FormInst } from 'naive-ui'
 import ClickCaptchaPopup from '@/components/biz/ClickCaptchaPopup/index.vue'
 import * as ionicons5 from '@vicons/ionicons5'
 
+const { t } = useLocale()
 const message = useMessage()
 const route = useRoute()
 const userStore = useUserStore()
@@ -29,7 +30,7 @@ const captchaPopupRef = ref<typeof CaptchaPopup | null>(null)
 // 发送短信按钮
 function sendSmsCode() {
   if (!loginForm.phone) {
-    message.error('请先填写手机号')
+    message.error(t('login.fillPhoneFirst'))
     return
   }
   if (isSending.value) {
@@ -42,7 +43,7 @@ function sendSmsCode() {
 // 发送短信验证码
 async function validateCallback({ validateInfo, finish, close }: ISendValidateCaptchaPayload) {
   if (!loginForm.phone) {
-    message.error('请先填写手机号')
+    message.error(t('login.fillPhoneFirst'))
     return
   }
 
@@ -59,7 +60,7 @@ async function validateCallback({ validateInfo, finish, close }: ISendValidateCa
       }
     }, 1000)
     close()
-    message.success('验证码发送成功')
+    message.success(t('login.smsSentSuccess'))
   }
   catch (error: any) {
     console.error(error)
@@ -75,13 +76,13 @@ async function validateCallback({ validateInfo, finish, close }: ISendValidateCa
 async function handleLogin() {
   const { phone, smsCode } = loginForm
   if (!phone || !smsCode) {
-    message.error('手机号或者短信验证码不能为空')
+    message.error(t('login.emptyPhoneWarning'))
     return
   }
   if (isLoading.value)
     return
   isLoading.value = true
-  messageReactive = message.loading('登录中', { duration: 0 })
+  messageReactive = message.loading(t('login.signingIn'), { duration: 0 })
   try {
     await userStore.login('mobileSmsCode', { username: phone, password: smsCode })
     isLoading.value = false
@@ -97,9 +98,9 @@ async function handleLogin() {
 
 <template>
   <NForm ref="formRef" :model="loginForm" label-width="80" :show-feedback="false">
-    <NFormItem label="手机号码" path="username">
+    <NFormItem :label="t('login.phoneDesc')" path="username">
       <NInput
-        v-model:value="loginForm.phone" :disabled="isLoading" placeholder="请输入手机号码" :input-props="{
+        v-model:value="loginForm.phone" :disabled="isLoading" :placeholder="t('login.inputPhoneDesc')" :input-props="{
           'autocomplete': 'tel',
           'inputmode': 'tel',
           'aria-describedby': 'phone-hint',
@@ -111,10 +112,10 @@ async function handleLogin() {
       </NInput>
     </NFormItem>
 
-    <NFormItem label="验证码" path="smsCode">
+    <NFormItem :label="t('login.code')" path="smsCode">
       <div class="grid grid-cols-3 w-full gap-2">
         <NInput
-          v-model:value="loginForm.smsCode" class="col-span-2" placeholder="请输入短信验证码" :input-props="{
+          v-model:value="loginForm.smsCode" class="col-span-2" :placeholder="t('login.inputSmsCode')" :input-props="{
             'autocomplete': 'one-time-code',
             'inputmode': 'numeric',
             'pattern': '[0-9]*',
@@ -126,7 +127,7 @@ async function handleLogin() {
           </template>
         </NInput>
         <NButton class="col-span-1" :disabled="isSending" type="primary" @click="sendSmsCode">
-          {{ isSending ? `${countdown}s` : '发送' }}
+          {{ isSending ? `${countdown}s` : t('login.send') }}
         </NButton>
       </div>
     </NFormItem>
@@ -136,7 +137,7 @@ async function handleLogin() {
         :loading="isLoading" type="primary" class="w-full"
         :class="[isLoading ? 'cursor-wait pointer-events-auto' : '']" native-type="submit" @click="handleLogin"
       >
-        {{ isLoading ? '登录中...' : '登录' }}
+        {{ isLoading ? t('login.signingInDots') : t('login.signIn') }}
       </NButton>
     </NFormItem>
   </NForm>

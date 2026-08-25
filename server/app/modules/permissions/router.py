@@ -1,11 +1,15 @@
-from fastapi import APIRouter, Depends, Request, BackgroundTasks
 from typing import List
-from app.core.deps import get_current_active_user, PermissionChecker
+
+from fastapi import APIRouter, BackgroundTasks, Depends, Request
+
 from app.common.schemas.response import APIResponse
-from .schemas import PermissionCreate, PermissionUpdate, PermissionTreeResponse
-from .service import permission_service, PermissionService
-from app.modules.users.models import SysUserEntity
+from app.core.deps import PermissionChecker, get_current_active_user
+from app.core.i18n import i18n
 from app.modules.operation_log.deps import log_operation
+from app.modules.users.models import SysUserEntity
+
+from .schemas import PermissionCreate, PermissionTreeResponse, PermissionUpdate
+from .service import PermissionService, permission_service
 
 router = APIRouter(prefix="/api/v1", tags=["系统权限"])
 
@@ -31,7 +35,7 @@ async def create_permission(
     _: dict = Depends(PermissionChecker("system:menu:create")),
 ):
     await service.createAndAssignToUser(perm, current_user)
-    return APIResponse(title="创建成功")
+    return APIResponse(title=i18n.t("global.success.created"))
 
 
 @router.put("/permissions/{id}", response_model=APIResponse)
@@ -46,7 +50,7 @@ async def update_permission(
     _: dict = Depends(PermissionChecker("system:menu:update")),
 ):
     await service.update(id, perm)
-    return APIResponse(title="更新成功")
+    return APIResponse(title=i18n.t("global.success.updated"))
 
 
 @router.delete("/permissions/{id}", response_model=APIResponse)
@@ -60,4 +64,4 @@ async def delete_permission(
     _: dict = Depends(PermissionChecker("system:menu:delete")),
 ):
     await service.delete(id)
-    return APIResponse(title="删除成功")
+    return APIResponse(title=i18n.t("global.success.deleted"))

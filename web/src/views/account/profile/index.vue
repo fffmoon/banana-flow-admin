@@ -6,10 +6,12 @@ import type { FormInst, FormRules, UploadCustomRequestOptions } from 'naive-ui'
 import { NButton, NForm, NFormItem, NInput, NRadio, NRadioButton, NRadioGroup, NSelect, NUpload, NSpin } from 'naive-ui'
 import useScreen from '@/hooks/useResponsive'
 import type { TabItem } from '@/layout/ContentLayout/TabLayout/index.vue'
+import { useLocale } from '@i18n/index'
 
 const message = useMessage()
 const userStore = useUserStore()
 const { deviceSize } = useScreen()
+const { t } = useLocale()
 
 // #region ➤ 个人资料逻辑
 // ================================================
@@ -27,20 +29,40 @@ const infoForm = reactive({
 })
 
 const genderOptions = [
-    { label: '未知', value: 0 },
-    { label: '男', value: 1 },
-    { label: '女', value: 2 }
+    { label: t('user.profile.genderOptions.unknown'), value: 0 },
+    { label: t('user.profile.genderOptions.male'), value: 1 },
+    { label: t('user.profile.genderOptions.female'), value: 2 }
 ]
 
 const infoRules: FormRules = {
-    nickname: [{ required: true, message: '请输入昵称', trigger: 'blur' }],
+    nickname: [{
+        required: true,
+        message: t('user.profile.validation.nicknameRequired'),
+        trigger: 'blur'
+    }],
     email: [
-        { required: true, message: '请输入邮箱', trigger: 'blur' },
-        { type: 'email', message: '邮箱格式不正确', trigger: 'blur' }
+        {
+            required: true,
+            message: t('user.profile.validation.emailRequired'),
+            trigger: 'blur'
+        },
+        {
+            type: 'email',
+            message: t('user.profile.validation.emailInvalid'),
+            trigger: 'blur'
+        }
     ],
     mobilePhone: [
-        { required: true, message: '请输入手机号', trigger: 'blur' },
-        { pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }
+        {
+            required: true,
+            message: t('user.profile.validation.phoneRequired'),
+            trigger: 'blur'
+        },
+        {
+            pattern: /^1[3-9]\d{9}$/,
+            message: t('user.profile.validation.phoneInvalid'),
+            trigger: 'blur'
+        }
     ]
 }
 
@@ -58,7 +80,7 @@ function initInfo() {
 
 async function handleUpload({ file, onFinish, onError }: UploadCustomRequestOptions) {
     if (file.file && file.file.size > 5 * 1024 * 1024) {
-        message.error('图片大小不能超过 5MB')
+        message.error(t('user.profile.avatar.sizeExceeded'))
         onError()
         return
     }
@@ -68,10 +90,10 @@ async function handleUpload({ file, onFinish, onError }: UploadCustomRequestOpti
         formData.append('file', file.file as File)
         const res = await API.common.UploadImage(formData)
         infoForm.avatar = res.data.fileUrl
-        message.success('头像上传成功，请记得点击保存')
+        message.success(t('user.profile.avatar.uploadSuccess'))
         onFinish()
     } catch (error) {
-        message.error('头像上传失败')
+        message.error(t('user.profile.avatar.uploadFail'))
         onError()
     } finally {
         uploadLoading.value = false
@@ -89,7 +111,7 @@ async function handleUpdateProfile() {
                     gender: infoForm.gender as 0 | 1 | 2,
                     avatar: infoForm.avatar
                 })
-                message.success('修改成功')
+                message.success(t('user.profile.messages.updateSuccess'))
                 await userStore.fetchUserInfo()
             } catch (error) { }
         }
@@ -109,14 +131,34 @@ function validatePasswordSame(rule: any, value: string) {
 }
 
 const pwdRules: FormRules = {
-    oldPassword: [{ required: true, message: '请输入旧密码', trigger: 'blur' }],
+    oldPassword: [{
+        required: true,
+        message: t('user.profile.validation.oldPasswordRequired'),
+        trigger: 'blur'
+    }],
     newPassword: [
-        { required: true, message: '请输入新密码', trigger: 'blur' },
-        { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
+        {
+            required: true,
+            message: t('user.profile.validation.newPasswordRequired'),
+            trigger: 'blur'
+        },
+        {
+            min: 6,
+            message: t('user.profile.validation.newPasswordMin'),
+            trigger: 'blur'
+        }
     ],
     confirmPassword: [
-        { required: true, message: '请再次输入新密码', trigger: 'blur' },
-        { validator: validatePasswordSame, message: '两次密码输入不一致', trigger: 'blur' }
+        {
+            required: true,
+            message: t('user.profile.validation.confirmPasswordRequired'),
+            trigger: 'blur'
+        },
+        {
+            validator: validatePasswordSame,
+            message: t('user.profile.validation.confirmPasswordMismatch'),
+            trigger: 'blur'
+        }
     ]
 }
 
@@ -128,7 +170,7 @@ async function handleChangePassword() {
                     oldPassword: pwdForm.oldPassword,
                     newPassword: pwdForm.newPassword
                 })
-                message.success('密码修改成功，请重新登录')
+                message.success(t('user.profile.messages.changePasswordSuccess'))
                 await userStore.logout()
             } catch (error) {
                 console.error(error)
@@ -157,10 +199,10 @@ const formPlacement = computed(() => {
 
 // Tab 配置
 const activeTab = ref(0)
-const tabList: TabItem<number>[] = [
-    { id: 0, label: '修改个人资料' },
-    { id: 1, label: '修改密码' },
-]
+const tabList: Ref<TabItem<number>[]> = computed(() => [
+    { id: 0, label: t('user.profile.tabs.editProfile') },
+    { id: 1, label: t('user.profile.tabs.changePassword') },
+])
 
 // #endregion UI 配置
 
@@ -171,7 +213,7 @@ const tabList: TabItem<number>[] = [
         <!-- 修改资料 -->
         <b-scrollbar v-if="activeTab === 0" class="h-full">
             <h2 dashed class="text-xl font-bold text-gray-700 line-height-40px mb-4" title-placement="center">
-                基本信息
+                {{ t('user.profile.basicInfo') }}
             </h2>
 
             <div class="flex flex-col md:flex-row gap-8">
@@ -186,8 +228,8 @@ const tabList: TabItem<number>[] = [
                             </n-spin>
                             <div
                                 class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-sm backdrop-blur-[1px]">
-                                <span v-if="!uploadLoading">点击更换</span>
-                                <span v-else>上传中...</span>
+                                <span v-if="!uploadLoading">{{ t('user.profile.avatar.change') }}</span>
+                                <span v-else>{{ t('user.profile.avatar.uploading') }}</span>
                             </div>
                         </div>
                     </n-upload>
@@ -201,28 +243,33 @@ const tabList: TabItem<number>[] = [
                 <div class="flex-1 max-w-lg md:w-3/4">
                     <n-form ref="infoFormRef" :model="infoForm" :rules="infoRules" :label-placement="formPlacement"
                         label-width="100" require-mark-placement="right-hanging">
-                        <n-form-item label="用户名">
-                            <n-input v-model:value="infoForm.username" disabled placeholder="用户名不可修改" />
+                        <n-form-item :label="t('user.profile.form.username')">
+                            <n-input v-model:value="infoForm.username"
+                                :placeholder="t('user.profile.form.usernamePlaceholder')" disabled />
                         </n-form-item>
-                        <n-form-item label="昵称" path="nickname">
-                            <n-input v-model:value="infoForm.nickname" placeholder="请输入昵称" />
+                        <n-form-item :label="t('user.profile.form.nickname')" path="nickname">
+                            <n-input v-model:value="infoForm.nickname"
+                                :placeholder="t('user.profile.form.nicknamePlaceholder')" />
                         </n-form-item>
-                        <n-form-item label="性别" path="gender">
+                        <n-form-item :label="t('user.profile.form.gender')" path="gender">
                             <n-radio-group v-model:value="infoForm.gender" name="gender">
                                 <n-radio v-for="option in genderOptions" :key="option.value" :value="option.value">
                                     {{ option.label }}
                                 </n-radio>
                             </n-radio-group>
                         </n-form-item>
-                        <n-form-item label="手机号" path="mobilePhone">
-                            <n-input v-model:value="infoForm.mobilePhone" placeholder="请输入手机号" />
+                        <n-form-item :label="t('user.profile.form.phone')" path="mobilePhone">
+                            <n-input v-model:value="infoForm.mobilePhone"
+                                :placeholder="t('user.profile.form.phonePlaceholder')" />
                         </n-form-item>
-                        <n-form-item label="邮箱" path="email">
-                            <n-input v-model:value="infoForm.email" placeholder="请输入邮箱" />
+                        <n-form-item :label="t('user.profile.form.email')" path="email">
+                            <n-input v-model:value="infoForm.email"
+                                :placeholder="t('user.profile.form.emailPlaceholder')" />
                         </n-form-item>
                         <n-form-item>
                             <div class="flex w-full justify-center ml-0 md:justify-start md:ml-[100px]">
-                                <n-button type="primary" @click="handleUpdateProfile">保存修改</n-button>
+                                <n-button type="primary" @click="handleUpdateProfile">{{ t('user.profile.buttons.save')
+                                    }}</n-button>
                             </div>
                         </n-form-item>
                     </n-form>
@@ -234,28 +281,29 @@ const tabList: TabItem<number>[] = [
         <!-- 修改密码 -->
         <b-scrollbar v-if="activeTab === 1" class="h-full">
             <h2 dashed class="text-xl font-bold text-gray-700 line-height-40px mb-4" title-placement="center">
-                安全设置
+                {{ t('user.profile.securitySettings') }}
             </h2>
             <div class="flex justify-center py-4 md:py-8">
                 <div class="w-full max-w-lg">
                     <n-form ref="pwdFormRef" :model="pwdForm" :rules="pwdRules" :label-placement="formPlacement"
                         label-width="100">
-                        <n-form-item label="旧密码" path="oldPassword">
+                        <n-form-item :label="t('user.profile.form.oldPassword')" path="oldPassword">
                             <n-input v-model:value="pwdForm.oldPassword" type="password" show-password-on="click"
-                                placeholder="请输入当前密码" />
+                                :placeholder="t('user.profile.form.oldPasswordPlaceholder')" />
                         </n-form-item>
-                        <n-form-item label="新密码" path="newPassword">
+                        <n-form-item :label="t('user.profile.form.newPassword')" path="newPassword">
                             <n-input v-model:value="pwdForm.newPassword" type="password" show-password-on="click"
-                                placeholder="请输入新密码" />
+                                :placeholder="t('user.profile.form.newPasswordPlaceholder')" />
                         </n-form-item>
-                        <n-form-item label="确认密码" path="confirmPassword">
+                        <n-form-item :label="t('user.profile.form.confirmPassword')" path="confirmPassword">
                             <n-input v-model:value="pwdForm.confirmPassword" type="password" show-password-on="click"
-                                placeholder="请再次输入新密码" />
+                                :placeholder="t('user.profile.form.confirmPasswordPlaceholder')" />
                         </n-form-item>
 
                         <div class="flex justify-center ml-0 gap-4 md:justify-start md:ml-[100px]">
-                            <n-button type="primary" @click="handleChangePassword">确认修改</n-button>
-                            <n-button @click="resetPwdForm">重置</n-button>
+                            <n-button type="primary" @click="handleChangePassword">{{
+                                t('user.profile.buttons.confirmChange') }}</n-button>
+                            <n-button @click="resetPwdForm">{{ t('user.profile.buttons.reset') }}</n-button>
                         </div>
                     </n-form>
                 </div>

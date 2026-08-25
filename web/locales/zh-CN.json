@@ -1,0 +1,307 @@
+{
+  "app": {
+    "title": "蕉速后台管理系统"
+  },
+  "common": {
+    "confirm": "确定",
+    "cancel": "取消"
+  },
+  "message": {
+    "hello": "你好",
+    "welcome": "欢迎"
+  },
+  "navbar": {
+    "action": {
+      "locale": "切换语言"
+    }
+  },
+  "language": {
+    "zh-CN": "简体中文",
+    "en-US": "English"
+  },
+  "user": {
+    "menu": {
+      "profile": "个人资料设置",
+      "preferences": "偏好设置",
+      "logout": "退出登录"
+    },
+    "store": {
+      "loginSuccess": "登录成功",
+      "loginFailNoToken": "登录失败：未获取到token",
+      "fetchUserInfoFail": "获取用户信息失败",
+      "fetchMenuFail": "获取权限菜单失败",
+      "unknownUser": "未登录用户",
+      "logout": "退出登录",
+      "logoutConfirm": "您确定要退出登录吗？"
+    },
+    "profile": {
+      "tabs": {
+        "editProfile": "修改个人资料",
+        "changePassword": "修改密码"
+      },
+      "basicInfo": "基本信息",
+      "securitySettings": "安全设置",
+      "avatar": {
+        "change": "点击更换",
+        "uploading": "上传中...",
+        "uploadSuccess": "头像上传成功，请记得点击保存",
+        "uploadFail": "头像上传失败",
+        "sizeExceeded": "图片大小不能超过 5MB"
+      },
+      "genderOptions": {
+        "unknown": "未知",
+        "male": "男",
+        "female": "女"
+      },
+      "form": {
+        "username": "用户名",
+        "usernamePlaceholder": "用户名不可修改",
+        "nickname": "昵称",
+        "nicknamePlaceholder": "请输入昵称",
+        "gender": "性别",
+        "phone": "手机号",
+        "phonePlaceholder": "请输入手机号",
+        "email": "邮箱",
+        "emailPlaceholder": "请输入邮箱",
+        "oldPassword": "旧密码",
+        "oldPasswordPlaceholder": "请输入当前密码",
+        "newPassword": "新密码",
+        "newPasswordPlaceholder": "请输入新密码",
+        "confirmPassword": "确认密码",
+        "confirmPasswordPlaceholder": "请再次输入新密码"
+      },
+      "validation": {
+        "nicknameRequired": "请输入昵称",
+        "emailRequired": "请输入邮箱",
+        "emailInvalid": "邮箱格式不正确",
+        "phoneRequired": "请输入手机号",
+        "phoneInvalid": "手机号格式不正确",
+        "oldPasswordRequired": "请输入旧密码",
+        "newPasswordRequired": "请输入新密码",
+        "newPasswordMin": "密码长度不能少于6位",
+        "confirmPasswordRequired": "请再次输入新密码",
+        "confirmPasswordMismatch": "两次密码输入不一致"
+      },
+      "buttons": {
+        "save": "保存修改",
+        "confirmChange": "确认修改",
+        "reset": "重置"
+      },
+      "messages": {
+        "updateSuccess": "修改成功",
+        "changePasswordSuccess": "密码修改成功，请重新登录"
+      }
+    }
+  },
+  "search": {
+    "placeholder": "输入你要搜索的导航",
+    "search": "搜索",
+    "support": "支持标题、首字母、URL模糊查询",
+    "confirm": "确认",
+    "switch": "切换",
+    "exit": "退出",
+    "noResult": "没有找到相关结果"
+  },
+  "i18nPage": {
+    "title": "国际化",
+    "content": "多语言效果演示",
+    "language": {
+      "title": "语言设置",
+      "select": "选择界面语言"
+    },
+    "display": {
+      "basic": "基础文本",
+      "greeting": "您好！欢迎使用我们的系统！",
+      "welcome": "欢迎回来，{name}！",
+      "datetime": "日期时间",
+      "dateFormat": "yyyy年M月d日",
+      "timeFormat": "HH时mm分",
+      "number": "数字与货币",
+      "plural": "复数形式",
+      "messageCount": "您有{count}条消息 | 您有一条消息 | 您有{count}条消息"
+    }
+  },
+  "login": {
+    "signIn": "登录",
+    "signingIn": "登录中",
+    "signingInDots": "登录中...",
+    "register": "注册",
+    "registering": "注册中...",
+    "registerNow": "立即注册",
+    "account": "账号",
+    "password": "密码",
+    "phone": "手机号",
+    "phoneDesc": "手机号码",
+    "email": "邮箱地址",
+    "smsCode": "短信验证码",
+    "code": "验证码",
+    "emailCode": "邮箱验证码",
+    "send": "发送",
+    "getCode": "获取验证码",
+    "setPassword": "设置密码",
+    "confirmPassword": "确认密码",
+    "inputUsername": "请输入用户名",
+    "inputPassword": "请输入密码",
+    "inputPhone": "请输入手机号",
+    "inputPhoneDesc": "请输入手机号码",
+    "inputSmsCode": "请输入短信验证码",
+    "inputEmail": "示例：yourname@example.com",
+    "input6Code": "6位数字验证码",
+    "inputConfirmPassword": "请再次输入密码",
+    "passwordFormat": "8-20位字母+数字组合",
+    "emptyAccountWarning": "账号或者密码不能为空",
+    "emptyPhoneWarning": "手机号或者短信验证码不能为空",
+    "fillPhoneFirst": "请先填写手机号",
+    "fillEmailFirst": "请先填写邮箱地址",
+    "smsSentSuccess": "验证码发送成功",
+    "emailSentSuccess": "验证码已发送至您的邮箱",
+    "registerSuccess": "注册成功，正在登录...",
+    "registerSuccess2": "注册成功，正在登录中...",
+    "validEmail": "请输入有效的邮箱地址",
+    "input4Code": "请输入4位验证码",
+    "passwordRule": "需8-20位字母+数字组合",
+    "passwordMismatch": "两次输入的密码不一致",
+    "passwordMismatch2": "确认密码与密码不一致",
+    "validPhone": "请输入有效的手机号码",
+    "passwordMinRule": "密码必须至少包含6个字符",
+    "slogan1": "开箱即用，后台、前端、设计师的解决方案",
+    "slogan2": "多生态支持、功能丰富、高颜值模板",
+    "loginAccount": "登录你的账户",
+    "noAccount": "没有账户？",
+    "goRegister": "去注册",
+    "accountLogin": "账号登录",
+    "smsLogin": "短信登录",
+    "registerAccount": "注册你的账户",
+    "hasAccount": "已经有账户？",
+    "goLogin": "去登录",
+    "phoneRegister": "手机号注册",
+    "emailRegister": "邮箱注册",
+    "demoLogin": "使用演示账号直接登录",
+    "superAdmin": "超级管理员",
+    "admin": "管理员",
+    "normalUser": "普通用户"
+  },
+  "notificationPopover": {
+    "tabs": {
+      "message": "消息",
+      "todo": "待办"
+    },
+    "empty": {
+      "message": "暂无消息",
+      "todo": "暂无待办事项"
+    },
+    "actions": {
+      "viewAll": "查看全部消息"
+    }
+  },
+  "notificationList": {
+    "tabs": {
+      "unread": "未读消息",
+      "read": "已读消息"
+    },
+    "type": {
+      "options": {
+        "all": "全部",
+        "notice": "通知",
+        "announcement": "公告",
+        "privateMessage": "私信"
+      },
+      "notice": "通知",
+      "announcement": "公告",
+      "privateMessage": "私信",
+      "unknown": "未知"
+    },
+    "table": {
+      "columns": {
+        "type": "类型",
+        "title": "标题",
+        "content": "内容",
+        "publisher": "发布人",
+        "time": "时间",
+        "actions": "操作"
+      },
+      "defaultPublisher": "系统",
+      "paginationPrefix": "共 {count} 条"
+    },
+    "search": {
+      "titleLabel": "标题",
+      "titlePlaceholder": "输入标题搜索",
+      "publisherLabel": "发布人",
+      "publisherPlaceholder": "输入发布人搜索",
+      "typeLabel": "类型",
+      "typePlaceholder": "全部"
+    },
+    "actions": {
+      "search": "搜索",
+      "reset": "重置",
+      "markAllRead": {
+        "button": "全部已读",
+        "title": "确认操作",
+        "content": "确定要将所有未读消息标记为已读吗？",
+        "success": "操作成功"
+      },
+      "view": "查看",
+      "delete": "删除",
+      "deleteConfirm": "确认删除该条消息吗？",
+      "deleteSuccess": "删除成功"
+    }
+  },
+  "settings": {
+    "title": "设置",
+    "theme": "主题",
+    "primaryColor": "主色调",
+    "customColor": "自定义色调",
+    "navbarMode": "导航栏模式",
+    "watermark": "页面水印",
+    "pageTransition": "页面切换动画",
+    "networkRequest": "网络请求效果",
+    "transition": {
+      "slide": "滑动",
+      "fade": "淡入淡出",
+      "slideRight": "向右滑动",
+      "slideLeft": "向左滑动",
+      "zoom": "缩放",
+      "flip": "翻转"
+    },
+    "layout": {
+      "verticalMixed": "侧边栏混合模式",
+      "classic": "经典模式 (顶栏+侧栏)",
+      "sidebar": "侧边栏模式",
+      "vertical": "极简侧边栏",
+      "top": "顶栏模式",
+      "mixed": "分栏布局",
+      "topMixed": "顶栏居中模式"
+    }
+  },
+  "themes": {
+    "theme": {
+      "light": "亮色",
+      "dark": "黑暗",
+      "system": "系统"
+    },
+    "color": {
+      "default": "默认主题",
+      "custom": "自定义主题",
+      "pink": "粉色主题",
+      "orange": "橘色主题",
+      "green": "绿色主题"
+    }
+  },
+  "loading": {
+    "labels": {
+      "dot": "闪烁的点",
+      "load": "转圈的圆环"
+    }
+  },
+  "watermark": {
+    "global": "全局水印",
+    "showTimestamp": "时间戳显示",
+    "customContent": "自定义内容",
+    "inputContent": "输入水印内容",
+    "inputPlaceholder": "请输入水印内容",
+    "fontSize": "字号大小",
+    "fontColor": "字号颜色",
+    "resetConfig": "重置水印配置",
+    "reset": "重置"
+  }
+}

@@ -1,92 +1,46 @@
-/*
- * @Author: Qing
- * @Description:
- * @Date: 2025-03-31 18:49:58
- * @LastEditTime: 2025-04-23 17:29:47
- */
-import moment from 'moment'
-import { dateEnUS, dateZhCN, enUS, zhCN } from 'naive-ui'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import i18n from './index'
-import 'moment/dist/locale/zh-cn'
+import { naiveuiMap } from './config'
+import { syncPluginsLocale } from './sync'
 
 export function useLocale() {
   const { locale, t, availableLocales, d, n } = useI18n()
   const loading = ref(false)
 
-  // 当前的语言
   const currentLocale = computed(() => locale.value)
 
-  // 支持的语言列表
-  const availableLocalesList = computed(() => availableLocales)
-
-  // 可以切换的语言列表
+  // 动态生成下拉菜单可用的语言列表
   const changeableLocales = computed(() => {
-    if (!availableLocalesList.value || availableLocalesList.value.length === 0)
-      return []
-    return availableLocalesList.value.map((item) => {
-      return {
-        label: t(`language.${item}`),
-        key: item,
-        disabled: item === locale.value,
-      }
-    })
+    return availableLocales.map(item => ({
+      label: t(`language.${item}`),
+      key: item,
+      disabled: item === locale.value,
+    }))
   })
-
-  /* moment扩展 */
-  // 设置 Moment 语言
-  const setMomentLocale = (lang: string) => {
-    // 处理映射关系：Vue I18n (zh-CN) -> Moment (zh-cn)
-    if (lang === 'zh-CN') {
-      moment.locale('zh-cn')
-    }
-    else {
-      // 默认为英文
-      moment.locale('en')
-    }
-  }
 
   // 切换语言
   const changeLocale = async (value: string) => {
+    if (value === locale.value)
+      return
+
     loading.value = true
     try {
-      // 动态导入语言包
-      const messages = await import(`../locales/${value}.ts`)
-      // console.log('加载的语言包内容:', messages)
-      i18n.global.setLocaleMessage(value, messages.default)
-
+      // 1. 切换 vue-i18n 内部状态
       locale.value = value
-      localStorage.setItem('locale', value)
 
-      // 修改 HTML lang 属性
-      document.querySelector('html')?.setAttribute('lang', value)
-
-      setMomentLocale(value)
+      // 2. 调用统一同步中心，触发所有第三方插件的语言切换
+      syncPluginsLocale(value)
     }
     catch (error) {
-      console.error('语言包加载失败:', error)
+      console.error('语言切换失败:', error)
     }
     finally {
       loading.value = false
     }
   }
 
-  // naiveui 扩展
-  const naiveuiMap = {
-    'zh-CN': {
-      options: zhCN,
-      dateOptions: dateZhCN,
-    },
-    'en-US': {
-      options: enUS,
-      dateOptions: dateEnUS,
-    },
-  }
-  // 获取当前语言的语言配置
-  const getNaiveuiLocale = computed(() => {
-    return naiveuiMap[currentLocale.value] as typeof naiveuiMap['zh-CN']
-  })
+  // 获取当前 Naive UI 配置供 <n-config-provider> 使用
+  const getNaiveuiLocale = computed(() => naiveuiMap[currentLocale.value] || naiveuiMap['en-US'])
 
   return {
     t,

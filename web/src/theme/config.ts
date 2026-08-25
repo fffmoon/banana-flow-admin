@@ -4,9 +4,9 @@
  * @Date: 2025-01-26 21:22:26
  * @LastEditTime: 2025-07-31 15:14:19
  */
-import type { ITheme, IThemeConfig } from './type'
+import type { IColorThemeConfig, IThemeColorOption } from './type'
 
-export const themeDefault: IThemeConfig = {
+export const themeDefault: IColorThemeConfig = {
   light: {
     // 兼容 naiveui 使用方法：var(--common-primary-color)
     naiveui: {
@@ -171,7 +171,7 @@ export const themeDefault: IThemeConfig = {
   },
 }
 
-export const themeFF3D68: IThemeConfig = {
+export const themeFF3D68: IColorThemeConfig = {
   light: {
     naiveui: {
       common: {
@@ -198,7 +198,7 @@ export const themeFF3D68: IThemeConfig = {
   },
 }
 
-export const themef97316: IThemeConfig = {
+export const themef97316: IColorThemeConfig = {
   light: {
     naiveui: {
       common: {
@@ -225,7 +225,7 @@ export const themef97316: IThemeConfig = {
   },
 }
 
-export const theme16a34a: IThemeConfig = {
+export const theme16a34a: IColorThemeConfig = {
   light: {
     naiveui: {
       common: {
@@ -252,20 +252,4 @@ export const theme16a34a: IThemeConfig = {
   },
 }
 
-export const themeCustom: IThemeConfig = JSON.parse(JSON.stringify(themeDefault)) as IThemeConfig
-
-// 主题列表
-export const themes: ITheme[] = [
-  { id: 'themeDefault', label: '默认主题', options: themeDefault, showMenu: true },
-  { id: 'themeCustom', label: '自定义主题', options: themeCustom, showMenu: false },
-  { id: 'themeFF3D68', label: '粉色主题', options: themeFF3D68, showMenu: true },
-  { id: 'themef97316', label: '橘色主题', options: themef97316, showMenu: true },
-  { id: 'theme16a34a', label: '绿色主题', options: theme16a34a, showMenu: true },
-]
-
-// 切换主题的列表
-export const themeDoms = [
-  { id: 0, label: '亮色', icon: 'i-mdi-brightness-5', value: 'light' },
-  { id: 1, label: '黑暗', icon: 'i-mdi-brightness-4', value: 'dark' },
-  { id: 2, label: '系统', icon: 'i-mdi-brightness-auto', value: 'system' },
-]
+export const themeCustom: IColorThemeConfig = JSON.parse(JSON.stringify(themeDefault)) as IColorThemeConfig

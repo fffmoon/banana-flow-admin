@@ -11,7 +11,7 @@ import {
   createWebHistory,
 } from 'vue-router'
 
-import { DEFAULT_ROUTER_COMPONENT_PATH, DEFAULT_ROUTER_LAYOUT_COMPONENT_PATH } from '@/constants'
+import { DEFAULT_ROUTER_LAYOUT_COMPONENT_PATH } from '@/constants'
 import { fixedRoutes } from './modules/fixedRoutes'
 import { createRouterGuards } from './routerGuards'
 import { generateFullPath, generateMeta, loadView, normalizePath, toRouteRecordRaw } from './utils'
@@ -162,7 +162,7 @@ export function setupDynamicRoutes(data: IRouteDataRaw[] = []) {
 export function removeAllRoutes() {
   const routes = router.getRoutes()
   routes.forEach((route) => {
-    if (route.name && !route.meta.constant) {
+    if (route.name && !route.meta.constant && router.hasRoute(route.name)) {
       router.removeRoute(route.name)
     }
   })

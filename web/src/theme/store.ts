@@ -1,266 +1,232 @@
-import type { GlobalThemeOverrides } from 'naive-ui'
 /*
  * @Author: Qing
- * @Description: 主题
+ * @Description: 主题状态管理
  * @Date: 2024-05-28 20:16:33
- * @LastEditTime: 2025-07-31 17:19:08
+ * @LastEditTime: 2025-10-24 10:00:00
  */
+
+import type { GlobalThemeOverrides } from 'naive-ui'
 import type {
-  ITheme,
-  IThemeConfig,
+  IColorThemeConfig,
+  IThemeColorOption,
   IThemeCustomOptions,
   IThemeMode,
-  IThemeSeries,
+  IThemeModeOption,
   IUserThemeMode,
-} from '@/theme'
+} from '@/theme/type'
 import { deepMerge } from '@antfu/utils'
+import { globalT as t } from '@i18n/index'
+import { usePreferredDark, useStorage } from '@vueuse/core'
+
 import { defineStore } from 'pinia'
+import { computed, ref, watch } from 'vue'
 import CONFIG from '@/settings'
 import { store } from '@/store'
-import {
-  generateStateColors,
-  setCssVarsRecursively,
-} from '@/theme'
-import { Storage } from '@/utils/storage/Storage'
-import { themeDefault, themes } from './themes'
+import { generateStateColors, setCssVarsRecursively } from '@/theme/utils'
+import { themeCustom as rawThemeCustom, theme16a34a, themeDefault, themef97316, themeFF3D68 } from './config'
 
-interface ThemeState {
-  // 用户主题模式
-  userThemeMode: IUserThemeMode
-  // 主题模式
-  themeMode: IThemeMode
-  // 色调ID
-  themeColorId: string
-  // 自定义数据
-  customOptions: IThemeCustomOptions | null
-  // naiveui数据
-  naiveuiOptions: GlobalThemeOverrides | null
-  // 自定义主题数据
-  themeCustom: IThemeConfig
-}
+export const useThemeStore = defineStore('theme', () => {
+  // #region ➤ State
+  // ================================================
 
-export const useThemeStore = defineStore('theme', {
-  state: (): ThemeState => ({
-    userThemeMode: Storage.get('userThemeMode', CONFIG.app.colorScheme),
-    themeMode: 'light',
-    themeColorId: Storage.get('themeColorId', 'themeDefault'),
-    themeCustom: Storage.get('themeCustom', JSON.parse(JSON.stringify(themeDefault)) as IThemeConfig),
-    customOptions: null,
-    naiveuiOptions: null,
-  }),
-  getters: {
-    // 获取主题是否为暗黑模式
-    getIsDarkTheme(): boolean {
-      return this.themeMode === 'dark'
-    },
-    // 获取主题风格naiveui参数
-    getNaiveuiOptions(): GlobalThemeOverrides {
-      return this.naiveuiOptions as GlobalThemeOverrides
-    },
-    // 获取主题风格自定义参数
-    getCustomOptions(): IThemeCustomOptions {
-      return this.customOptions as IThemeCustomOptions
-    },
-  },
-  actions: {
-    /**
-     * 初始化主题
-     */
-    initTheme() {
-      // 初始自定义主题，将自定义主题的配置和用户保存的配置进行合并
-      const defaultThemeCustom = themes.find(t => t.id === 'themeCustom') as ITheme
-      this.themeCustom = deepMerge(defaultThemeCustom.options, this.themeCustom) as IThemeConfig
-      // 设置主题色
-      this.setThemeColorScheme(this.themeColorId)
-      // 启用监听系统
-      this.watchSystemTheme()
-      this.setUserThemeMode(this.userThemeMode)
-    },
-    // 检测系统主题变化
-    watchSystemTheme() {
-      const systemThemeHandler = (e: MediaQueryListEvent) => {
-        console.log('监听到系统主题变化：', e.matches, this.userThemeMode)
-        if (this.userThemeMode === 'system') {
-          this.setActiveThemeMode(e.matches ? 'dark' : 'light')
-        }
+  const userThemeMode = useStorage<IUserThemeMode>('userThemeMode', CONFIG.app.colorScheme)
+  const themeMode = useStorage<IThemeMode>('themeMode', 'light')
+  const themeColorId = useStorage<string>('themeColorId', 'themeDefault')
+  const themeCustom = useStorage<IColorThemeConfig>('themeCustom', JSON.parse(JSON.stringify(themeDefault)))
+
+  const customOptions = ref<IThemeCustomOptions | null>(null)
+  const naiveuiOptions = ref<GlobalThemeOverrides | null>(null)
+
+  const isSystemDark = usePreferredDark()
+
+  // #endregion State
+
+  // #region ➤ Getters
+  // ================================================
+
+  const getIsDarkTheme = computed(() => themeMode.value === 'dark')
+  const getNaiveuiOptions = computed(() => naiveuiOptions.value as GlobalThemeOverrides)
+  const getCustomOptions = computed(() => customOptions.value as IThemeCustomOptions)
+
+  const themeColorOptions = computed<IThemeColorOption[]>(() => [
+    { id: 'themeDefault', label: t('themes.color.default'), options: themeDefault, showMenu: true },
+    { id: 'themeCustom', label: t('themes.color.custom'), options: rawThemeCustom, showMenu: false },
+    { id: 'themeFF3D68', label: t('themes.color.pink'), options: themeFF3D68, showMenu: true },
+    { id: 'themef97316', label: t('themes.color.orange'), options: themef97316, showMenu: true },
+    { id: 'theme16a34a', label: t('themes.color.green'), options: theme16a34a, showMenu: true },
+  ])
+
+  const themeModeOptions = computed<IThemeModeOption[]>(() => [
+    { id: 0, label: t('themes.theme.light'), icon: 'i-mdi-brightness-5', value: 'light' },
+    { id: 1, label: t('themes.theme.dark'), icon: 'i-mdi-brightness-4', value: 'dark' },
+    { id: 2, label: t('themes.theme.system'), icon: 'i-mdi-brightness-auto', value: 'system' },
+  ])
+
+  // #endregion Getters
+
+  // #region ➤ Watchers
+  // ================================================
+
+  // 监听模式选择，决定最终的 themeMode
+  watch([userThemeMode, isSystemDark], ([userMode, systemDark]) => {
+    if (userMode === 'system') {
+      themeMode.value = systemDark ? 'dark' : 'light'
+    }
+    else {
+      themeMode.value = userMode
+    }
+  }, { immediate: true })
+
+  // 监听 themeMode 变化，自动处理 DOM 上的 Class
+  watch(themeMode, (mode) => {
+    document.documentElement.classList.remove('light', 'dark')
+    document.documentElement.classList.add(mode)
+  }, { immediate: true })
+
+  // 监听主题配色相关的所有状态，发生改变时重新计算并注入 CSS 变量
+  watch([themeMode, themeColorId, themeCustom], () => {
+    updateThemeSettings()
+  }, { immediate: true, deep: true })
+
+  // #endregion Watchers
+
+  // #region ➤ Actions
+  // ================================================
+
+  function initTheme() {
+    // 合并本地保存的自定义主题和默认自定义主题
+    const defaultCustomTheme = themeColorOptions.value.find(t => t.id === 'themeCustom')?.options
+    if (defaultCustomTheme) {
+      themeCustom.value = deepMerge(defaultCustomTheme, themeCustom.value) as IColorThemeConfig
+    }
+  }
+
+  function setUserThemeMode(mode: IUserThemeMode) {
+    userThemeMode.value = mode
+  }
+
+  function toggleActiveThemeMode() {
+    userThemeMode.value = getIsDarkTheme.value ? 'light' : 'dark'
+  }
+
+  function resetThemeToDefault() {
+    userThemeMode.value = 'light'
+    themeColorId.value = 'themeDefault'
+  }
+
+  function setColorTheme(id: string) {
+    const targetTheme = themeColorOptions.value.find(t => t.id === id)
+    if (!targetTheme) {
+      console.error('主题风格未找到：', id)
+      return
+    }
+    themeColorId.value = id
+  }
+
+  function setCustomPrimaryColor(primaryColor: string) {
+    const customConfig = JSON.parse(JSON.stringify(themeCustom.value)) as IColorThemeConfig
+
+    // 遍历 light 和 dark，批量替换主色调
+    for (const key of ['light', 'dark'] as const) {
+      customConfig[key].custom.primaryColor = primaryColor
+      if (customConfig[key].naiveui.common) {
+        customConfig[key].naiveui.common!.primaryColor = primaryColor
       }
+    }
 
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)')
-      prefersDark.addEventListener('change', systemThemeHandler)
+    themeCustom.value = customConfig
+    themeColorId.value = 'themeCustom'
+  }
 
-      onBeforeUnmount(() => {
-        prefersDark.removeEventListener('change', systemThemeHandler)
-      })
-    },
-    /**
-     * 设置用户选择的主题模式
-     */
-    setUserThemeMode(mode: IUserThemeMode) {
-      this.userThemeMode = mode
-      Storage.set('userThemeMode', mode)
-      if (mode === 'system') {
-        // 初始设置
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)')
-        this.setActiveThemeMode(prefersDark.matches ? 'dark' : 'light')
-      }
-      else {
-        this.setActiveThemeMode(mode)
-      }
-    },
-    /**
-     * 设置主题
-     */
-    setActiveThemeMode(themeMode: IThemeMode) {
-      this.themeMode = themeMode
-      Storage.set('themeMode', this.themeMode)
-      this.applyThemeToDom()
-      this.updateThemeSettings()
-    },
-    // 将主题名字添加到DOM的根目录
-    applyThemeToDom() {
-      // 先删除，再添加
-      for (const key in themeDefault) {
-        const themeMode = key as IThemeMode
-        document.documentElement.classList.remove(themeMode)
-      }
-      document.documentElement.classList.add(this.themeMode)
-    },
-    /**
-     * 切换主题
-     */
-    toggleActiveThemeMode() {
-      this.setUserThemeMode(!this.getIsDarkTheme ? 'dark' : 'light')
-    },
-    /**
-     * 重置为默认主题
-     */
-    resetThemeToDefault() {
-      this.customOptions = null
-      this.naiveuiOptions = null
-      this.setActiveThemeMode('light')
-      this.setThemeColorScheme('themeDefault')
-    },
-    /**
-     * 切换主题的主色调
-     */
-    setThemeColorScheme(themeColorId: string) {
-      // 获取主题
-      const targetTheme = themes.find(t => t.id === themeColorId)
-      if (!targetTheme) {
-        console.error('主题风格未找到：', themeColorId)
-        return false
-      }
+  // #endregion Actions
 
-      // 生成主题的类名
-      // this.createAllThemeClass(targetTheme.options)
+  // #region ➤ Helpers
+  // ================================================
 
-      // 更新状态
-      this.themeColorId = themeColorId
-      Storage.set('themeColorId', this.themeColorId)
-      this.updateThemeSettings()
-    },
-    /**
-     * 设置自定义的主色调
-     */
-    setCustomPrimaryColor(primaryColor: string) {
-      // 合成自定义颜色
-      // 切换主要色调
-      const targetTheme = themes.find(t => t.id === 'themeCustom') as ITheme
-      for (const key in targetTheme.options) {
-        const theme = targetTheme.options[key] as IThemeSeries
-        theme.custom.primaryColor = primaryColor
-        if (theme.naiveui.common) {
-          theme.naiveui.common.primaryColor = primaryColor
-        }
-      }
-      // 更新状态
-      this.themeCustom = targetTheme.options
-      Storage.set('themeCustom', this.themeCustom)
-      this.setThemeColorScheme('themeCustom')
-    },
-    /**
-     * 更新主题配置
-     */
-    updateThemeSettings() {
-      const theme = themes.find(t => t.id === this.themeColorId) as ITheme
-      const currentTheme = theme.options[this.themeMode]
+  function updateThemeSettings() {
+    let currentConfig: IColorThemeConfig
 
-      this.updateCustomOptions(currentTheme.custom)
-      this.updateNaiveuiOptions(currentTheme.naiveui)
-    },
-    // 更新自定义的颜色
-    updateCustomOptions(customOptions: IThemeCustomOptions) {
-      /* 处理自定义的颜色 */
-      // 检查主色调有没有定义，如果没有定义则报错
-      const primaryColor = customOptions.primaryColor
-      if (!primaryColor) {
-        console.error('主色调未定义')
-        return false
-      }
+    if (themeColorId.value === 'themeCustom') {
+      currentConfig = themeCustom.value
+    }
+    else {
+      const targetTheme = themeColorOptions.value.find(t => t.id === themeColorId.value)
+      currentConfig = targetTheme ? targetTheme.options : themeDefault
+    }
 
-      /* 通过主色调生成警告、提示、成功等专业颜色，生成之后合并 */
-      // DOTO
-      /* const palette = generateHarmonyColors(primaryColor)
-      const processedCustomOptions = deepMerge(palette, customOptions) as IThemeCustomOptions */
+    const currentThemeSeries = currentConfig[themeMode.value]
 
-      /* 通过各种专业颜色生成状态颜色，生成之后合并 */
-      type ColorType = 'primary' | 'info' | 'success' | 'warning' | 'error'
-      type ColorKey = `${ColorType}Color`
+    // 1. 处理自定义颜色
+    customOptions.value = processCustomColors(currentThemeSeries.custom)
+    setCssVarsRecursively(customOptions.value, '--custom')
 
-      const professionalColors: ColorType[] = ['primary', 'info', 'success', 'warning', 'error']
+    // 2. 处理 Naive UI 颜色
+    naiveuiOptions.value = deepMerge({ common: customOptions.value } as GlobalThemeOverrides, currentThemeSeries.naiveui)
+    setCssVarsRecursively(naiveuiOptions.value)
+  }
 
-      // 生成需要处理的颜色映射
-      const renamedColors = professionalColors.reduce((acc: Partial<IThemeCustomOptions>, colorType) => {
-        const colorKey = `${colorType}Color` as ColorKey
-        // 类型安全检查是否存在该颜色配置
-        if (!(colorKey in customOptions))
-          return acc
-        // 明确类型为字符串（需确保实际数据符合该类型）
-        const colorValue = customOptions[colorKey] as string
-        // 生成状态颜色
+  function processCustomColors(customConfig: IThemeCustomOptions): IThemeCustomOptions {
+    if (!customConfig.primaryColor) {
+      console.error('主色调未定义')
+      return customConfig
+    }
+
+    const professionalColors: Array<'primary' | 'info' | 'success' | 'warning' | 'error'> = [
+      'primary',
+      'info',
+      'success',
+      'warning',
+      'error',
+    ]
+
+    const renamedColors: Partial<IThemeCustomOptions> = {}
+
+    professionalColors.forEach((colorType) => {
+      const colorKey = `${colorType}Color` as keyof IThemeCustomOptions
+      const colorValue = customConfig[colorKey] as string
+
+      if (colorValue) {
         const stateColors = generateStateColors(colorValue)
-        return {
-          ...acc,
+        Object.assign(renamedColors, {
           [colorKey]: stateColors.base,
           [`${colorType}ColorHover`]: stateColors.hover,
           [`${colorType}ColorPressed`]: stateColors.pressed,
           [`${colorType}ColorSuppl`]: stateColors.suppl,
           [`${colorType}ColorDisabled`]: stateColors.disabled,
-        }
-      }, {})
-      const processedCustomOptions = deepMerge(
-        renamedColors,
-        customOptions,
-      ) as IThemeCustomOptions
+        })
+      }
+    })
 
-      /* 通过主色调生成所有模块的颜色，生成之后合并 */
-      // DOTO
+    return deepMerge(renamedColors, customConfig) as IThemeCustomOptions
+  }
+  // #endregion Helpers
 
-      // 更新状态
-      this.customOptions = processedCustomOptions
-      Storage.set('customOptions', processedCustomOptions)
-      // console.log('customOptions', this.customOptions)
+  return {
+    // State
+    userThemeMode,
+    themeMode,
+    themeColorId,
+    themeCustom,
+    customOptions,
+    naiveuiOptions,
 
-      // 应用样式
-      setCssVarsRecursively(this.customOptions, '--custom')
-    },
-    // 更新 naiveui 的颜色
-    updateNaiveuiOptions(naiveuiOptions: GlobalThemeOverrides) {
-      /* 处理 naiveui 的颜色 */
-      // 通过自定义颜色生成 naiveui 的颜色，生成之后合并
-      const processedNaiveuiOptions = deepMerge({ common: this.customOptions } as GlobalThemeOverrides, naiveuiOptions)
+    // Getters
+    getIsDarkTheme,
+    getNaiveuiOptions,
+    getCustomOptions,
+    themeColorOptions,
+    themeModeOptions,
 
-      this.naiveuiOptions = processedNaiveuiOptions
-      Storage.set('naiveuiOptions', processedNaiveuiOptions)
-      // console.info('updateNaiveuiOptions', this.naiveuiOptions)
-
-      // 应用样式
-      setCssVarsRecursively(this.naiveuiOptions)
-    },
-  },
+    // Actions
+    initTheme,
+    setUserThemeMode,
+    toggleActiveThemeMode,
+    resetThemeToDefault,
+    setColorTheme,
+    setCustomPrimaryColor,
+  }
 })
 
-// 导出 store，方便在组件外使用
 export function useThemeStoreWithOut() {
   return useThemeStore(store)
 }

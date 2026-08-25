@@ -1,22 +1,25 @@
-from fastapi import HTTPException, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from app.modules.auth.security import verify_password, get_password_hash
+from datetime import datetime
 
-from .repository import UserRepository
-from .models import SysUserEntity
+from fastapi import Depends, HTTPException
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.deps import get_db
+from app.core.i18n import i18n
+from app.modules.auth.security import get_password_hash, verify_password
 from app.modules.roles.models import SysRoleEntity
-from .schemas import (
-    UserCreate,
-    UserProfileUpdate,
-    UserFilter,
-    UserAdminUpdate,
-    UserPasswordUpdate,
-)
 from app.utils.handler_permission import has_permission
 from app.utils.pagination import paginate
-from app.core.deps import get_db
-from datetime import datetime
+
+from .models import SysUserEntity
+from .repository import UserRepository
+from .schemas import (
+    UserAdminUpdate,
+    UserCreate,
+    UserFilter,
+    UserPasswordUpdate,
+    UserProfileUpdate,
+)
 
 
 class UserService:
@@ -29,9 +32,14 @@ class UserService:
         if current_user.id == target_user.id:
             return
         if target_user.is_super_admin:
-            raise HTTPException(status_code=403, detail="操作失败，禁止操作超级管理员")
+            raise HTTPException(
+                status_code=403,
+                detail=i18n.t("user.error.operation_super_admin_forbidden"),
+            )
         if not has_permission(current_user.role_level, target_user.role_level):
-            raise HTTPException(status_code=403, detail="操作失败，您的权限不足")
+            raise HTTPException(
+                status_code=403, detail=i18n.t("user.error.insufficient_permission")
+            )
 
     async def get_users_list(self, filters: UserFilter, page_params):
         """异步查询列表"""
@@ -50,7 +58,9 @@ class UserService:
         # 1. 异步获取目标用户
         user = await self.repo.get(user_id)
         if not user:
-            raise HTTPException(status_code=404, detail="用户不存在")
+            raise HTTPException(
+                status_code=404, detail=i18n.t("user.error.user_not_found")
+            )
 
         self.check_data_scope(current_user, user)
 
@@ -64,11 +74,14 @@ class UserService:
                 target_level = role_level_map.get(r_id, 999)
                 if not has_permission(current_user.role_level, target_level):
                     raise HTTPException(
-                        status_code=400, detail="不能分配比自己等级高的角色"
+                        status_code=400,
+                        detail=i18n.t("user.error.cannot_assign_higher_role"),
                     )
 
         if current_user.id == user_id and user_in.is_active is False:
-            raise HTTPException(status_code=400, detail="不允许停用自身")
+            raise HTTPException(
+                status_code=400, detail=i18n.t("user.error.cannot_disable_self")
+            )
 
         return await self.repo.update(user_id, user_in)
 
@@ -94,11 +107,11 @@ class UserService:
             if exist_user and exist_user.id != user_id:
                 if check_email and exist_user.email == check_email:
                     raise HTTPException(
-                        status_code=400, detail="该邮箱已被其他用户使用"
+                        status_code=400, detail=i18n.t("user.error.email_taken")
                     )
                 if check_phone and exist_user.mobile_phone == check_phone:
                     raise HTTPException(
-                        status_code=400, detail="该手机号已被其他用户使用"
+                        status_code=400, detail=i18n.t("user.error.phone_taken")
                     )
 
         # 执行更新
@@ -107,13 +120,19 @@ class UserService:
     async def delete_user(self, user_id: int, current_user: SysUserEntity):
         user = await self.repo.get(user_id)
         if not user:
-            raise HTTPException(status_code=404, detail="用户不存在")
+            raise HTTPException(
+                status_code=404, detail=i18n.t("user.error.user_not_found")
+            )
         if user.is_system:
-            raise HTTPException(status_code=400, detail="系统内置用户，不允许删除")
+            raise HTTPException(
+                status_code=400, detail=i18n.t("user.error.system_user_forbidden")
+            )
 
         self.check_data_scope(current_user, user)
         if user.id == current_user.id:
-            raise HTTPException(status_code=400, detail="不允许删除当前账户")
+            raise HTTPException(
+                status_code=400, detail=i18n.t("user.error.cannot_delete_self")
+            )
 
         user.is_deleted = True
         user.deleted_at = datetime.now()
@@ -129,11 +148,15 @@ class UserService:
         # 1. 获取当前用户信息（包含密码哈希）
         user = await self.repo.get(user_id)
         if not user:
-            raise HTTPException(status_code=404, detail="用户不存在")
+            raise HTTPException(
+                status_code=404, detail=i18n.t("user.error.user_not_found")
+            )
 
         # 2. 验证旧密码
         if not verify_password(password_in.old_password, user.password_hash):
-            raise HTTPException(status_code=400, detail="旧密码错误，请重新输入")
+            raise HTTPException(
+                status_code=400, detail=i18n.t("user.error.old_password_incorrect")
+            )
 
         # 3. 生成新密码哈希
         new_hash = get_password_hash(password_in.new_password)

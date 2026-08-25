@@ -1,17 +1,18 @@
-from typing import AsyncGenerator, List
+from typing import AsyncGenerator
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError
-from sqlalchemy.ext.asyncio import AsyncSession
+from jose import JWTError, jwt
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload, joinedload
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
-from app.core.database import AsyncSessionLocal
 from app.core.config import settings
-from app.modules.auth.schemas import TokenPayload
+from app.core.database import AsyncSessionLocal
+from app.core.i18n import i18n
 from app.core.redis_client import redis_manager
-from app.modules.users.models import SysUserEntity
 from app.modules.roles.models import SysRoleEntity
+from app.modules.users.models import SysUserEntity
 
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login/json")
 
@@ -31,7 +32,7 @@ async def get_current_user(
 ) -> SysUserEntity:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="无法验证凭据或登录已过期",
+        detail=i18n.t("global.error.unauthorized"),
         headers={"WWW-Authenticate": "Bearer"},
     )
 
@@ -56,10 +57,11 @@ async def get_current_user(
         redis_key, settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
 
-    # 核心：异步查询 + 显式预加载角色和权限 (防止 LazyLoadingError)
     result = await db.execute(
         select(SysUserEntity)
-        .options(joinedload(SysUserEntity.roles).selectinload(SysRoleEntity.permissions))
+        .options(
+            joinedload(SysUserEntity.roles).selectinload(SysRoleEntity.permissions)
+        )
         .where(SysUserEntity.id == user_id)
     )
     user = result.unique().scalar_one_or_none()
@@ -95,7 +97,9 @@ class PermissionChecker:
         if self.required_permission not in user_permissions:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"权限不足: {self.required_permission}",
+                detail=i18n.t(
+                    "global.permission.error.forbidden", perm=self.required_permission
+                ),
             )
         return user
 

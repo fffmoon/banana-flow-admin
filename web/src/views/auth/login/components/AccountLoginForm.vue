@@ -10,6 +10,7 @@ import type { FormInst } from 'naive-ui'
 import * as ionicons5 from '@vicons/ionicons5'
 import { LoginParams, LoginType } from '@stores/user'
 
+const { t } = useLocale()
 const userStore = useUserStore()
 const message = useMessage()
 const route = useRoute()
@@ -27,13 +28,13 @@ let messageReactive: IMessageInstance | null = null
 async function handleLogin() {
   const { username, password } = loginForm
   if (!username || !password) {
-    message.error('账号或者密码不能为空')
+    message.error(t('login.emptyAccountWarning'))
     return
   }
   if (isLoading.value)
     return
   isLoading.value = true
-  messageReactive = message.loading('登录中', { duration: 0 })
+  messageReactive = message.loading(t('login.signingIn'), { duration: 0 })
   try {
     await userStore.login('accountName', loginForm)
     isLoading.value = false
@@ -48,7 +49,7 @@ async function handleLogin() {
 
 // 使用指定账号登录
 async function handleLoginWithAccount(type: LoginType, params: LoginParams) {
-  messageReactive = message.loading('登录中', { duration: 0 })
+  messageReactive = message.loading(t('login.signingIn'), { duration: 0 })
   isLoading.value = true
   try {
     await userStore.login(type, params)
@@ -67,8 +68,8 @@ defineExpose({
 
 <template>
   <NForm ref="formRef" :model="loginForm" label-width="80" :show-feedback="false">
-    <NFormItem label="账号" path="username">
-      <NInput v-model:value="loginForm.username" :disabled="isLoading" placeholder="请输入用户名" class="mb-10px" clearable
+    <NFormItem :label="t('login.account')" path="username">
+      <NInput v-model:value="loginForm.username" :disabled="isLoading" :placeholder="t('login.inputUsername')" class="mb-10px" clearable
         :input-props="{
           autocomplete: 'tel',
           inputmode: 'tel',
@@ -80,8 +81,8 @@ defineExpose({
       </NInput>
     </NFormItem>
 
-    <NFormItem label="密码" path="password">
-      <NInput v-model:value="loginForm.password" :disabled="isLoading" type="password" placeholder="请输入密码"
+    <NFormItem :label="t('login.password')" path="password">
+      <NInput v-model:value="loginForm.password" :disabled="isLoading" type="password" :placeholder="t('login.inputPassword')"
         class="mb-10px" show-password-on="click" maxlength="30" :input-props="{
           'autocomplete': 'current-password',
           'aria-describedby': 'password-hint',
@@ -95,7 +96,7 @@ defineExpose({
     <NFormItem>
       <NButton :loading="isLoading" type="primary" class="w-full"
         :class="[isLoading ? 'cursor-wait pointer-events-auto' : '']" native-type="submit" @click="handleLogin">
-        {{ isLoading ? '登录中...' : '登录' }}
+        {{ isLoading ? t('login.signingInDots') : t('login.signIn') }}
       </NButton>
     </NFormItem>
   </NForm>
