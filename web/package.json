@@ -37,6 +37,7 @@
   "dependencies": {
     "@antfu/eslint-config": "^4.1.0",
     "@antfu/utils": "^9.1.0",
+    "@fingerprintjs/fingerprintjs": "^5.2.0",
     "@iconify-json/mdi": "^1.2.3",
     "@iconify/vue": "^5.0.0",
     "@radix-ui/colors": "^3.0.0",

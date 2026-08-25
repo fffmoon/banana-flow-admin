@@ -1,6 +1,7 @@
 import os
 import sys
 from contextlib import asynccontextmanager
+import json
 
 import uvicorn
 from fastapi import FastAPI
@@ -93,8 +94,7 @@ async def root():
         },
         title=i18n.t("global.success.ok"),
     )
-
-
+    
 if __name__ == "__main__":
     uvicorn.run(
         "app.main:app", host=settings.HOST, port=settings.PORT, reload=settings.DEBUG

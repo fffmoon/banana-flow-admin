@@ -82,17 +82,6 @@ class Base(AsyncAttrs, DeclarativeBase):
     pass
 
 
-class TimestampMixin:
-    """自动包含创建和更新时间"""
-
-    from sqlalchemy.sql import func
-
-    create_time = Column(DateTime, server_default=func.now(), comment="创建时间")
-    update_time = Column(
-        DateTime, server_default=func.now(), onupdate=func.now(), comment="更新时间"
-    )
-
-
 class SoftDeleteMixin:
     """自动包含软删除字段"""
 

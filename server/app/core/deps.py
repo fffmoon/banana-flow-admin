@@ -57,7 +57,6 @@ async def get_current_user(
         redis_key, settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
 
-    # 核心：异步查询 + 显式预加载角色和权限 (防止 LazyLoadingError)
     result = await db.execute(
         select(SysUserEntity)
         .options(

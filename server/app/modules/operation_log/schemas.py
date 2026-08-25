@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Any
+from typing import Optional, Any
 from datetime import datetime
 from app.common.schemas.response import CamelCaseModel
 

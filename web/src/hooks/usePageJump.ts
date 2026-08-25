@@ -59,9 +59,19 @@ export function usePageJump(_router?: Router) {
     let finalLocation: RouteLocationRaw
 
     if (typeof target === 'string') {
-      finalLocation = {
-        path: target,
-        query, // 直接使用传入的 query
+      if (query) {
+        const resolvedTarget = router.resolve(target)
+        finalLocation = {
+          path: resolvedTarget.path,
+          query: {
+            ...resolvedTarget.query,
+            ...query,
+          },
+          hash: resolvedTarget.hash,
+        }
+      }
+      else {
+        finalLocation = target
       }
     }
     else {

@@ -23,6 +23,25 @@ INIT_ROLES = [
         "sort": 3,
         "isSystem": True,
         "roleLevel": 10,
+        "menu_ids": [1, 2, 3, 4, 5, 6, 66],
+    },
+    {
+        "roleName": "设计角色",
+        "roleCode": "designer",
+        "status": True,
+        "sort": 4,
+        "isSystem": True,
+        "roleLevel": 10,
+        "menu_ids": [1, 2, 3, 4, 5, 6, 66, 67],
+    },
+    {
+        "roleName": "产品角色",
+        "roleCode": "product",
+        "status": True,
+        "sort": 5,
+        "isSystem": True,
+        "roleLevel": 10,
+        "menu_ids": [1, 2, 3, 4, 5, 6, 66, 68],
     },
 ]
 
@@ -36,11 +55,7 @@ INIT_USERS = [
         "gender": 0,
         "username": "superAdmin",
         "isActive": True,
-        "roles": [
-            {
-                "roleCode": "super_admin",
-            }
-        ],
+        "roles": [{"roleCode": "super_admin"}],
     },
     {
         "nickname": "管理员",
@@ -50,11 +65,7 @@ INIT_USERS = [
         "gender": None,
         "username": "admin",
         "isActive": True,
-        "roles": [
-            {
-                "roleCode": "admin",
-            }
-        ],
+        "roles": [{"roleCode": "admin"}],
     },
     {
         "nickname": "普通用户",
@@ -64,17 +75,34 @@ INIT_USERS = [
         "gender": None,
         "username": "user",
         "isActive": True,
-        "roles": [
-            {
-                "roleCode": "user",
-            }
-        ],
+        "roles": [{"roleCode": "user"}],
+    },
+    {
+        "nickname": "设计-张三",
+        "email": "zhangsan@example.com",
+        "mobilePhone": None,
+        "avatar": None,
+        "gender": None,
+        "username": "zhangsan",
+        "isActive": True,
+        "roles": [{"roleCode": "user"}, {"roleCode": "designer"}],
+    },
+    {
+        "nickname": "产品-李四",
+        "email": "lisi@example.com",
+        "mobilePhone": None,
+        "avatar": None,
+        "gender": None,
+        "username": "lisi",
+        "isActive": True,
+        "roles": [{"roleCode": "user"}, {"roleCode": "product"}],
     },
 ]
 
-# 菜单数据
+# 菜单数据 (权限表)
 INIT_MENUS = [
     {
+        "id": 7,
         "title": "导航",
         "name": "Board_77wyja",
         "code": "board",
@@ -85,6 +113,7 @@ INIT_MENUS = [
         "sort": 1,
         "children": [
             {
+                "id": 8,
                 "title": "仪表板",
                 "name": "AdminDashboard",
                 "code": "admin:dashboard",
@@ -96,6 +125,7 @@ INIT_MENUS = [
                 "sort": 1,
             },
             {
+                "id": 9,
                 "title": "营销数据",
                 "name": "BoardMarketing_wtwmhg",
                 "code": "admin:market",
@@ -109,6 +139,7 @@ INIT_MENUS = [
         ],
     },
     {
+        "id": 10,
         "title": "功能演示",
         "name": "Showcase_k6vovd",
         "code": "showcase",
@@ -119,6 +150,7 @@ INIT_MENUS = [
         "sort": 2,
         "children": [
             {
+                "id": 11,
                 "title": "多级导航",
                 "name": "ShowcaseIndex",
                 "code": "showcase:multilevel",
@@ -129,6 +161,7 @@ INIT_MENUS = [
                 "sort": 1,
                 "children": [
                     {
+                        "id": 12,
                         "title": "导航1",
                         "name": "ShowcaseIndexMultiLevelNav",
                         "code": "showcase:multilevel:nav1",
@@ -140,6 +173,7 @@ INIT_MENUS = [
                         "sort": 1,
                     },
                     {
+                        "id": 13,
                         "title": "导航2",
                         "name": "ShowcaseIndexMultiLevelNav2",
                         "code": "showcase:multilevel:nav2",
@@ -150,6 +184,7 @@ INIT_MENUS = [
                         "sort": 2,
                         "children": [
                             {
+                                "id": 14,
                                 "title": "导航2-1",
                                 "name": "ShowcaseIndexMultiLevelNav21",
                                 "code": "showcase:multilevel:nav2:1",
@@ -161,6 +196,7 @@ INIT_MENUS = [
                                 "sort": 1,
                             },
                             {
+                                "id": 15,
                                 "title": "导航2-2",
                                 "name": "ShowcaseIndexMultiLevelNav22",
                                 "code": "showcase:multilevel:nav2:2",
@@ -176,6 +212,7 @@ INIT_MENUS = [
                 ],
             },
             {
+                "id": 16,
                 "title": "标签页",
                 "name": "ShowcaseTabs",
                 "code": "showcase:tabs",
@@ -187,6 +224,7 @@ INIT_MENUS = [
                 "sort": 2,
             },
             {
+                "id": 17,
                 "title": "页面缓存",
                 "name": "ShowcasePageCache",
                 "code": "showcase:page-cache",
@@ -198,6 +236,7 @@ INIT_MENUS = [
                 "sort": 3,
             },
             {
+                "id": 18,
                 "title": "局部最大化",
                 "name": "ShowcaseMaximize",
                 "code": "showcase:maximize",
@@ -209,6 +248,7 @@ INIT_MENUS = [
                 "sort": 4,
             },
             {
+                "id": 19,
                 "title": "页面水印",
                 "name": "ShowcaseWatermark",
                 "code": "showcase:watermark",
@@ -220,6 +260,7 @@ INIT_MENUS = [
                 "sort": 5,
             },
             {
+                "id": 20,
                 "title": "指令复制、防抖、节流",
                 "name": "ShowcaseDirectives",
                 "code": "showcase:directives",
@@ -231,6 +272,7 @@ INIT_MENUS = [
                 "sort": 6,
             },
             {
+                "id": 21,
                 "title": "页面刷新",
                 "name": "ShowcaseRefresh",
                 "code": "showcase:refresh",
@@ -243,6 +285,7 @@ INIT_MENUS = [
                 "sort": 7,
             },
             {
+                "id": 22,
                 "title": "国际化",
                 "name": "ShowcaseI18nPage",
                 "code": "showcase:i18n",
@@ -254,6 +297,7 @@ INIT_MENUS = [
                 "sort": 8,
             },
             {
+                "id": 23,
                 "title": "页面离开提醒",
                 "name": "ShowcaseRouteConfirmPage",
                 "code": "showcase:route-confirm",
@@ -265,6 +309,7 @@ INIT_MENUS = [
                 "sort": 9,
             },
             {
+                "id": 24,
                 "title": "Mock",
                 "name": "ShowcaseMockPage",
                 "code": "showcase:mock",
@@ -276,6 +321,7 @@ INIT_MENUS = [
                 "sort": 10,
             },
             {
+                "id": 25,
                 "title": "权限管理体系",
                 "name": "ShowcasePermission_fado8p",
                 "code": "permission",
@@ -289,6 +335,7 @@ INIT_MENUS = [
         ],
     },
     {
+        "id": 26,
         "title": "UI组件",
         "name": "Ui_w70fcu",
         "code": "ui",
@@ -300,6 +347,7 @@ INIT_MENUS = [
         "sort": 3,
         "children": [
             {
+                "id": 27,
                 "title": "消息通知 Message",
                 "name": "UiMessage",
                 "code": "ui:message",
@@ -311,6 +359,7 @@ INIT_MENUS = [
                 "sort": 1,
             },
             {
+                "id": 28,
                 "title": "右键菜单 ContextMenu",
                 "name": "UiContextMenu",
                 "code": "ui:context-menu",
@@ -322,6 +371,7 @@ INIT_MENUS = [
                 "sort": 2,
             },
             {
+                "id": 29,
                 "title": "图片预览 Image",
                 "name": "UiImagePreviewPage",
                 "code": "ui:image-preview",
@@ -333,6 +383,7 @@ INIT_MENUS = [
                 "sort": 3,
             },
             {
+                "id": 30,
                 "title": "滚动条 Scrollbar",
                 "name": "UiScrollbarPage",
                 "code": "ui:scrollbar",
@@ -344,6 +395,7 @@ INIT_MENUS = [
                 "sort": 4,
             },
             {
+                "id": 31,
                 "title": "下拉菜单 Dropdown",
                 "name": "UiDropdown",
                 "code": "ui:dropdown",
@@ -355,6 +407,7 @@ INIT_MENUS = [
                 "sort": 5,
             },
             {
+                "id": 32,
                 "title": "弹出信息 Popover",
                 "name": "UiPopoverPage",
                 "code": "ui:popover",
@@ -366,6 +419,7 @@ INIT_MENUS = [
                 "sort": 6,
             },
             {
+                "id": 33,
                 "title": "间距 Space",
                 "name": "UiSpacePage",
                 "code": "ui:space",
@@ -379,6 +433,7 @@ INIT_MENUS = [
         ],
     },
     {
+        "id": 34,
         "title": "主题",
         "name": "Theme_108dko",
         "code": "theme",
@@ -390,6 +445,7 @@ INIT_MENUS = [
         "sort": 4,
         "children": [
             {
+                "id": 35,
                 "title": "主题展示",
                 "name": "ThemeShow",
                 "code": "theme:show",
@@ -401,6 +457,7 @@ INIT_MENUS = [
                 "sort": 1,
             },
             {
+                "id": 36,
                 "title": "主题数据",
                 "name": "ThemeDatas",
                 "code": "theme:datas",
@@ -412,6 +469,7 @@ INIT_MENUS = [
                 "sort": 2,
             },
             {
+                "id": 37,
                 "title": "主题编辑器",
                 "name": "ThemeNaiveuiEditor",
                 "code": "theme:editor",
@@ -425,6 +483,7 @@ INIT_MENUS = [
         ],
     },
     {
+        "id": 38,
         "title": "图片库",
         "name": "ImageManagement_feygps",
         "code": "image:management",
@@ -435,6 +494,7 @@ INIT_MENUS = [
         "sort": 5,
         "children": [
             {
+                "id": 39,
                 "title": "图片库",
                 "name": "ImageManagementIndex",
                 "code": "image:list",
@@ -448,6 +508,7 @@ INIT_MENUS = [
         ],
     },
     {
+        "id": 40,
         "title": "异常页面",
         "name": "Exception_eozq3s",
         "code": "exception",
@@ -459,6 +520,7 @@ INIT_MENUS = [
         "sort": 6,
         "children": [
             {
+                "id": 41,
                 "title": "403",
                 "name": "Exception403",
                 "code": "exception:403",
@@ -470,6 +532,7 @@ INIT_MENUS = [
                 "sort": 1,
             },
             {
+                "id": 42,
                 "title": "404",
                 "name": "Exception404",
                 "code": "exception:404",
@@ -481,6 +544,7 @@ INIT_MENUS = [
                 "sort": 2,
             },
             {
+                "id": 43,
                 "title": "500",
                 "name": "Exception500",
                 "code": "exception:500",
@@ -494,6 +558,7 @@ INIT_MENUS = [
         ],
     },
     {
+        "id": 44,
         "title": "友情链接",
         "name": "Blogroll_mf0sx0",
         "code": "blogroll",
@@ -504,6 +569,7 @@ INIT_MENUS = [
         "sort": 7,
         "children": [
             {
+                "id": 45,
                 "title": "github",
                 "name": "BlogrollGithub",
                 "code": "blogroll:github",
@@ -515,6 +581,7 @@ INIT_MENUS = [
                 "sort": 1,
             },
             {
+                "id": 46,
                 "title": "reka-ui",
                 "name": "BlogrollRekaUi",
                 "code": "blogroll:rekaui",
@@ -526,6 +593,7 @@ INIT_MENUS = [
                 "sort": 2,
             },
             {
+                "id": 47,
                 "title": "shadcn-ui",
                 "name": "BlogrollShadcnUi",
                 "code": "blogroll:shadcnui",
@@ -539,6 +607,7 @@ INIT_MENUS = [
         ],
     },
     {
+        "id": 48,
         "title": "系统管理",
         "name": "System_klc5mo",
         "code": "system",
@@ -549,6 +618,7 @@ INIT_MENUS = [
         "sort": 8,
         "children": [
             {
+                "id": 49,
                 "title": "菜单管理",
                 "name": "SystemMenu_xspi58",
                 "code": "system:menu",
@@ -560,6 +630,7 @@ INIT_MENUS = [
                 "sort": 1,
                 "children": [
                     {
+                        "id": 50,
                         "title": "新增权限",
                         "name": "",
                         "code": "system:menu:create",
@@ -571,6 +642,7 @@ INIT_MENUS = [
                         "query": {},
                     },
                     {
+                        "id": 51,
                         "title": "编辑权限",
                         "name": "",
                         "code": "system:menu:update",
@@ -582,6 +654,7 @@ INIT_MENUS = [
                         "query": {},
                     },
                     {
+                        "id": 52,
                         "title": "删除权限",
                         "name": "",
                         "code": "system:menu:delete",
@@ -593,6 +666,7 @@ INIT_MENUS = [
                         "query": {},
                     },
                     {
+                        "id": 53,
                         "title": "获取权限列表",
                         "name": "",
                         "code": "system:menu:list",
@@ -606,6 +680,7 @@ INIT_MENUS = [
                 ],
             },
             {
+                "id": 54,
                 "title": "角色管理",
                 "name": "SystemRoles",
                 "code": "system:role",
@@ -619,6 +694,7 @@ INIT_MENUS = [
                 "sort": 2,
                 "children": [
                     {
+                        "id": 55,
                         "title": "新增角色",
                         "name": "",
                         "code": "system:roles:create",
@@ -630,6 +706,7 @@ INIT_MENUS = [
                         "query": {},
                     },
                     {
+                        "id": 56,
                         "title": "编辑角色",
                         "name": "",
                         "code": "system:roles:update",
@@ -641,6 +718,7 @@ INIT_MENUS = [
                         "query": {},
                     },
                     {
+                        "id": 57,
                         "title": "删除角色",
                         "name": "",
                         "code": "system:roles:delete",
@@ -652,6 +730,7 @@ INIT_MENUS = [
                         "query": {},
                     },
                     {
+                        "id": 58,
                         "title": "分配菜单权限",
                         "name": "",
                         "code": "system:roles:assign_menus",
@@ -663,6 +742,7 @@ INIT_MENUS = [
                         "query": {},
                     },
                     {
+                        "id": 59,
                         "title": "获取角色列表",
                         "name": "",
                         "code": "system:roles:list",
@@ -676,6 +756,7 @@ INIT_MENUS = [
                 ],
             },
             {
+                "id": 60,
                 "title": "用户管理",
                 "name": "SystemUser",
                 "code": "system:user",
@@ -689,6 +770,7 @@ INIT_MENUS = [
                 "sort": 3,
                 "children": [
                     {
+                        "id": 61,
                         "title": "新增用户",
                         "name": "",
                         "code": "system:users:create",
@@ -700,6 +782,7 @@ INIT_MENUS = [
                         "query": {},
                     },
                     {
+                        "id": 62,
                         "title": "编辑用户",
                         "name": "",
                         "code": "system:users:update",
@@ -711,6 +794,7 @@ INIT_MENUS = [
                         "query": {},
                     },
                     {
+                        "id": 63,
                         "title": "删除用户",
                         "name": "",
                         "code": "system:users:delete",
@@ -722,6 +806,7 @@ INIT_MENUS = [
                         "query": {},
                     },
                     {
+                        "id": 64,
                         "title": "获取用户列表",
                         "name": "",
                         "code": "system:users:list",
@@ -735,6 +820,7 @@ INIT_MENUS = [
                 ],
             },
             {
+                "id": 65,
                 "title": "操作日志",
                 "name": "SystemOperationLog_t4srva",
                 "code": "system:operation-log",

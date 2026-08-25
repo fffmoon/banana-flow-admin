@@ -6,8 +6,8 @@
 - 后端项目名称：`banana-flow-admin-server-py`
 - 部署路径：`/opt/banana-flow-admin-platform`
 - 版本号规范：`v年月日.当日序号.组件标识`
-  - 前端版本示例：`v20260403.1.web`
-  - 后端版本示例：`v20260403.1.server`
+  - 前端版本示例：`v20260522.1.web`
+  - 后端版本示例：`v20260522.1.server`
 
 ## 1. 环境准备
 
@@ -49,7 +49,7 @@
 cd /opt/banana-flow-admin-platform
 
 # 导入数据库镜像
-docker load -i images/database-images.tar
+docker load -i images/database-images.tar.gz
 
 # 导入应用镜像
 docker load -i images/banana-flow-admin-server-py-v20260403.1.server.tar.gz
@@ -115,10 +115,10 @@ docker compose ps
 
 ```bash
 # 查看所有服务实时日志
-docker-compose logs -f
+docker compose logs -f
 
 # 查看特定服务日志
-docker-compose logs -f banana-flow-admin-server-py
+docker compose logs -f banana-flow-admin-server-py
 # 或者直接查看挂载的日志文件
 tail -f server/logs/banana-flow-admin-server.log
 ```
@@ -127,10 +127,10 @@ tail -f server/logs/banana-flow-admin-server.log
 
 ```bash
 # 重启所有服务
-docker-compose restart
+docker compose restart
 
 # 仅重启单个服务，比如前端
-docker-compose restart banana-flow-admin-web-v3
+docker compose restart banana-flow-admin-web-v3
 ```
 
 ### 4.3 更新部署

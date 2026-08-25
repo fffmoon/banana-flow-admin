@@ -1,6 +1,9 @@
+from pathlib import Path
 from typing import List, Optional
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+BASE_DIR = Path(__file__).resolve().parents[2]
 
 
 class Settings(BaseSettings):
@@ -29,7 +32,7 @@ class Settings(BaseSettings):
     DB_HOST: str = "localhost"
     DB_PORT: int = 3306
     DB_USER: str = "root"
-    DB_PASSWORD: str = None
+    DB_PASSWORD: str = ""
     DB_NAME: str = "banana_flow_admin_db"
 
     # JWT 安全配置
@@ -65,7 +68,7 @@ class Settings(BaseSettings):
     I18N_DIR: str = "app/locales"
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=BASE_DIR / ".env",
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore",

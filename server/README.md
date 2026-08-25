@@ -97,7 +97,6 @@ project/
 │   ├── __init__.py
 │   ├── main.py                   # 应用实例和启动文件
 │   ├── core/                     # 核心配置
-│   │   ├── __init__.py
 │   │   ├── config.py             # 配置文件
 │   │   ├── security.py           # 认证安全相关
 │   │   ├── deps.py               # get_redis、get_db
@@ -112,8 +111,9 @@ project/
 │   ├── libs/                     # 存放C库文件
 │   │   └── libgdmifcso.so   
 │   ├── utils/                    # 工具函数
-│   │   ├── __init__.py
 │   │   └── common.py
+│   ├── scripts/                    # 工具函数
+│   │   └── init_db.py              # 初始化数据库脚本
 │   └── tests/                    # 测试文件
 │       ├── __init__.py
 │       ├── conftest.py

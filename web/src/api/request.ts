@@ -5,6 +5,7 @@
  * @LastEditTime: 2025-03-31 10:00:00
  */
 import type { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import fpPromise from '@fingerprintjs/fingerprintjs'
 import { useRequestCacheStore } from '@stores/requestCache'
 import axios from 'axios'
 import CryptoJS from 'crypto-js'
@@ -146,7 +147,7 @@ const service = axios.create({
 
 // --- 请求拦截器 ---
 service.interceptors.request.use(
-  (config: CustomInternalAxiosRequestConfig) => {
+  async (config: CustomInternalAxiosRequestConfig) => {
     const requestCacheStore = useRequestCacheStore()
 
     // 缓存处理 (读取)
@@ -172,6 +173,14 @@ service.interceptors.request.use(
     const userStore = useUserStore()
     if (userStore.getToken && config.headers) {
       config.headers.Authorization = userStore.getToken
+    }
+
+    // 发送唯一设备码
+    const fp = await fpPromise.load()
+    const result = await fp.get()
+    const visitorId = result.visitorId
+    if (config.headers) {
+      config.headers['X-Device-ID'] = visitorId
     }
 
     // 数据格式转换

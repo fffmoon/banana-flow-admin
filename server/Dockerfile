@@ -1,7 +1,7 @@
 # ==========================================
 # 第一阶段：Builder（用于安装依赖和编译）
 # ==========================================
-FROM python:3.10-slim as builder
+FROM python:3.12-slim as builder
 
 WORKDIR /build
 
@@ -25,7 +25,7 @@ RUN pip install --upgrade pip --no-cache-dir -i https://mirrors.aliyun.com/pypi/
 # ==========================================
 # 第二阶段：Runner（最终运行的精简镜像）
 # ==========================================
-FROM python:3.10-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 

@@ -61,6 +61,16 @@ cd banana-flow-admin
 
 *详情见 [前端文档](./web/README.md)*
 
+## 📦 离线镜像打包
+
+Win10 下可在项目根目录一键生成部署镜像包：
+
+```sh
+node scripts/build-images.js
+```
+
+生成文件会输出到 `deploy/images`，详细参数见 [离线镜像制作说明](./deploy/image-create.md)。
+
 
 ## 🧩 项目结构
 

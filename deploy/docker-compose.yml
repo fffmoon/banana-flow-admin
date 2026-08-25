@@ -5,7 +5,6 @@ services:
   # 数据库服务
   # ----------------------------------------
   mysql:
-    container_name: mysql-container
     image: mysql:8.0
     restart: always
     ports:
@@ -24,7 +23,6 @@ services:
       - banana-flow-admin-network
 
   redis:
-    container_name: redis-container
     image: redis:7.0
     restart: always
     ports:

@@ -1,9 +1,11 @@
 import asyncio
 import os
+import shutil
 import sys
+from pathlib import Path
 
 from loguru import logger
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 
 sys.path.append(os.getcwd())
 
@@ -20,13 +22,47 @@ logger.remove()
 logger.add(sys.stderr, level="INFO")
 
 
+def init_seed_images():
+    """同步种子图片到静态资源上传目录"""
+    logger.info("--- 0. 开始检查和同步测试图片 ---")
+
+    SCRIPT_DIR = Path(__file__).resolve().parent
+    PROJECT_ROOT = SCRIPT_DIR.parent.parent
+
+    SEED_IMAGES_DIR = SCRIPT_DIR / "seed_data" / "images"
+    UPLOAD_DIR = PROJECT_ROOT / "static" / "uploads" / "seed"
+
+    # 如果没有种子文件夹，给出提示并跳过
+    if not SEED_IMAGES_DIR.exists():
+        logger.warning(f"种子图片目录不存在，跳过同步: {SEED_IMAGES_DIR}")
+        return
+
+    # 确保目标 uploads 目录存在
+    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+    copied_count = 0
+    # 遍历源目录下的所有图片
+    for img_path in SEED_IMAGES_DIR.iterdir():
+        if img_path.is_file():
+            dest_path = UPLOAD_DIR / img_path.name
+            # 判断目标目录是否已经存在该图片
+            if not dest_path.exists():
+                shutil.copy2(img_path, dest_path)
+                logger.info(f"已复制图片: {img_path.name}")
+                copied_count += 1
+
+    if copied_count > 0:
+        logger.success(f"成功同步了 {copied_count} 张测试图片！")
+    else:
+        logger.info("图片检查完成，无新图片需要同步。")
+
+
 async def init_roles(session):
     """初始化角色"""
-    logger.info("--- 1. 开始检查角色数据 ---")
+    logger.info("--- 2. 开始检查角色数据 ---")
     for role_data in INIT_ROLES:
         r_code = role_data["roleCode"]
 
-        # 检查是否存在
         result = await session.execute(
             select(SysRoleEntity).where(SysRoleEntity.role_code == r_code)
         )
@@ -41,6 +77,16 @@ async def init_roles(session):
                 is_system=role_data.get("isSystem", False),
                 role_level=role_data.get("roleLevel", 10),
             )
+
+            # 建立关联关系
+            menu_ids = role_data.get("menu_ids", [])
+            if menu_ids:
+                menus_result = await session.execute(
+                    select(PermissionsEntity).where(PermissionsEntity.id.in_(menu_ids))
+                )
+                permissions = menus_result.scalars().all()
+                new_role.permissions = list(permissions)
+
             session.add(new_role)
             logger.info(f"新增角色: {role_data['roleName']} ({r_code})")
         else:
@@ -55,17 +101,13 @@ async def init_users(session):
     for user_data in INIT_USERS:
         username = user_data["username"]
 
-        # 检查用户是否存在
         result = await session.execute(
             select(SysUserEntity).where(SysUserEntity.username == username)
         )
         exists_user = result.scalar_one_or_none()
 
         if not exists_user:
-            # 1. 查找该用户需要的角色对象
-            # JSON结构: roles: [{"roleCode": "admin"}]
             target_role_codes = [r["roleCode"] for r in user_data.get("roles", [])]
-
             roles_result = await session.execute(
                 select(SysRoleEntity).where(
                     SysRoleEntity.role_code.in_(target_role_codes)
@@ -78,25 +120,19 @@ async def init_users(session):
                     f"警告: 用户 {username} 需要的角色 {target_role_codes} 在数据库中未找到，将创建无角色用户。"
                 )
 
-            # 2. 创建用户对象
-            # 注意：JSON 里的 mobilePhone -> mobile_phone, isActive -> is_active
             new_user = SysUserEntity(
                 username=username,
                 nickname=user_data["nickname"],
                 email=user_data["email"],
-                # 修正: password -> password_hash
                 password_hash=get_password_hash(settings.ADMIN_PASSWORD),
                 is_active=user_data.get("isActive", True),
                 avatar=user_data.get("avatar"),
                 gender=user_data.get("gender", 0),
                 mobile_phone=user_data.get("mobilePhone"),
-                is_system=True,  # 初始化脚本创建的通常认为是系统用户，可选
+                is_system=True,
             )
 
-            # 3. 关联角色 (Many-to-Many)
-            # SQLAlchemy 会自动处理中间表 sys_user_role 的插入
             new_user.roles = list(roles_db)
-
             session.add(new_user)
             logger.info(f"新增用户: {username}")
         else:
@@ -107,9 +143,8 @@ async def init_users(session):
 
 async def init_menus(session):
     """初始化菜单 (权限表)"""
-    logger.info("--- 3. 开始检查菜单/权限数据 ---")
+    logger.info("--- 1. 开始检查菜单/权限数据 ---")
 
-    # 1. 检查路由表是否有数据
     result = await session.execute(select(func.count()).select_from(PermissionsEntity))
     count = result.scalar()
 
@@ -119,19 +154,18 @@ async def init_menus(session):
 
     logger.info("菜单表为空，开始写入初始化数据...")
 
-    # 递归插入函数
     async def create_menu_recursive(menus_list, parent_id=0):
         for menu_item in menus_list:
-            # 提取 children，不写入当前行
             children = menu_item.get("children", [])
 
-            # 构建模型对象 (字段映射: JSON CamelCase -> Model snake_case)
+            # 添加 id 取值逻辑
             new_menu = PermissionsEntity(
+                id=menu_item.get("id"),
                 parent_id=parent_id,
                 title=menu_item["title"],
-                name=menu_item["name"],
+                name=menu_item.get("name", ""),
                 code=menu_item.get("code"),
-                type=menu_item.get("type", 1),  # 默认为菜单
+                type=menu_item.get("type", 1),
                 path=menu_item.get("path", ""),
                 component_path=menu_item.get("componentPath", ""),
                 icon=menu_item.get("icon"),
@@ -154,14 +188,26 @@ async def init_menus(session):
             session.add(new_menu)
             await session.flush()
 
-            # 递归处理子菜单
             if children:
                 await create_menu_recursive(children, parent_id=new_menu.id)
 
-    # 开始插入
     try:
         await create_menu_recursive(INIT_MENUS, parent_id=0)
         await session.commit()
+
+        # 兼容处理：尝试修复 PostgreSQL 显式插入 ID 后自增序列不同步的问题
+        try:
+            dialect = session.bind.dialect.name
+            if dialect == "postgresql":
+                await session.execute(
+                    text(
+                        "SELECT setval('sys_permissions_id_seq', (SELECT MAX(id) FROM sys_permissions));"
+                    )
+                )
+                await session.commit()
+        except Exception:
+            pass
+
         logger.success("菜单数据初始化完成")
     except Exception as e:
         logger.error(f"菜单初始化失败，正在回滚: {e}")
@@ -172,11 +218,19 @@ async def init_menus(session):
 async def main():
     logger.info(f"🚀 开始初始化数据脚本 - {settings.APP_NAME}")
 
+    # === 优先执行文件操作 ===
+    try:
+        init_seed_images()
+    except Exception as e:
+        # 文件拷贝失败不要阻断数据库的初始化
+        logger.error(f"图片同步发生异常: {e}")
+
+    # === 执行数据库初始化逻辑 ===
     async with AsyncSessionLocal() as session:
         try:
+            await init_menus(session)
             await init_roles(session)
             await init_users(session)
-            await init_menus(session)
 
             logger.success("✅ 所有初始化数据处理完毕！")
         except Exception as e:
